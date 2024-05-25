@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="graphstream-ui">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://E:/Download/gs-ui-swing-master.zip!/gs-ui-swing-master/src" />
+      <root url="jar://E:/Download/gs-ui-swing-master.zip!/gs-ui-swing-master/src-test" />
+    </SOURCES>
+  </library>
+</component>
