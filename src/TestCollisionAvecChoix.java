@@ -20,12 +20,6 @@ public class TestCollisionAvecChoix {
     }
 
     public static void main(String[] args) {
-        //System.out.println(test.getGraph_vol().getNode("AF000090").getAttribute("aeroport_depart_longitude"));
-
-
-        //System.out.println(test.CalculVitesses(test.getGraph_vol().getNode("AF000090"))[1]);
-
-
         ArrayList<Collision> collisions = test.RechercheCollision();
         System.out.println(collisions.size());
         System.out.println(collisions);
