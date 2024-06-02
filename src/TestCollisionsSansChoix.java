@@ -20,6 +20,7 @@ public class TestCollisionsSansChoix {
 
         boolean erreur = false;
 
+
         try {
             vol_test0 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test0.csv");
             vol_test1 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test1.csv");
