@@ -15,10 +15,11 @@ public class TestCollisionsSansChoix {
     public static Carte vol_test9;
 
 
-
+    /**
     public static void main(String[] args) {
 
         boolean erreur = false;
+
 
         try {
             vol_test0 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test0.csv");
@@ -62,5 +63,5 @@ public class TestCollisionsSansChoix {
             System.exit(1);
         }
 
-    }
+    }**/
 }

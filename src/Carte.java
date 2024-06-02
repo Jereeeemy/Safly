@@ -38,8 +38,8 @@ public class Carte {
      * @throws IOException en cas d'erreur de lecture de fichier.
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
-    public Carte(String fichier) throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        graph_vol = new SingleGraph("Carte"+fichier);
+    public Carte(File fichier) throws IOException, ExceptionNoFlight, ExceptionOrientation {
+        graph_vol = new SingleGraph("Carte"+fichier.toString());
         nb_aeroports = 0;
         nb_vols = 0;
         liste_aeroports = this.LireAeroports();
@@ -87,7 +87,7 @@ public class Carte {
     }
 
     /**
-     * Lit les aéroports à partir d'un fichier et les ajoute à la liste des aéroports.
+     * Lit les aéroports à partir d'un fichier par défaut et les ajoute à la liste des aéroports.
      * @return La liste des aéroports.
      * @throws IOException en cas d'erreur de lecture de fichier.
      */
@@ -117,6 +117,41 @@ public class Carte {
         return aeroports;
     }
 
+    /**
+     * Lit les aéroports à partir d'un fichier passé en parametre et les ajoute à la liste des aéroports.
+     * @return La liste des aéroports.
+     * @throws IOException en cas d'erreur de lecture de fichier.
+     */
+    private ArrayList<Aeroport> LireAeroports(File fichier_aeroports) throws IOException, ExceptionOrientation {
+        BufferedReader lecteur = new BufferedReader(new FileReader(fichier_aeroports));
+        String line;
+        ArrayList<Aeroport> aeroports = new ArrayList<>();
+        while ((line = lecteur.readLine()) != null) {
+            StringTokenizer st = new StringTokenizer(line, ";");
+            String code=(st.nextToken());//Code de l'aéroport
+            String nom_ville=(st.nextToken());//Nom de la ville où est présent l'aéroport
+
+            double latitude=(CalculValeur(nom_ville, st.nextToken(),st.nextToken(),st.nextToken(),st.nextToken()));//Latitude de l'aéroport
+
+            double longitude=(CalculValeur(nom_ville, st.nextToken(),st.nextToken(),st.nextToken(),st.nextToken()));//Longitude de l'aéroport
+
+            // Conversion des coordonnées en coordonnées cartésiennes
+            double y = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.cos(longitude*((Math.PI)/180));
+            double x = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.sin(longitude*((Math.PI)/180));
+
+            Aeroport aeroport = new Aeroport(code,nom_ville,x,y);
+            aeroports.add(aeroport);
+            nb_aeroports++;//Incrémentation du compteur d'aéroports
+        }
+        lecteur.close();
+        return aeroports;
+    }
+
+
+
+
+
+
 
     /**
      * Trouve un aéroport par son code.
@@ -139,7 +174,7 @@ public class Carte {
      * @return Le chemin absolu du fichier de vol choisi.
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
-    private String ChoixVol() throws ExceptionNoFlight {
+    private File ChoixVol() throws ExceptionNoFlight {
         Scanner scanner = new Scanner(in);
         File repertoire = new File("data");//Dossier contenant tous les fichiers nécessaires
         File[] files = repertoire.listFiles((dir, name) -> name.endsWith(".csv") && name.startsWith("vol"));// Liste contenant tous les fichiers de vols (qui commencent par "vol-test" et du type ".csv"
@@ -170,7 +205,7 @@ public class Carte {
             }
         }
 
-        return files[choix].getAbsolutePath();
+        return files[choix];
 
     }
 
@@ -183,7 +218,7 @@ public class Carte {
      */
     private ArrayList<Vol> LireVols() throws IOException, ExceptionNoFlight, InputMismatchException {
         ArrayList<Vol> vols = new ArrayList<>();
-        String nomfichier=ChoixVol();//le fichier est choisi grâce à la méthode ChoixVol()
+        File nomfichier= ChoixVol();//le fichier est choisi grâce à la méthode ChoixVol()
         BufferedReader lecteur = new BufferedReader(new FileReader(nomfichier));
         String line;
         while ((line = lecteur.readLine()) != null) {
@@ -198,13 +233,13 @@ public class Carte {
     }
 
     /**
-     * Lit les vols à partir d'un fichier spécifique (Utilisé pour faire des tests plus rapidement).
+     * Lit les vols à partir d'un fichier spécifique passé en paramètre.
      * @param fichier Nom du fichier contenant les informations des vols.
      * @return La liste des vols.
      * @throws IOException en cas d'erreur de lecture de fichier.
      * @throws InputMismatchException en cas d'erreur de format du fichier.
      */
-    private ArrayList<Vol> LireVols(String fichier) throws IOException, ExceptionNoFlight, InputMismatchException {
+    private ArrayList<Vol> LireVols(File fichier) throws IOException, ExceptionNoFlight, InputMismatchException {
         ArrayList<Vol> vols = new ArrayList<>();
         BufferedReader lecteur = new BufferedReader(new FileReader(fichier));
         String line;
