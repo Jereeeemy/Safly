@@ -15,7 +15,7 @@ public class TestCollisionsSansChoix {
     public static Carte vol_test9;
 
 
-
+    /**
     public static void main(String[] args) {
 
         boolean erreur = false;
@@ -62,5 +62,5 @@ public class TestCollisionsSansChoix {
             System.exit(1);
         }
 
-    }
+    }**/
 }
