@@ -45,6 +45,7 @@ public class PageChargerGraphe {
         boutonAccueil.setFocusable(false);
         boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
         boutonAccueil.setBackground(Color.decode("#D9D9D9"));
+        boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         boutonAccueil.addActionListener(new ActionListener() {
             @Override
@@ -84,6 +85,7 @@ public class PageChargerGraphe {
             }
         });
         boutonFichierGraphe.setFocusable(false);
+        boutonFichierGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonFichierGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierGraphe.setForeground(Color.WHITE);
         boutonFichierGraphe.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
@@ -100,6 +102,7 @@ public class PageChargerGraphe {
         boutonTelecharger.setBackground(Color.decode("#696767"));
         boutonTelecharger.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonTelecharger.setForeground(Color.WHITE);
+        boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
         centrePanel1.add(boutonTelecharger);
 
 
@@ -151,6 +154,7 @@ public class PageChargerGraphe {
         boutonColoration.setForeground(Color.WHITE);
         boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonColoration.setPreferredSize(new Dimension(220, 50));
+        boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         boutonColoration.setBackground(Color.decode("#122A47"));
         centrePanel2.add(boutonColoration);
@@ -205,9 +209,11 @@ public class PageChargerGraphe {
                 fenetreGraphe.setLocationRelativeTo(null);
                 fenetreGraphe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 fenetreGraphe.setVisible(true);
+
             }
         });
         boutonAfficherGraphe.setFocusable(false);
+        boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,25));
         boutonAfficherGraphe.setForeground(Color.WHITE);
         boutonAfficherGraphe.setPreferredSize(new Dimension(320, 80));

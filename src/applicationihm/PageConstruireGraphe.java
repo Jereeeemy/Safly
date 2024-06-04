@@ -35,6 +35,7 @@ public class PageConstruireGraphe {
         RoundedButton boutonAccueil = new RoundedButton("Accueil",25);
         boutonAccueil.setFocusable(false);
         boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
+        boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonAccueil.setBackground(Color.decode("#D9D9D9"));
         boutonAccueil.addActionListener(new ActionListener() {
             @Override
@@ -79,6 +80,7 @@ public class PageConstruireGraphe {
         boutonFichierAeroport.setForeground(Color.WHITE);
         boutonFichierAeroport.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         boutonFichierAeroport.setBackground(Color.decode("#696767"));
+        boutonFichierAeroport.setCursor(new Cursor(Cursor.HAND_CURSOR));
         centrePanel1.add(boutonFichierAeroport);
         centrePanel1.add(labelNomFichier);
         RoundedButton boutonFichierVol = new RoundedButton("Importer une liste de vols",50);
@@ -104,6 +106,7 @@ public class PageConstruireGraphe {
         boutonFichierVol.setForeground(Color.WHITE);
         boutonFichierAeroport.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierVol.setBackground(Color.decode("#696767"));
+        boutonFichierVol.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         centrePanel1.add(boutonFichierVol);
         centrePanel1.add(labelListeVol);
@@ -132,11 +135,13 @@ public class PageConstruireGraphe {
         DsaturBouton.setForeground(Color.WHITE);
         DsaturBouton.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         DsaturBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         groupAlgos.add(WelshBouton);
         groupAlgos.add(DsaturBouton);
         WelshBouton.setBackground(Color.decode("#696767"));
         DsaturBouton.setBackground(Color.decode("#696767"));
         WelshBouton.setSelected(true);
+        WelshBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         miniPanelCentral.add(WelshBouton);
         miniPanelCentral.add(DsaturBouton);
         JLabel labelChoixKmax = new JLabel("Choix de K-max :");
@@ -153,7 +158,7 @@ public class PageConstruireGraphe {
         boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,30));
         boutonColoration.setForeground(Color.WHITE);
         boutonColoration.setPreferredSize(new Dimension(400,80));
-        //boutonColoration.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonColoration.setBackground(Color.decode("#122A47"));
         centrePanel2.add(boutonColoration);
 
@@ -209,6 +214,7 @@ public class PageConstruireGraphe {
         boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,30));
         boutonAfficherGraphe.setPreferredSize(new Dimension(320,80));
         boutonAfficherGraphe.setBackground(Color.decode("#122A47"));
+        boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelConstruireBas.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
         panelConstruireBas.add(boutonAfficherGraphe);

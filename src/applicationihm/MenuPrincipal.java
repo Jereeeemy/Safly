@@ -49,6 +49,7 @@ public class MenuPrincipal extends JFrame {
         boutonTheme.setSelected(true);
         boutonTheme.setFont(new Font("Lucida Sans",Font.PLAIN,15));
         boutonTheme.setFocusable(false);
+        boutonTheme.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelHaut.setLayout(new FlowLayout(FlowLayout.RIGHT));
         panelHaut.add(boutonTheme);
         boutonTheme.addActionListener(new ActionListener() {
