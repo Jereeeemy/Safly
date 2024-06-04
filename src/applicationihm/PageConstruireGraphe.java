@@ -68,7 +68,8 @@ public class PageConstruireGraphe {
                     File selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
                     labelNomFichier.setText(fileName);
-                    labelNomFichier.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+                    labelNomFichier.setForeground(Color.BLUE);
+                    labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
                     boutonFichierAeroport.setForeground(Color.GREEN);
                     panelConstruire.revalidate();
                     panelConstruire.repaint();
@@ -93,7 +94,8 @@ public class PageConstruireGraphe {
                    File selectedFile = fileChooser.getSelectedFile();
                    String fileName = selectedFile.getName();
                    labelListeVol.setText(fileName);
-                   labelListeVol.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+                   labelListeVol.setForeground(Color.BLUE);
+                   labelListeVol.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
                    boutonFichierVol.setForeground(Color.GREEN);
                    panelConstruire.revalidate();
                    panelConstruire.repaint();
@@ -169,15 +171,15 @@ public class PageConstruireGraphe {
                 new Object[][]{
                         {"Informations : ", null},
                         {null, null},
-                        {"Noeuds :", 280},
+                        {"Noeuds :", " "+ " "+ 280},
                         {"",null},
-                        {"Arêtes :", 7},
+                        {"Arêtes :", " "+ " "+ 7},
                         {"",null},
-                        {"Degré Moyen :", 6},
+                        {"Degré Moyen :", " "+ " "+ 6},
                         {"",null},
-                        {"Nb Composantes :", 12},
+                        {"Nb Composantes :", " "+ " "+ 12},
                         {"",null},
-                        {"Diamètre", 6},
+                        {"Diamètre", " "+ " "+ 6},
                         {"",null},
 
                 },

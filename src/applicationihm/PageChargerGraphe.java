@@ -68,7 +68,7 @@ public class PageChargerGraphe {
         labelDeposeFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         centrePanel1.add(labelDeposeFichier);
         final JLabel labelNomFichier = new JLabel();
-        RoundedButton boutonFichierGraphe = new RoundedButton("Déposer un fichier de graphe", 90);
+        RoundedButton boutonFichierGraphe = new RoundedButton("Déposer un fichier de graphe", 70);
         boutonFichierGraphe.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -78,7 +78,8 @@ public class PageChargerGraphe {
                     File selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
                     labelNomFichier.setText(fileName);
-                    labelNomFichier.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+                    labelNomFichier.setForeground(Color.BLUE);
+                    labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
                     boutonFichierGraphe.setForeground(Color.GREEN);
                     panelCharger.revalidate();
                     panelCharger.repaint();
@@ -97,7 +98,7 @@ public class PageChargerGraphe {
         labelTelechargerFichier.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         labelTelechargerFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         centrePanel1.add(labelTelechargerFichier);
-        RoundedButton boutonTelecharger = new RoundedButton("Télécharger", 70);
+        RoundedButton boutonTelecharger = new RoundedButton("Télécharger", 50);
         boutonTelecharger.setFocusable(false);
         boutonTelecharger.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
         boutonTelecharger.setBackground(Color.decode("#696767"));
@@ -136,7 +137,9 @@ public class PageChargerGraphe {
         groupAlgos.add(WelshBouton);
         groupAlgos.add(DsaturBouton);
         WelshBouton.setBackground(Color.decode("#696767"));
+        WelshBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         DsaturBouton.setBackground(Color.decode("#696767"));
+        DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         WelshBouton.setSelected(true);
         miniPanelCentral.add(WelshBouton);
         miniPanelCentral.add(DsaturBouton);
@@ -167,15 +170,15 @@ public class PageChargerGraphe {
                 new Object[][]{
                         {"Informations : ", null},
                         {null, null},
-                        {"Noeuds :", 280},
+                        {"Noeuds :", " "+ " "+ 280},
                         {"",null},
-                        {"Arêtes :", 7},
+                        {"Arêtes :", " "+ " "+ 7},
                         {"",null},
-                        {"Degré Moyen :", 6},
+                        {"Degré Moyen :", " "+ " "+ 6},
                         {"",null},
-                        {"Nb Composantes :", 12},
+                        {"Nb Composantes :", " "+ " "+ 12},
                         {"",null},
-                        {"Diamètre", 6},
+                        {"Diamètre", " "+ " "+ 6},
                         {"",null},
 
                 },

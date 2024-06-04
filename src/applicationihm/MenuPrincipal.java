@@ -5,11 +5,12 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 
 public class MenuPrincipal extends JFrame {
     private Image background;
     private final JPanel panelAccueil;
-    private JToggleButton boutonTheme;
+    private final JToggleButton boutonTheme;
 
     public MenuPrincipal() {
         String titre = "Safly";
@@ -17,8 +18,11 @@ public class MenuPrincipal extends JFrame {
         this.setSize(1250, 700);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        background = new ImageIcon(getClass().getResource("/background1.png")).getImage();
+        try {
+            background = new ImageIcon(Objects.requireNonNull(getClass().getResource("/background1.png"))).getImage();
+        }catch(Exception e){
+            setBackground(Color.GRAY);
+        }
         panelAccueil = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -52,12 +56,7 @@ public class MenuPrincipal extends JFrame {
         boutonTheme.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelHaut.setLayout(new FlowLayout(FlowLayout.RIGHT));
         panelHaut.add(boutonTheme);
-        boutonTheme.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setBackgroundImage(background);
-            }
-        });
+        boutonTheme.addActionListener(e -> setBackgroundImage(background));
 
         JLabel texteAccueil = new JLabel("<html><div style:'text-align: center'>Bienvenue sur Safly, l'application de gestion de conflits aériens,<br> vous pouvez effectuer diverses manipulations de graphes <br>en cliquant sur le bouton de votre choix.</div></html>");
         texteAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,26));
@@ -70,11 +69,12 @@ public class MenuPrincipal extends JFrame {
         JPanel panelCentral2Droite = new JPanel();
         panelCentral2Droite.setBackground(Color.decode("#D9D9D9"));
 
-        ImageIcon imageChargerGraphe = new ImageIcon(getClass().getResource("/chargergraphe.png"));
+
+        ImageIcon imageChargerGraphe = new ImageIcon(Objects.requireNonNull(getClass().getResource("/chargergraphe.png")));
         Image imageChargerGrapheScale = imageChargerGraphe.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon IconeCharger = new ImageIcon(imageChargerGrapheScale);
 
-        ImageIcon imageConstruireGraphe = new ImageIcon(getClass().getResource("/construiregraphe.png"));
+        ImageIcon imageConstruireGraphe = new ImageIcon(Objects.requireNonNull(getClass().getResource("/construiregraphe.png")));
         Image imageConstruireGrapheScale = imageConstruireGraphe.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon IconeConstruire = new ImageIcon(imageConstruireGrapheScale);
 
@@ -145,10 +145,10 @@ public class MenuPrincipal extends JFrame {
 
     public void setBackgroundImage(Image backgroundimage) {
         if (!boutonTheme.isSelected()) {
-            background = new ImageIcon(getClass().getResource("/background2.png")).getImage();
+            background = new ImageIcon(Objects.requireNonNull(getClass().getResource("/background2.png"))).getImage();
             panelAccueil.repaint();
         } else {
-            background = new ImageIcon(getClass().getResource("/background1.png")).getImage();
+            background = new ImageIcon(Objects.requireNonNull(getClass().getResource("/background1.png"))).getImage();
             panelAccueil.repaint();
         }
     }
