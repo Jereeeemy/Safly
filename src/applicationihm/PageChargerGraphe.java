@@ -6,6 +6,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 
 public class PageChargerGraphe {
@@ -46,7 +48,6 @@ public class PageChargerGraphe {
         boutonAccueil.setFocusable(false);
         boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
         boutonAccueil.setBackground(Color.decode("#D9D9D9"));
-        boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         boutonAccueil.addActionListener(new ActionListener() {
             @Override
@@ -56,6 +57,36 @@ public class PageChargerGraphe {
                 menuPrincipal.repaint();
             }
         });
+
+        boutonAccueil.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                menuPrincipal.setContentPane(menuPrincipal.getPanelAccueil());
+                menuPrincipal.revalidate();
+                menuPrincipal.repaint();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonAccueil.setBackground(Color.GRAY);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonAccueil.setBackground(Color.decode("#D9D9D9"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonAccueil.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+
         panelChargerHaut.add(boutonAccueil, BorderLayout.CENTER);
         panelChargerHaut.setLayout(new FlowLayout(FlowLayout.CENTER));
 
@@ -72,6 +103,13 @@ public class PageChargerGraphe {
         boutonFichierGraphe.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        boutonFichierGraphe.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(panelCharger);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -80,14 +118,32 @@ public class PageChargerGraphe {
                     labelNomFichier.setText(fileName);
                     labelNomFichier.setForeground(Color.BLUE);
                     labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
-                    boutonFichierGraphe.setForeground(Color.GREEN);
+                    boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
                     panelCharger.revalidate();
                     panelCharger.repaint();
                 }
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonFichierGraphe.setBackground(Color.decode("#472F12"));
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonFichierGraphe.setBackground(Color.decode("#696767"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonAccueil.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         });
         boutonFichierGraphe.setFocusable(false);
-        boutonFichierGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonFichierGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierGraphe.setForeground(Color.WHITE);
         boutonFichierGraphe.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
@@ -184,6 +240,7 @@ public class PageChargerGraphe {
                 },
                 new String[]{"Informations Graphe :", null}
         ));
+
         tableauInfoGraphe.setGridColor(Color.DARK_GRAY);
         tableauInfoGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,18));
         tableauInfoGraphe.setForeground(Color.WHITE);

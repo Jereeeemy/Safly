@@ -5,6 +5,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Objects;
 
 public class MenuPrincipal extends JFrame {
@@ -98,22 +100,64 @@ public class MenuPrincipal extends JFrame {
         boutonConstruireGraphe.setVerticalTextPosition(SwingConstants.BOTTOM);
         boutonConstruireGraphe.setPreferredSize(new Dimension(250, 200));
         boutonConstruireGraphe.setContentAreaFilled(false);
-        boutonConstruireGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        boutonChargerGraphe.addActionListener(new ActionListener() {
+
+        boutonChargerGraphe.addMouseListener(new MouseListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 setContentPane(new PageChargerGraphe(MenuPrincipal.this).getPanel());
                 revalidate();
                 repaint();
             }
-        });
-        boutonConstruireGraphe.addActionListener(new ActionListener() {
+
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mousePressed(MouseEvent e) {
+                boutonChargerGraphe.setBackground(Color.DARK_GRAY);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonChargerGraphe.setBackground(Color.decode("#696767"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonChargerGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonChargerGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+
+        boutonConstruireGraphe.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
                 setContentPane(new PageConstruireGraphe(MenuPrincipal.this).getPanel());
                 revalidate();
                 repaint();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonConstruireGraphe.setBackground(Color.DARK_GRAY);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonConstruireGraphe.setBackground(Color.decode("#696767"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonConstruireGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonConstruireGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
 
