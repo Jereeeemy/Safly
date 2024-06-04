@@ -42,6 +42,7 @@ public class PageChargerGraphe {
         panelChargerBas.setOpaque(false);
 
         RoundedButton boutonAccueil = new RoundedButton("Accueil", 25);
+        boutonAccueil.setFocusable(false);
         boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
         boutonAccueil.setBackground(Color.decode("#D9D9D9"));
 
@@ -76,12 +77,13 @@ public class PageChargerGraphe {
                     String fileName = selectedFile.getName();
                     labelNomFichier.setText(fileName);
                     labelNomFichier.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+                    boutonFichierGraphe.setForeground(Color.GREEN);
                     panelCharger.revalidate();
                     panelCharger.repaint();
                 }
             }
         });
-
+        boutonFichierGraphe.setFocusable(false);
         boutonFichierGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierGraphe.setForeground(Color.WHITE);
         boutonFichierGraphe.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
@@ -93,6 +95,7 @@ public class PageChargerGraphe {
         labelTelechargerFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         centrePanel1.add(labelTelechargerFichier);
         RoundedButton boutonTelecharger = new RoundedButton("Télécharger", 70);
+        boutonTelecharger.setFocusable(false);
         boutonTelecharger.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
         boutonTelecharger.setBackground(Color.decode("#696767"));
         boutonTelecharger.setFont(new Font("Lucida Sans",Font.PLAIN,20));
@@ -118,10 +121,12 @@ public class PageChargerGraphe {
         ButtonGroup groupAlgos = new ButtonGroup();
         JRadioButton WelshBouton = new JRadioButton("Welsh & Powell");
         WelshBouton.setForeground(Color.WHITE);
+        WelshBouton.setFocusable(false);
         WelshBouton.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         WelshBouton.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         JRadioButton DsaturBouton = new JRadioButton("D-Satur");
         DsaturBouton.setForeground(Color.WHITE);
+        DsaturBouton.setFocusable(false);
         DsaturBouton.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         DsaturBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         groupAlgos.add(WelshBouton);
@@ -142,6 +147,7 @@ public class PageChargerGraphe {
         miniPanelCentral.setBackground(Color.decode("#696767"));
         centrePanel2.add(miniPanelCentral);
         RoundedButton boutonColoration = new RoundedButton("Effectuer la coloration", 50);
+        boutonColoration.setFocusable(false);
         boutonColoration.setForeground(Color.WHITE);
         boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonColoration.setPreferredSize(new Dimension(220, 50));
@@ -201,6 +207,7 @@ public class PageChargerGraphe {
                 fenetreGraphe.setVisible(true);
             }
         });
+        boutonAfficherGraphe.setFocusable(false);
         boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,25));
         boutonAfficherGraphe.setForeground(Color.WHITE);
         boutonAfficherGraphe.setPreferredSize(new Dimension(320, 80));

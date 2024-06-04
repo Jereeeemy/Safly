@@ -18,9 +18,7 @@ public class MenuPrincipal extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-
         background = new ImageIcon(getClass().getResource("/background1.png")).getImage();
-
         panelAccueil = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -50,6 +48,7 @@ public class MenuPrincipal extends JFrame {
         boutonTheme.setBackground(Color.decode("#696767"));
         boutonTheme.setSelected(true);
         boutonTheme.setFont(new Font("Lucida Sans",Font.PLAIN,15));
+        boutonTheme.setFocusable(false);
         panelHaut.setLayout(new FlowLayout(FlowLayout.RIGHT));
         panelHaut.add(boutonTheme);
         boutonTheme.addActionListener(new ActionListener() {
@@ -80,10 +79,12 @@ public class MenuPrincipal extends JFrame {
 
         RoundedButton boutonChargerGraphe = new RoundedButton("Charger un graphe", 25 ,IconeCharger);
         boutonChargerGraphe.setBackground(Color.decode("#696767"));
+        boutonChargerGraphe.setFocusable(false);
         boutonChargerGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonChargerGraphe.setForeground(Color.WHITE);
         RoundedButton boutonConstruireGraphe = new RoundedButton("Construire un graphe", 25 ,IconeConstruire);
         boutonConstruireGraphe.setBackground(Color.decode("#696767"));
+        boutonConstruireGraphe.setFocusable(false);
         boutonConstruireGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonConstruireGraphe.setForeground(Color.WHITE);
         boutonChargerGraphe.setHorizontalTextPosition(SwingConstants.CENTER);

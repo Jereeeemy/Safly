@@ -33,6 +33,7 @@ public class PageConstruireGraphe {
         panelConstruireBas.setOpaque(false);
 
         RoundedButton boutonAccueil = new RoundedButton("Accueil",25);
+        boutonAccueil.setFocusable(false);
         boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
         boutonAccueil.setBackground(Color.decode("#D9D9D9"));
         boutonAccueil.addActionListener(new ActionListener() {
@@ -67,12 +68,13 @@ public class PageConstruireGraphe {
                     String fileName = selectedFile.getName();
                     labelNomFichier.setText(fileName);
                     labelNomFichier.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+                    boutonFichierAeroport.setForeground(Color.GREEN);
                     panelConstruire.revalidate();
                     panelConstruire.repaint();
                 }
             }
         });
-
+        boutonFichierAeroport.setFocusable(false);
         boutonFichierAeroport.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierAeroport.setForeground(Color.WHITE);
         boutonFichierAeroport.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
@@ -90,13 +92,14 @@ public class PageConstruireGraphe {
                    String fileName = selectedFile.getName();
                    labelListeVol.setText(fileName);
                    labelListeVol.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+                   boutonFichierVol.setForeground(Color.GREEN);
                    panelConstruire.revalidate();
                    panelConstruire.repaint();
 
                }
            }
         });
-
+        boutonFichierVol.setFocusable(false);
         boutonFichierVol.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         boutonFichierVol.setForeground(Color.WHITE);
         boutonFichierAeroport.setFont(new Font("Lucida Sans",Font.PLAIN,20));
@@ -146,6 +149,7 @@ public class PageConstruireGraphe {
         miniPanelCentral.setBackground(Color.decode("#696767"));
         centrePanel2.add(miniPanelCentral);
         RoundedButton boutonColoration = new RoundedButton("Effectuer la coloration",50);
+        boutonColoration.setFocusable(false);
         boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,30));
         boutonColoration.setForeground(Color.WHITE);
         boutonColoration.setPreferredSize(new Dimension(400,80));
@@ -200,6 +204,7 @@ public class PageConstruireGraphe {
                 fenetreGraphe.setVisible(true);
             }
         });
+        boutonAfficherGraphe.setFocusable(false);
         boutonAfficherGraphe.setForeground(Color.WHITE);
         boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,30));
         boutonAfficherGraphe.setPreferredSize(new Dimension(320,80));
