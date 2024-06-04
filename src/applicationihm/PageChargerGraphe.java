@@ -126,7 +126,7 @@ public class PageChargerGraphe {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                boutonFichierGraphe.setBackground(Color.decode("#472F12"));
+                boutonFichierGraphe.setBackground(Color.DARK_GRAY);
             }
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -143,6 +143,7 @@ public class PageChargerGraphe {
                 boutonAccueil.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
+
         boutonFichierGraphe.setFocusable(false);
         boutonFichierGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierGraphe.setForeground(Color.WHITE);
@@ -217,6 +218,33 @@ public class PageChargerGraphe {
         boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         boutonColoration.setBackground(Color.decode("#122A47"));
+        boutonColoration.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonColoration.setBackground(Color.decode("#2C5789"));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonColoration.setBackground(Color.decode("#122A47"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonColoration.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+
         centrePanel2.add(boutonColoration);
 
         JPanel centrePanel3 = new JPanel();
@@ -236,7 +264,6 @@ public class PageChargerGraphe {
                         {"",null},
                         {"Diamètre", " "+ " "+ 6},
                         {"",null},
-
                 },
                 new String[]{"Informations Graphe :", null}
         ));
@@ -271,20 +298,36 @@ public class PageChargerGraphe {
         panelChargerCentre.add(centrePanelContainer, BorderLayout.CENTER);
 
         RoundedButton boutonAfficherGraphe = new RoundedButton("Afficher le Graphe", 90);
-        boutonAfficherGraphe.addActionListener(new ActionListener() {
+        boutonAfficherGraphe.addMouseListener(new MouseListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 JFrame fenetreGraphe = new JFrame();
                 fenetreGraphe.setTitle("Graphe");
                 fenetreGraphe.setSize(750, 700);
                 fenetreGraphe.setLocationRelativeTo(null);
                 fenetreGraphe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 fenetreGraphe.setVisible(true);
+            }
 
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonAfficherGraphe.setBackground(Color.decode("#2C5789"));
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonAfficherGraphe.setBackground(Color.decode("#122A47"));
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonAfficherGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
+
         boutonAfficherGraphe.setFocusable(false);
-        boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,25));
         boutonAfficherGraphe.setForeground(Color.WHITE);
         boutonAfficherGraphe.setPreferredSize(new Dimension(320, 80));
