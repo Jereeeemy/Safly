@@ -1,6 +1,7 @@
 package applicationihm;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -164,19 +165,29 @@ public class PageChargerGraphe {
         JTable tableauInfoGraphe = new JTable();
         tableauInfoGraphe.setModel(new DefaultTableModel(
                 new Object[][]{
-                        {"Noeuds :", null},
-                        {"Arêtes :", null},
-                        {"Degré Moyen :", null},
-                        {"Nb Composantes :", null},
-                        {"Diamètre", null}
+                        {"Informations : ", null},
+                        {null, null},
+                        {"Noeuds :", 280},
+                        {"",null},
+                        {"Arêtes :", 7},
+                        {"",null},
+                        {"Degré Moyen :", 6},
+                        {"",null},
+                        {"Nb Composantes :", 12},
+                        {"",null},
+                        {"Diamètre", 6},
+                        {"",null},
+
                 },
                 new String[]{"Informations Graphe :", null}
         ));
-        tableauInfoGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,10));
+        tableauInfoGraphe.setGridColor(Color.DARK_GRAY);
+        tableauInfoGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,18));
         tableauInfoGraphe.setForeground(Color.WHITE);
         tableauInfoGraphe.setBackground(Color.decode("#696767"));
-        tableauInfoGraphe.setShowGrid(false);
-        tableauInfoGraphe.setPreferredSize(new Dimension(150, 200));
+        tableauInfoGraphe.setShowVerticalLines(true);
+        tableauInfoGraphe.setShowHorizontalLines(false);
+        tableauInfoGraphe.setPreferredSize(new Dimension(250, 300));
         tableauInfoGraphe.setRowHeight(tableauInfoGraphe.getRowHeight() + 10);
         tableauInfoGraphe.getColumnModel().getColumn(0).setPreferredWidth(200);
         tableauInfoGraphe.setEnabled(false);
