@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.util.InputMismatchException;
+package gestioncollisions;
 
 
 public class TestCollisionsSansChoix {
@@ -22,19 +21,19 @@ public class TestCollisionsSansChoix {
 
 
         try {
-            vol_test0 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test0.csv");
-            vol_test1 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test1.csv");
-            vol_test2 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test2.csv");
-            vol_test3 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test3.csv");
-            vol_test4 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test4.csv");
-            vol_test5 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test5.csv");
-            vol_test6 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test6.csv");
-            vol_test7 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test7.csv");
-            vol_test8 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test8.csv");
-            vol_test9 = new Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test9.csv");
+            vol_test0 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test0.csv");
+            vol_test1 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test1.csv");
+            vol_test2 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test2.csv");
+            vol_test3 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test3.csv");
+            vol_test4 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test4.csv");
+            vol_test5 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test5.csv");
+            vol_test6 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test6.csv");
+            vol_test7 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test7.csv");
+            vol_test8 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test8.csv");
+            vol_test9 = new gestioncollisions.Carte("D:/JAVA/SAE_JAVA_2024/data/vol-test9.csv");
 
         }
-        catch (IOException | ExceptionNoFlight | ExceptionOrientation e) {
+        catch (IOException | gestioncollisions.ExceptionNoFlight | gestioncollisions.ExceptionOrientation e) {
             System.out.println(e.getMessage());
             System.exit(1);
         }

@@ -1,3 +1,5 @@
+package gestioncollisions;
+
 /**
  * Exception levée lorsque aucun fichier de vol n'est disponible dans le répertoire.
  */

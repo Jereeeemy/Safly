@@ -242,7 +242,7 @@ public class PageConstruireGraphe {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JFrame fenetreGraphe = new JFrame();
-                fenetreGraphe.setTitle("Carte");
+                fenetreGraphe.setTitle("gestioncollisions.Carte");
                 fenetreGraphe.setSize(750, 700);
                 fenetreGraphe.setLocationRelativeTo(null);
                 fenetreGraphe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

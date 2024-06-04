@@ -1,7 +1,6 @@
 package applicationihm;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,9 +8,24 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
+
+import gestioncollisions.CreateurGraph;
+import gestioncollisions.ExceptionNoGraphVol;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;
+    private CreateurGraph test;
+    public File selectedFile;
+
+    {
+        try {
+            test = new CreateurGraph();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public PageChargerGraphe(MenuPrincipal menuPrincipal) {
 
@@ -100,12 +114,7 @@ public class PageChargerGraphe {
         centrePanel1.add(labelDeposeFichier);
         final JLabel labelNomFichier = new JLabel();
         RoundedButton boutonFichierGraphe = new RoundedButton("Déposer un fichier de graphe", 70);
-        boutonFichierGraphe.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
-            }
-        });
 
         boutonFichierGraphe.addMouseListener(new MouseListener() {
             @Override
@@ -113,7 +122,7 @@ public class PageChargerGraphe {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(panelCharger);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
+                    selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
                     labelNomFichier.setText(fileName);
                     labelNomFichier.setForeground(Color.BLUE);
@@ -301,12 +310,14 @@ public class PageChargerGraphe {
         boutonAfficherGraphe.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JFrame fenetreGraphe = new JFrame();
-                fenetreGraphe.setTitle("Graphe");
-                fenetreGraphe.setSize(750, 700);
-                fenetreGraphe.setLocationRelativeTo(null);
-                fenetreGraphe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                fenetreGraphe.setVisible(true);
+                File chemin = null;
+                chemin = selectedFile;
+                try {
+                    test = new CreateurGraph(chemin);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                test.getGraph().display();
             }
 
             @Override

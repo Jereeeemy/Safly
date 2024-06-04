@@ -1,3 +1,5 @@
+package gestioncollisions;
+
 import applicationihm.MenuPrincipal;
 
 import java.io.IOException;

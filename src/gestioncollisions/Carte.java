@@ -1,3 +1,4 @@
+package gestioncollisions;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -25,7 +26,7 @@ public class Carte {
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
     public Carte() throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        graph_vol = new SingleGraph("Carte");
+        graph_vol = new SingleGraph("gestioncollisions.Carte");
         nb_aeroports = 0;
         nb_vols = 0;
         liste_aeroports = this.LireAeroports();
@@ -39,14 +40,14 @@ public class Carte {
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
     public Carte(File fichier) throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        graph_vol = new SingleGraph("Carte"+fichier.toString());
+        graph_vol = new SingleGraph("gestioncollisions.Carte"+fichier.toString());
         nb_aeroports = 0;
         nb_vols = 0;
         liste_aeroports = this.LireAeroports();
         liste_vols = this.LireVols(fichier);
     }
 
-    // Getters pour les attributs de la classe Carte.
+    // Getters pour les attributs de la classe gestioncollisions.Carte.
     public Graph getGraph_vol() {
         return this.graph_vol;
     }
@@ -355,17 +356,17 @@ public class Carte {
                 intersectionY = vol1.depart.y + t * (vol1.arrivee.y - vol1.depart.y);
                 reponse[0] = intersectionX;
                 reponse[1] = intersectionY;
-                reponse[2] = 1.00; // Collision potentielle détectée
+                reponse[2] = 1.00; // gestioncollisions.Collision potentielle détectée
             }
         }
         else if (aeroports_inverses) { // Les vols sont colinéaires et se dirigent en sens opposés
             if ((v1_part_avant_v2 && v2_part_avant_v1_arrive) || (v2_part_avant_v1 && v1_part_avant_v2_arrive) || v1dec_meme_v2dec) {
-                reponse[2] = 2.00; // Collision spéciale détectée
+                reponse[2] = 2.00; // gestioncollisions.Collision spéciale détectée
             }
         }
         else if (meme_depart && meme_arrivee) { // Les vols sont colinéaires et vont dans la même direction
             if ((v1_part_avant_v2 && v2_arrive_avant_v1) || (v2_part_avant_v1 && v1_arrive_avant_v2) || diff_dec < temps_collision || diff_att < temps_collision) {
-                reponse[2] = 2.00; // Collision spéciale détectée
+                reponse[2] = 2.00; // gestioncollisions.Collision spéciale détectée
             }
         }
 

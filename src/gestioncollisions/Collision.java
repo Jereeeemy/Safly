@@ -1,3 +1,5 @@
+package gestioncollisions;
+
 /**
  * Classe représentant une collision entre un vol et un autre.
  */
