@@ -1,3 +1,5 @@
+import applicationihm.MenuPrincipal;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -20,6 +22,8 @@ public class TestCollisionAvecChoix {
     }
 
     public static void main(String[] args) {
+        MenuPrincipal fenetrePrincipale = new MenuPrincipal();
+        fenetrePrincipale.setVisible(true);
         ArrayList<Collision> collisions = test.RechercheCollision();
         System.out.println(collisions.size());
         System.out.println(collisions);
