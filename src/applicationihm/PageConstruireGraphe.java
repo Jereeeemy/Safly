@@ -8,9 +8,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
+
+import gestioncollisions.*;
+import org.graphstream.ui.swingViewer.Viewer;
 
 public class PageConstruireGraphe {
     private final JPanel panelConstruire;
+    public File selectedFile;
+
+    private Carte map;
 
     public PageConstruireGraphe(MenuPrincipal menuPrincipal) {
         Image background = menuPrincipal.getBackgroundImage();
@@ -67,12 +74,22 @@ public class PageConstruireGraphe {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(panelConstruire);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
+                    selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
                     labelNomFichier.setText(fileName);
                     labelNomFichier.setForeground(Color.BLUE);
                     labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
                     boutonFichierAeroport.setForeground(Color.GREEN);
+                    try {
+                        map = new Carte(selectedFile);
+
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ExceptionNoFlight ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ExceptionOrientation ex) {
+                        throw new RuntimeException(ex);
+                    }
                     panelConstruire.revalidate();
                     panelConstruire.repaint();
                 }

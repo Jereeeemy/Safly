@@ -12,11 +12,14 @@ import java.io.IOException;
 
 import gestioncollisions.CreateurGraph;
 import gestioncollisions.ExceptionNoGraphVol;
+import org.graphstream.ui.swingViewer.Viewer;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;
     private CreateurGraph test;
     public File selectedFile;
+
+
 
     {
         try {
@@ -45,6 +48,21 @@ public class PageChargerGraphe {
         JSeparator sepa2 = new JSeparator(SwingConstants.VERTICAL);
         sepa2.setBackground(Color.GRAY);
 
+        /*
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu menu = new JMenu("Options");
+        JMenuItem ItemReinit = new JMenuItem("Réinitialiser");
+        ItemReinit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PageChargerGraphe nouvellePage = new PageChargerGraphe(menuPrincipal);
+            }
+        });
+        menu.add(ItemReinit);
+        menuBar.add(menu);
+        menuPrincipal.setJMenuBar(menuBar);
+        */
 
         panelCharger.setLayout(new BorderLayout(60,45));
 
@@ -173,6 +191,31 @@ public class PageChargerGraphe {
         boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
         centrePanel1.add(boutonTelecharger);
 
+        boutonTelecharger.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (selectedFile == null) {
+                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonTelecharger.setBackground(Color.DARK_GRAY);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonTelecharger.setBackground(Color.decode("#696767"));
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonTelecharger.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
 
         JPanel centrePanel2 = new JPanel();
         centrePanel2.setLayout(new BoxLayout(centrePanel2, BoxLayout.PAGE_AXIS));
@@ -230,7 +273,10 @@ public class PageChargerGraphe {
         boutonColoration.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                if (selectedFile == null) {
+                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
             }
 
             @Override
@@ -310,16 +356,19 @@ public class PageChargerGraphe {
         boutonAfficherGraphe.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (selectedFile == null) {
+                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 File chemin = null;
                 chemin = selectedFile;
                 try {
                     test = new CreateurGraph(chemin);
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    JOptionPane.showMessageDialog(null,"Erreur lors de la lecture du fichier ! Vérifiez que le fichier fourni est correct.","erreur",JOptionPane.ERROR_MESSAGE);
                 }
                 test.getGraph().display();
             }
-
             @Override
             public void mousePressed(MouseEvent e) {
                 boutonAfficherGraphe.setBackground(Color.decode("#2C5789"));
@@ -356,6 +405,7 @@ public class PageChargerGraphe {
         panelCharger.add(paneldroite, BorderLayout.EAST);
         panelCharger.add(panelChargerBas,BorderLayout.SOUTH);
     }
+
 
     private static JSpinner getSpinnerKMax() {
         JSpinner spinnerKMax = new JSpinner();
