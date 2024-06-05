@@ -1,24 +1,37 @@
 package applicationihm;
 
+import collisions.Aeroport;
 import collisions.Carte;
 import collisions.ExceptionNoFlight;
 import collisions.ExceptionOrientation;
 
+import java.util.HashSet;
+import java.util.List;
 import javax.swing.*;
+import java.awt.Image;
+import java.awt.Cursor;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Font;
+
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Set;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
-import org.jxmapviewer.viewer.Waypoint;
+import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 
 
@@ -87,6 +100,7 @@ public class PageConstruireGraphe {
                     String fileName = selectedFile.getName();
                     try {
                         map.setListe_aeroports(selectedFile);
+                        System.out.println(map.getListe_aeroports());
                     } catch (ExceptionOrientation ex) {
                         throw new RuntimeException(ex);
                     } catch (IOException ex) {
@@ -137,6 +151,7 @@ public class PageConstruireGraphe {
                int returnValue = fileChooser.showOpenDialog(panelConstruire);
                if (returnValue == JFileChooser.APPROVE_OPTION) {
                    File selectedFile = fileChooser.getSelectedFile();
+
                    String fileName = selectedFile.getName();
                    labelListeVol.setText(fileName);
                    labelListeVol.setForeground(Color.BLUE);
@@ -378,6 +393,21 @@ public class PageConstruireGraphe {
         GeoPosition france = new GeoPosition(46.603354, 1.888334);
         mapViewer.setZoom(5);
         mapViewer.setAddressLocation(france);
+
+
+        Set<DefaultWaypoint> airportWaypoints = new HashSet<>();
+        for (Aeroport aeroport : map.getListe_aeroports()) {
+            GeoPosition position = new GeoPosition(aeroport.getLatitude(), aeroport.getLongitude());
+            airportWaypoints.add(new DefaultWaypoint(position));
+        }
+
+        // Créer un WaypointPainter et ajouter les Waypoints
+        WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<>();
+        waypointPainter.setWaypoints(airportWaypoints);
+
+        // Ajouter les marqueurs à la carte
+        mapViewer.setOverlayPainter(waypointPainter);
+
         // Ajouter le JXMapViewer à la fenêtre
         fenetreCarte.getContentPane().add(mapViewer);
         fenetreCarte.setVisible(true);

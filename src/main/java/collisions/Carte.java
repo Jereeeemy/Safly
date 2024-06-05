@@ -152,7 +152,7 @@ public class Carte {
             double y = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.cos(longitude*((Math.PI)/180));
             double x = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.sin(longitude*((Math.PI)/180));
 
-            Aeroport aeroport = new Aeroport(code,nom_ville,x,y);
+            Aeroport aeroport = new Aeroport(code,nom_ville,x,y,latitude,longitude);
             aeroports.add(aeroport);
             nb_aeroports++;//Incrémentation du compteur d'aéroports
         }
