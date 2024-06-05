@@ -1,3 +1,5 @@
+package gestioncollisions;
+
 public class Vol {
     String code;
     Aeroport depart;

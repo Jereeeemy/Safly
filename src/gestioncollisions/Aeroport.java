@@ -1,3 +1,5 @@
+package gestioncollisions;
+
 /**
  * Classe représentant un aéroport avec son code, la ville où il est situé, et ses coordonnées.
  */
@@ -21,7 +23,7 @@ public class Aeroport {
         this.y = y;
     }
 
-    // Getters et setters pour les attributs de la classe Aeroport.
+    // Getters et setters pour les attributs de la classe gestioncollisions.Aeroport.
 
     public String getCode() {
         return code;

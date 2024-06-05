@@ -1,3 +1,5 @@
+package gestioncollisions;
+
 /**
  * Exception levée lorsque l'orientation n'est ni "N" ni "S" ni "O" ni "E"
  */

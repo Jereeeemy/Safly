@@ -5,10 +5,26 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.IOException;
+/*
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.viewer.DefaultTileFactory;
+import org.jxmapviewer.viewer.GeoPosition;
+import org.jxmapviewer.viewer.TileFactoryInfo;
+import org.jxmapviewer.viewer.Waypoint;
+import org.jxmapviewer.viewer.WaypointPainter;
+*/
+import gestioncollisions.*;
+import org.graphstream.ui.swingViewer.Viewer;
 
 public class PageConstruireGraphe {
     private final JPanel panelConstruire;
+    public File selectedFile;
+
+    private Carte map;
 
     public PageConstruireGraphe(MenuPrincipal menuPrincipal) {
         Image background = menuPrincipal.getBackgroundImage();
@@ -65,12 +81,22 @@ public class PageConstruireGraphe {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(panelConstruire);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
+                    selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
                     labelNomFichier.setText(fileName);
                     labelNomFichier.setForeground(Color.BLUE);
                     labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
                     boutonFichierAeroport.setForeground(Color.GREEN);
+                    try {
+                        map = new Carte(selectedFile);
+
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ExceptionNoFlight ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ExceptionOrientation ex) {
+                        throw new RuntimeException(ex);
+                    }
                     panelConstruire.revalidate();
                     panelConstruire.repaint();
                 }
@@ -160,8 +186,32 @@ public class PageConstruireGraphe {
         boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,30));
         boutonColoration.setForeground(Color.WHITE);
         boutonColoration.setPreferredSize(new Dimension(400,80));
-        boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonColoration.setBackground(Color.decode("#122A47"));
+        boutonColoration.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonColoration.setBackground(Color.decode("#2C5789"));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonColoration.setBackground(Color.decode("#122A47"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonColoration.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
         centrePanel2.add(boutonColoration);
 
         JPanel centrePanel3 = new JPanel();
@@ -211,23 +261,44 @@ public class PageConstruireGraphe {
 
 
         RoundedButton boutonAfficherGraphe = new RoundedButton("Afficher la carte",90);
-        boutonAfficherGraphe.addActionListener(new ActionListener() {
+
+        boutonAfficherGraphe.addMouseListener(new MouseListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 JFrame fenetreGraphe = new JFrame();
-                fenetreGraphe.setTitle("Carte");
+                fenetreGraphe.setTitle("gestioncollisions.Carte");
                 fenetreGraphe.setSize(750, 700);
                 fenetreGraphe.setLocationRelativeTo(null);
                 fenetreGraphe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 fenetreGraphe.setVisible(true);
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonAfficherGraphe.setBackground(Color.decode("#2C5789"));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonAfficherGraphe.setBackground(Color.decode("#122A47"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonAfficherGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         });
+
         boutonAfficherGraphe.setFocusable(false);
         boutonAfficherGraphe.setForeground(Color.WHITE);
         boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,30));
         boutonAfficherGraphe.setPreferredSize(new Dimension(320,80));
         boutonAfficherGraphe.setBackground(Color.decode("#122A47"));
-        boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelConstruireBas.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
         panelConstruireBas.add(boutonAfficherGraphe);
@@ -241,6 +312,10 @@ public class PageConstruireGraphe {
         panelConstruire.add(panelConstruireCentre,BorderLayout.CENTER);
         panelConstruire.add(paneldroite,BorderLayout.EAST);
         panelConstruire.add(panelConstruireBas, BorderLayout.SOUTH);
+    }
+
+    private void initCarteFrance(){
+
     }
 
     private static JSpinner getSpinnerKMax() {
