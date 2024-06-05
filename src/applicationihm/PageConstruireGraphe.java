@@ -89,8 +89,8 @@ public class PageConstruireGraphe {
                     labelNomFichier.setForeground(Color.BLUE);
                     labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
                     boutonFichierAeroport.setForeground(Color.GREEN);
-                    try {
-                        map = new Carte(selectedFile);
+                    /*try {
+                        //map = new Carte(selectedFile);
 
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -98,7 +98,7 @@ public class PageConstruireGraphe {
                         throw new RuntimeException(ex);
                     } catch (ExceptionOrientation ex) {
                         throw new RuntimeException(ex);
-                    }
+                    }*/
                     panelConstruire.revalidate();
                     panelConstruire.repaint();
                 }

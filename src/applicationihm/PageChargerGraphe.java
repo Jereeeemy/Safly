@@ -16,18 +16,6 @@ public class PageChargerGraphe {
     private final JPanel panelCharger;
     private CreateurGraph test;
     public File selectedFile;
-
-
-
-    {
-        try {
-            test = new CreateurGraph();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
     public PageChargerGraphe(MenuPrincipal menuPrincipal) {
 
         panelCharger = new JPanel() {
@@ -46,21 +34,6 @@ public class PageChargerGraphe {
         JSeparator sepa2 = new JSeparator(SwingConstants.VERTICAL);
         sepa2.setBackground(Color.GRAY);
 
-        /*
-        JMenuBar menuBar = new JMenuBar();
-
-        JMenu menu = new JMenu("Options");
-        JMenuItem ItemReinit = new JMenuItem("Réinitialiser");
-        ItemReinit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PageChargerGraphe nouvellePage = new PageChargerGraphe(menuPrincipal);
-            }
-        });
-        menu.add(ItemReinit);
-        menuBar.add(menu);
-        menuPrincipal.setJMenuBar(menuBar);
-        */
 
         panelCharger.setLayout(new BorderLayout(60,45));
 
