@@ -10,9 +10,8 @@ import java.io.IOException;
 
 public class TestGraphVol {
     public static void main(String[] args) throws IOException, ExceptionNoGraphVol {
-        CreateurGraph test = new CreateurGraph();
-        File chemin = test.ChoixGraph();
-        test = new CreateurGraph(chemin);
-        test.graph.display();
+        File fichier = new File("data/graph-test3.txt");
+        CreateurGraph test = new CreateurGraph(fichier);
+        System.out.println(test.getGraph().getNodeCount());
     }
 }
