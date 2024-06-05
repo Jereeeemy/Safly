@@ -1,6 +1,10 @@
-package gestioncollisions;
+package tests;
 
 import applicationihm.MenuPrincipal;
+import collisions.Carte;
+import collisions.Collision;
+import collisions.ExceptionNoFlight;
+import collisions.ExceptionOrientation;
 
 import java.io.IOException;
 import java.util.ArrayList;

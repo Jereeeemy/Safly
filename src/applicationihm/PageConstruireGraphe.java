@@ -1,5 +1,9 @@
 package applicationihm;
 
+import collisions.Carte;
+import collisions.ExceptionNoFlight;
+import collisions.ExceptionOrientation;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -17,8 +21,6 @@ import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 */
-import gestioncollisions.*;
-import org.graphstream.ui.swingViewer.Viewer;
 
 public class PageConstruireGraphe {
     private final JPanel panelConstruire;
@@ -266,7 +268,7 @@ public class PageConstruireGraphe {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JFrame fenetreGraphe = new JFrame();
-                fenetreGraphe.setTitle("gestioncollisions.Carte");
+                fenetreGraphe.setTitle("collisions.Carte");
                 fenetreGraphe.setSize(750, 700);
                 fenetreGraphe.setLocationRelativeTo(null);
                 fenetreGraphe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

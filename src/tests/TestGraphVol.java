@@ -1,4 +1,7 @@
-package gestioncollisions;
+package tests;
+
+import graphvol.CreateurGraph;
+import graphvol.ExceptionNoGraphVol;
 
 import java.io.File;
 import java.io.IOException;

@@ -10,9 +10,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 
-import gestioncollisions.CreateurGraph;
-import gestioncollisions.ExceptionNoGraphVol;
-import org.graphstream.ui.swingViewer.Viewer;
+import graphvol.CreateurGraph;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;

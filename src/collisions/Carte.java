@@ -1,4 +1,4 @@
-package gestioncollisions;
+package collisions;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -26,7 +26,7 @@ public class Carte {
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
     public Carte() throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        graph_vol = new SingleGraph("gestioncollisions.Carte");
+        graph_vol = new SingleGraph("Collisions.Carte");
         nb_aeroports = 0;
         nb_vols = 0;
         liste_aeroports = this.LireAeroports();
@@ -34,20 +34,21 @@ public class Carte {
     }
 
     /**
-     * Constructeur pour initialiser la carte avec les aéroports et les vols depuis un fichier spécifique.
-     * @param fichier Nom du fichier contenant les informations des vols.
+     * Constructeur pour initialiser la carte avec les aéroports et les vols depuis un fichier spécifique pour les vols.
+     * @param fichier_vol Nom du fichier contenant les informations des vols.
+     * @param fichier_aeroport Nom du fichier contenant les informations des aéroports.
      * @throws IOException en cas d'erreur de lecture de fichier.
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
-    public Carte(File fichier) throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        graph_vol = new SingleGraph("gestioncollisions.Carte"+fichier.toString());
+    public Carte(File fichier_aeroport,File fichier_vol) throws IOException, ExceptionNoFlight, ExceptionOrientation {
+        graph_vol = new SingleGraph("Collisions.Carte"+fichier_vol.toString());
         nb_aeroports = 0;
         nb_vols = 0;
-        liste_aeroports = this.LireAeroports();
-        liste_vols = this.LireVols(fichier);
+        liste_aeroports = this.LireAeroports(fichier_aeroport);
+        liste_vols = this.LireVols(fichier_vol);
     }
 
-    // Getters pour les attributs de la classe gestioncollisions.Carte.
+    // Getters pour les attributs de la classe Collisions.Carte.
     public Graph getGraph_vol() {
         return this.graph_vol;
     }
@@ -63,6 +64,17 @@ public class Carte {
     public ArrayList<Aeroport> getListe_aeroports() {
         return liste_aeroports;
     }
+
+
+    // Setters pour les listes des aéroports et des vols
+    public void setListe_aeroports(File fichier_aeroport) throws ExceptionOrientation, IOException {
+        this.liste_aeroports = this.LireAeroports(fichier_aeroport);
+    }
+
+    public void setListe_vols(File fichier_vols) throws ExceptionNoFlight, IOException {
+        this.liste_vols = this.LireVols(fichier_vols);
+    }
+
 
     /**
      * Calcule la valeur de la coordonnée (latitude ou longitude) en degrés.
@@ -356,17 +368,17 @@ public class Carte {
                 intersectionY = vol1.depart.y + t * (vol1.arrivee.y - vol1.depart.y);
                 reponse[0] = intersectionX;
                 reponse[1] = intersectionY;
-                reponse[2] = 1.00; // gestioncollisions.Collision potentielle détectée
+                reponse[2] = 1.00; // Collisions.Collision potentielle détectée
             }
         }
         else if (aeroports_inverses) { // Les vols sont colinéaires et se dirigent en sens opposés
             if ((v1_part_avant_v2 && v2_part_avant_v1_arrive) || (v2_part_avant_v1 && v1_part_avant_v2_arrive) || v1dec_meme_v2dec) {
-                reponse[2] = 2.00; // gestioncollisions.Collision spéciale détectée
+                reponse[2] = 2.00; // Collision spéciale détectée
             }
         }
         else if (meme_depart && meme_arrivee) { // Les vols sont colinéaires et vont dans la même direction
             if ((v1_part_avant_v2 && v2_arrive_avant_v1) || (v2_part_avant_v1 && v1_arrive_avant_v2) || diff_dec < temps_collision || diff_att < temps_collision) {
-                reponse[2] = 2.00; // gestioncollisions.Collision spéciale détectée
+                reponse[2] = 2.00; // Collision spéciale détectée
             }
         }
 

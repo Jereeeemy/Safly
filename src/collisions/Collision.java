@@ -1,4 +1,4 @@
-package gestioncollisions;
+package collisions;
 
 /**
  * Classe représentant une collision entre un vol et un autre.

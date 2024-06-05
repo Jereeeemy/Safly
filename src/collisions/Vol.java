@@ -1,4 +1,5 @@
-package gestioncollisions;
+package collisions;
+
 
 public class Vol {
     String code;

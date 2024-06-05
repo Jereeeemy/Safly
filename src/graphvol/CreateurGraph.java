@@ -1,4 +1,4 @@
-package gestioncollisions;
+package graphvol;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -15,8 +15,8 @@ import static java.lang.System.in;
 public class CreateurGraph {
     Graph graph;
 
-    public CreateurGraph(File chemin_fichier) throws IOException {
-        this.graph = ChargerGraphDepuisFichier(chemin_fichier);
+    public CreateurGraph(File fichier) throws IOException {
+        this.graph = ChargerGraphDepuisFichier(fichier);
     }
 
     public CreateurGraph() throws IOException {
@@ -62,10 +62,10 @@ public class CreateurGraph {
         return files[choix];
     }
 
-    public Graph ChargerGraphDepuisFichier(File chemin_fichier) throws IOException {
-        Graph new_graph = new SingleGraph(chemin_fichier.getCanonicalPath());
+    public Graph ChargerGraphDepuisFichier(File fichier) throws IOException {
+        Graph new_graph = new SingleGraph(fichier.getCanonicalPath());
 
-        BufferedReader br = new BufferedReader(new FileReader(chemin_fichier));
+        BufferedReader br = new BufferedReader(new FileReader(fichier));
 
         // Lire le nombre maximum de couleurs (kmax)
         String line = br.readLine();
@@ -86,8 +86,10 @@ public class CreateurGraph {
             String[] noeuds = line.split(" ");
             String noeud1 = noeuds[0];
             String noeud2 = noeuds[1];
-            String edgeId = noeud1 + "-" + noeud2;
-            new_graph.addEdge(edgeId, noeud1, noeud2);
+            if(new_graph.getNode(noeud1) == null && new_graph.getNode(noeud2) == null){
+                String edgeId = noeud1 + "-" + noeud2;
+                new_graph.addEdge(edgeId, noeud1, noeud2);
+            }
         }
         return new_graph;
     }
