@@ -9,7 +9,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-
+/*
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.viewer.DefaultTileFactory;
+import org.jxmapviewer.viewer.GeoPosition;
+import org.jxmapviewer.viewer.TileFactoryInfo;
+import org.jxmapviewer.viewer.Waypoint;
+import org.jxmapviewer.viewer.WaypointPainter;
+*/
 import gestioncollisions.*;
 import org.graphstream.ui.swingViewer.Viewer;
 
@@ -305,6 +312,10 @@ public class PageConstruireGraphe {
         panelConstruire.add(panelConstruireCentre,BorderLayout.CENTER);
         panelConstruire.add(paneldroite,BorderLayout.EAST);
         panelConstruire.add(panelConstruireBas, BorderLayout.SOUTH);
+    }
+
+    private void initCarteFrance(){
+
     }
 
     private static JSpinner getSpinnerKMax() {

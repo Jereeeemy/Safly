@@ -35,5 +35,27 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="src" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/libs/jxmapviewer2-master/jxmapviewer2/src/main/java" />
+          <root url="file://$MODULE_DIR$/libs/jxmapviewer2-master/jxmapviewer2/src/test/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="java" level="project" />
+    <orderEntry type="library" name="gradle-wrapper" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/jxmapviewer2-master/jxmapviewer2/gradle/wrapper/gradle-wrapper.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
