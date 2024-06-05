@@ -133,12 +133,12 @@ public class PageChargerGraphe {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                boutonFichierGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                boutonAccueil.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                boutonFichierGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
 

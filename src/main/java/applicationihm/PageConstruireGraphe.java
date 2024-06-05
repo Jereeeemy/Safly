@@ -13,14 +13,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-/*
+
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
-*/
+
 
 public class PageConstruireGraphe {
     private final JPanel panelConstruire;
@@ -77,39 +77,56 @@ public class PageConstruireGraphe {
         JLabel labelNomFichier = new JLabel();
         JLabel labelListeVol = new JLabel();
         RoundedButton boutonFichierAeroport = new RoundedButton("Importer une liste d'aéroports",50);
-        boutonFichierAeroport.addActionListener(new ActionListener() {
+        boutonFichierAeroport.addMouseListener(new MouseListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(panelConstruire);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
+                    try {
+                        map.setListe_aeroports(selectedFile);
+                    } catch (ExceptionOrientation ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
                     labelNomFichier.setText(fileName);
                     labelNomFichier.setForeground(Color.BLUE);
                     labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
-                    boutonFichierAeroport.setForeground(Color.GREEN);
-                    /*try {
-                        //map = new Carte(selectedFile);
-
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (ExceptionNoFlight ex) {
-                        throw new RuntimeException(ex);
-                    } catch (ExceptionOrientation ex) {
-                        throw new RuntimeException(ex);
-                    }*/
+                    boutonFichierAeroport.setForeground(Color.decode("#77E59B"));
                     panelConstruire.revalidate();
                     panelConstruire.repaint();
                 }
             }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonFichierAeroport.setBackground(Color.DARK_GRAY);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonFichierAeroport.setBackground(Color.decode("#696767"));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonFichierAeroport.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonFichierAeroport.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         });
+
+
         boutonFichierAeroport.setFocusable(false);
         boutonFichierAeroport.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierAeroport.setForeground(Color.WHITE);
         boutonFichierAeroport.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         boutonFichierAeroport.setBackground(Color.decode("#696767"));
-        boutonFichierAeroport.setCursor(new Cursor(Cursor.HAND_CURSOR));
         centrePanel1.add(boutonFichierAeroport);
         centrePanel1.add(labelNomFichier);
         RoundedButton boutonFichierVol = new RoundedButton("Importer une liste de vols",50);
@@ -267,12 +284,8 @@ public class PageConstruireGraphe {
         boutonAfficherGraphe.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JFrame fenetreGraphe = new JFrame();
-                fenetreGraphe.setTitle("collisions.Carte");
-                fenetreGraphe.setSize(750, 700);
-                fenetreGraphe.setLocationRelativeTo(null);
-                fenetreGraphe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                fenetreGraphe.setVisible(true);
+                afficherCarte();
+
             }
 
             @Override
@@ -337,6 +350,39 @@ public class PageConstruireGraphe {
         spinnerKMax.setBackground(Color.decode("#696767"));
         return spinnerKMax;
     }
+
+    private void afficherCarte() {
+        JFrame fenetreCarte = new JFrame();
+        fenetreCarte.setTitle("Carte de la France");
+        fenetreCarte.setSize(800, 600);
+        fenetreCarte.setLocationRelativeTo(null);
+        fenetreCarte.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        // Créer un JXMapViewer
+        JXMapViewer mapViewer = new JXMapViewer();
+        // Définir le fournisseur de tuiles (TileFactory) pour le JXMapViewer
+        TileFactoryInfo info = new TileFactoryInfo(1, 17, 11,
+                256, true, true,
+                "http://tile.openstreetmap.org",
+                "x", "y", "z") {
+            @Override
+            public String getTileUrl(int x, int y, int zoom) {
+                int invZoom = getTotalMapZoom() - zoom;
+                return this.baseURL + "/" + invZoom + "/" + x + "/" + y + ".png";
+            }
+        };
+        DefaultTileFactory tileFactory = new DefaultTileFactory(info);
+        mapViewer.setTileFactory(tileFactory);
+
+        // Centrer la carte sur la France
+        GeoPosition france = new GeoPosition(46.603354, 1.888334);
+        mapViewer.setZoom(5);
+        mapViewer.setAddressLocation(france);
+        // Ajouter le JXMapViewer à la fenêtre
+        fenetreCarte.getContentPane().add(mapViewer);
+        fenetreCarte.setVisible(true);
+    }
+
 
     public JPanel getPanel() {
         return panelConstruire;
