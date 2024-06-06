@@ -48,6 +48,12 @@ public class Carte {
         liste_vols = this.LireVols(fichier_vol);
     }
 
+    public Carte(File fichier_aeroport) throws IOException, ExceptionNoFlight, ExceptionOrientation {
+        nb_aeroports = 0;
+        nb_vols = 0;
+        liste_aeroports = this.LireAeroports(fichier_aeroport);
+    }
+
     // Getters pour les attributs de la classe Collisions.Carte.
     public Graph getGraph_vol() {
         return this.graph_vol;

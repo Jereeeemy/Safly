@@ -99,22 +99,28 @@ public class PageConstruireGraphe {
                     selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
                     try {
-                        map.setListe_aeroports(selectedFile);
-                        System.out.println(map.getListe_aeroports());
-                    } catch (ExceptionOrientation ex) {
-                        throw new RuntimeException(ex);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                        // Initialiser la carte avec la liste des aéroports
+                        map = new Carte(selectedFile);
 
-                    labelNomFichier.setText(fileName);
-                    labelNomFichier.setForeground(Color.BLUE);
-                    labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
-                    boutonFichierAeroport.setForeground(Color.decode("#77E59B"));
-                    panelConstruire.revalidate();
-                    panelConstruire.repaint();
+                        // Debug: vérifier les aéroports chargés
+                        for (Aeroport aeroport : map.getListe_aeroports()) {
+                            System.out.println(aeroport.getCode() + " - " + aeroport.getVille() + " - " + aeroport.getLatitude() + " - " + aeroport.getLongitude());
+                        }
+
+                        labelNomFichier.setText(fileName);
+                        labelNomFichier.setForeground(Color.BLUE);
+                        labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
+                        boutonFichierAeroport.setForeground(Color.decode("#77E59B"));
+                        panelConstruire.revalidate();
+                        panelConstruire.repaint();
+                    } catch (Exception ex) {
+                        // Afficher un message d'erreur si le fichier ne peut pas être lu
+                        JOptionPane.showMessageDialog(panelConstruire, "Attention ! votre fichier d'aeroports ne correspond pas.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
                 }
             }
+
             @Override
             public void mousePressed(MouseEvent e) {
                 boutonFichierAeroport.setBackground(Color.DARK_GRAY);
@@ -224,6 +230,10 @@ public class PageConstruireGraphe {
         boutonColoration.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (selectedFile == null) {
+                    JOptionPane.showMessageDialog(panelConstruire, "Veuillez d'abord charger un fichier de vols.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
             }
             @Override
@@ -375,6 +385,7 @@ public class PageConstruireGraphe {
 
         // Créer un JXMapViewer
         JXMapViewer mapViewer = new JXMapViewer();
+
         // Définir le fournisseur de tuiles (TileFactory) pour le JXMapViewer
         TileFactoryInfo info = new TileFactoryInfo(1, 17, 11,
                 256, true, true,
@@ -394,11 +405,13 @@ public class PageConstruireGraphe {
         mapViewer.setZoom(5);
         mapViewer.setAddressLocation(france);
 
-
+        // Ajouter les marqueurs des aéroports
         Set<DefaultWaypoint> airportWaypoints = new HashSet<>();
-        for (Aeroport aeroport : map.getListe_aeroports()) {
-            GeoPosition position = new GeoPosition(aeroport.getLatitude(), aeroport.getLongitude());
-            airportWaypoints.add(new DefaultWaypoint(position));
+        if (map != null) {
+            for (Aeroport aeroport : map.getListe_aeroports()) {
+                GeoPosition position = new GeoPosition(aeroport.getLatitude(), aeroport.getLongitude());
+                airportWaypoints.add(new DefaultWaypoint(position));
+            }
         }
 
         // Créer un WaypointPainter et ajouter les Waypoints
@@ -412,6 +425,7 @@ public class PageConstruireGraphe {
         fenetreCarte.getContentPane().add(mapViewer);
         fenetreCarte.setVisible(true);
     }
+
 
 
     public JPanel getPanel() {
