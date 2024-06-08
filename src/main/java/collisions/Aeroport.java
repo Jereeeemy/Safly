@@ -9,6 +9,8 @@ public class Aeroport {
     String ville;
     double x;
     double y;
+    double longitude;
+    double latitude;
 
     /**
      * Constructeur pour créer un aéroport.
@@ -22,6 +24,15 @@ public class Aeroport {
         this.ville = ville;
         this.x = x;
         this.y = y;
+    }
+
+    public Aeroport(String code, String ville, double x, double y, double latitude, double longitude) {
+        this.code = code;
+        this.ville = ville;
+        this.x = x;
+        this.y = y;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
 
@@ -57,4 +68,13 @@ public class Aeroport {
     public void sety(double y) {
         this.y = y;
     }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
 }
