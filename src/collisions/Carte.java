@@ -48,12 +48,6 @@ public class Carte {
         liste_vols = this.LireVols(fichier_vol);
     }
 
-    public Carte(File fichier_aeroport) throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        nb_aeroports = 0;
-        nb_vols = 0;
-        liste_aeroports = this.LireAeroports(fichier_aeroport);
-    }
-
     // Getters pour les attributs de la classe Collisions.Carte.
     public Graph getGraph_vol() {
         return this.graph_vol;
@@ -158,7 +152,7 @@ public class Carte {
             double y = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.cos(longitude*((Math.PI)/180));
             double x = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.sin(longitude*((Math.PI)/180));
 
-            Aeroport aeroport = new Aeroport(code,nom_ville,x,y,latitude,longitude);
+            Aeroport aeroport = new Aeroport(code,nom_ville,x,y);
             aeroports.add(aeroport);
             nb_aeroports++;//Incrémentation du compteur d'aéroports
         }
