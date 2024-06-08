@@ -1,4 +1,4 @@
-package applicationihm;
+package java.applicationihm;
 
 public class Main {
     public static void main(String[] args) {

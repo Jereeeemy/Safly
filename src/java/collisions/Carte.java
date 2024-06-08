@@ -1,4 +1,4 @@
-package collisions;
+package java.collisions;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -46,6 +46,12 @@ public class Carte {
         nb_vols = 0;
         liste_aeroports = this.LireAeroports(fichier_aeroport);
         liste_vols = this.LireVols(fichier_vol);
+    }
+
+    public Carte(File fichier_aeroport) throws IOException, ExceptionNoFlight, ExceptionOrientation {
+        nb_aeroports = 0;
+        nb_vols = 0;
+        liste_aeroports = this.LireAeroports(fichier_aeroport);
     }
 
     // Getters pour les attributs de la classe Collisions.Carte.
@@ -152,7 +158,7 @@ public class Carte {
             double y = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.cos(longitude*((Math.PI)/180));
             double x = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.sin(longitude*((Math.PI)/180));
 
-            Aeroport aeroport = new Aeroport(code,nom_ville,x,y);
+            Aeroport aeroport = new Aeroport(code,nom_ville,x,y,latitude,longitude);
             aeroports.add(aeroport);
             nb_aeroports++;//Incrémentation du compteur d'aéroports
         }
@@ -335,8 +341,8 @@ public class Carte {
         double intersectionY;
 
         // Différences de temps de départ et d'arrivée entre les vols
-        double diff_dec = Math.abs((vol2.heure_depart * 60 + vol2.minute_depart) - (vol1.heure_depart * 60 + vol1.minute_depart));
-        double diff_att = Math.abs((vol2.heure_arrivee * 60 + vol2.minute_arrivee) - (vol1.heure_arrivee * 60 + vol1.minute_arrivee));
+        double diff_dec = abs((vol2.heure_depart * 60 + vol2.minute_depart) - (vol1.heure_depart * 60 + vol1.minute_depart));
+        double diff_att = abs((vol2.heure_arrivee * 60 + vol2.minute_arrivee) - (vol1.heure_arrivee * 60 + vol1.minute_arrivee));
 
         // Vérifications diverses pour déterminer le type de collision possible
         boolean aeroports_inverses = vol1.depart.x == vol2.arrivee.x && vol1.depart.y == vol2.arrivee.y && vol1.arrivee.x == vol2.depart.x && vol1.arrivee.y == vol2.depart.y;// L'aéroport de départ de l'un est l'aéroport d'arrivée de l'autre et inversement

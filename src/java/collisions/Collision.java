@@ -1,4 +1,4 @@
-package collisions;
+package java.collisions;
 
 /**
  * Classe représentant une collision entre un vol et un autre.

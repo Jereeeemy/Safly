@@ -1,4 +1,4 @@
-package applicationihm;
+package java.applicationihm;
 
 import javax.swing.*;
 import java.awt.*;

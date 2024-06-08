@@ -1,4 +1,4 @@
-package graphvol;
+package java.graphvol;
 
 /**
  * Exception levée lorsque aucun fichier graph-test n'est disponible dans le répertoire.

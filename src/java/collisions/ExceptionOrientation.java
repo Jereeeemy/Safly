@@ -1,4 +1,4 @@
-package collisions;
+package java.collisions;
 
 /**
  * Exception levée lorsque l'orientation n'est ni "N" ni "S" ni "O" ni "E"

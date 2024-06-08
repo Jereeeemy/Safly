@@ -1,4 +1,4 @@
-package applicationihm;
+package java.applicationihm;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -7,10 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.graphvol.CreateurGraph;
 import java.io.File;
 import java.io.IOException;
-
-import graphvol.CreateurGraph;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;
@@ -113,16 +112,25 @@ public class PageChargerGraphe {
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     selectedFile = fileChooser.getSelectedFile();
                     String fileName = selectedFile.getName();
-                    labelNomFichier.setText(fileName);
-                    labelNomFichier.setForeground(Color.BLUE);
-                    labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
-                    boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
-                    panelCharger.revalidate();
-                    panelCharger.repaint();
+                    try {
+                        // Essayer de créer le graphe avec le fichier sélectionné
+                        test = new CreateurGraph(selectedFile);
+
+                        // Mettre à jour l'affichage si la création du graphe réussit
+                        labelNomFichier.setText(fileName);
+                        labelNomFichier.setForeground(Color.BLUE);
+                        labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
+                        boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
+                        panelCharger.revalidate();
+                        panelCharger.repaint();
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(panelCharger, "Erreur lors de la lecture du fichier ! Vérifiez que le fichier fourni est correct.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace(); // Afficher l'erreur dans le terminal pour un débogage ultérieur
+                    }
                 }
             }
 
-            @Override
+        @Override
             public void mousePressed(MouseEvent e) {
                 boutonFichierGraphe.setBackground(Color.DARK_GRAY);
             }
@@ -133,12 +141,12 @@ public class PageChargerGraphe {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                boutonFichierGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                boutonAccueil.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                boutonFichierGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
 
@@ -330,13 +338,6 @@ public class PageChargerGraphe {
                 if (selectedFile == null) {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
-                }
-                File chemin = null;
-                chemin = selectedFile;
-                try {
-                    test = new CreateurGraph(chemin);
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null,"Erreur lors de la lecture du fichier ! Vérifiez que le fichier fourni est correct.","erreur",JOptionPane.ERROR_MESSAGE);
                 }
                 test.getGraph().display();
             }

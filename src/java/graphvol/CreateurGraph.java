@@ -1,4 +1,4 @@
-package graphvol;
+package java.graphvol;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
@@ -86,8 +86,9 @@ public class CreateurGraph {
             String[] noeuds = line.split(" ");
             String noeud1 = noeuds[0];
             String noeud2 = noeuds[1];
-            if(new_graph.getNode(noeud1) == null && new_graph.getNode(noeud2) == null){
-                String edgeId = noeud1 + "-" + noeud2;
+            String edgeId = noeud1 + "-" + noeud2;
+            String edgeIdReverse = noeud2 + "-" + noeud1;
+            if(new_graph.getEdge(edgeId) == null && new_graph.getEdge(edgeIdReverse) == null){
                 new_graph.addEdge(edgeId, noeud1, noeud2);
             }
         }

@@ -1,4 +1,4 @@
-package collisions;
+package java.collisions;
 
 
 public class Vol {

@@ -1,4 +1,4 @@
-package welshpowell;
+package java.welshpowell;
 import org.graphstream.graph.*;
 
 import java.util.ArrayList;

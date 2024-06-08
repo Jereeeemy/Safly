@@ -1,10 +1,10 @@
-package tests;
+package java.tests;
 
-import applicationihm.MenuPrincipal;
-import collisions.Carte;
-import collisions.Collision;
-import collisions.ExceptionNoFlight;
-import collisions.ExceptionOrientation;
+import java.applicationihm.MenuPrincipal;
+import java.collisions.Carte;
+import java.collisions.Collision;
+import java.collisions.ExceptionNoFlight;
+import java.collisions.ExceptionOrientation;
 
 import java.io.IOException;
 import java.util.ArrayList;
