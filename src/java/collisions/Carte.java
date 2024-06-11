@@ -447,8 +447,3 @@ public class Carte {
     }
 
 }
-
-
-
-
-

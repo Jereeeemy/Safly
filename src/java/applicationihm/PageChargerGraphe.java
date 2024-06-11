@@ -1,4 +1,4 @@
-package java.applicationihm;
+package applicationihm;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.graphvol.CreateurGraph;
+import graphvol.CreateurGraph;
 import java.io.File;
 import java.io.IOException;
 
@@ -130,7 +130,7 @@ public class PageChargerGraphe {
                 }
             }
 
-        @Override
+            @Override
             public void mousePressed(MouseEvent e) {
                 boutonFichierGraphe.setBackground(Color.DARK_GRAY);
             }

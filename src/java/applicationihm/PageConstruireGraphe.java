@@ -1,7 +1,7 @@
-package java.applicationihm;
+package applicationihm;
 
-import java.collisions.Aeroport;
-import java.collisions.Carte;
+import collisions.Aeroport;
+import collisions.Carte;
 
 import java.util.HashSet;
 import javax.swing.*;
@@ -146,23 +146,23 @@ public class PageConstruireGraphe {
         centrePanel1.add(labelNomFichier);
         RoundedButton boutonFichierVol = new RoundedButton("Importer une liste de vols",50);
         boutonFichierVol.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
-               JFileChooser fileChooser = new JFileChooser();
-               int returnValue = fileChooser.showOpenDialog(panelConstruire);
-               if (returnValue == JFileChooser.APPROVE_OPTION) {
-                   File selectedFile = fileChooser.getSelectedFile();
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                int returnValue = fileChooser.showOpenDialog(panelConstruire);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
 
-                   String fileName = selectedFile.getName();
-                   labelListeVol.setText(fileName);
-                   labelListeVol.setForeground(Color.BLUE);
-                   labelListeVol.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
-                   boutonFichierVol.setForeground(Color.GREEN);
-                   panelConstruire.revalidate();
-                   panelConstruire.repaint();
+                    String fileName = selectedFile.getName();
+                    labelListeVol.setText(fileName);
+                    labelListeVol.setForeground(Color.BLUE);
+                    labelListeVol.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
+                    boutonFichierVol.setForeground(Color.GREEN);
+                    panelConstruire.revalidate();
+                    panelConstruire.repaint();
 
-               }
-           }
+                }
+            }
         });
         boutonFichierVol.setFocusable(false);
         boutonFichierVol.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
