@@ -1,6 +1,7 @@
 package collisions;
 
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ import static java.lang.System.in;
 
 public class Carte {
     private Graph graph_vol;
+    private Graph graph_aeroport;
     private ArrayList<Aeroport> liste_aeroports;
     private ArrayList<Vol> liste_vols;
     private static int nb_aeroports;
@@ -26,7 +28,8 @@ public class Carte {
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
     public Carte() throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        graph_vol = new SingleGraph("Collisions.Carte");
+        graph_vol = new SingleGraph("Collisions_Carte");
+        graph_aeroport = new SingleGraph("Graph_Aeroport_As_Node");
         nb_aeroports = 0;
         nb_vols = 0;
         liste_aeroports = this.LireAeroports();
@@ -41,7 +44,8 @@ public class Carte {
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
     public Carte(File fichier_aeroport,File fichier_vol) throws IOException, ExceptionNoFlight, ExceptionOrientation {
-        graph_vol = new SingleGraph("Collisions.Carte"+fichier_vol.toString());
+        graph_vol = new SingleGraph("Collisions_Carte_"+fichier_vol);
+        graph_aeroport = new MultiGraph("Graph_Aeroport_As.Node_"+fichier_vol);
         nb_aeroports = 0;
         nb_vols = 0;
         liste_aeroports = this.LireAeroports(fichier_aeroport);
@@ -58,6 +62,8 @@ public class Carte {
     public Graph getGraph_vol() {
         return this.graph_vol;
     }
+
+    public Graph getGraph_aeroport(){return this.graph_aeroport;}
 
     public int getNb_aeroports() {
         return this.nb_aeroports;
@@ -229,7 +235,7 @@ public class Carte {
     }
 
     /**
-     * Lit les vols à partir d'un fichier choisi par l'utilisateur.
+     * Lit les vols à partir d'un fichier choisi par l'utilisateur et construit un graph avec les vols en tant que noeuds.
      * @return La liste des vols.
      * @throws IOException en cas d'erreur de lecture de fichier.
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
@@ -252,7 +258,7 @@ public class Carte {
     }
 
     /**
-     * Lit les vols à partir d'un fichier spécifique passé en paramètre.
+     * Lit les vols à partir d'un fichier spécifique passé en paramètre et construit un graph avec les vols en tant que noeuds.
      * @param fichier Nom du fichier contenant les informations des vols.
      * @return La liste des vols.
      * @throws IOException en cas d'erreur de lecture de fichier.
@@ -268,6 +274,38 @@ public class Carte {
             this.getGraph_vol().addNode(vol.code);//On met le code du vol en tant qu'id du noeud
             vols.add(vol);
             nb_vols++;//Incrémentation du compteur de vols
+        }
+        lecteur.close();
+        return vols;
+    }
+
+
+
+    /**
+     * Lit les vols à partir d'un fichier spécifique passé en paramètre et construit un graph avec les vols en tant qu'arretes et les aéroports en tant que noeuds.
+     * @param fichier Nom du fichier contenant les informations des vols.
+     * @return La liste des vols.
+     * @throws IOException en cas d'erreur de lecture de fichier.
+     * @throws InputMismatchException en cas d'erreur de format du fichier.
+     */
+    private ArrayList<Vol> LireVolsAsEdge(File fichier) throws IOException, ExceptionNoFlight, InputMismatchException {
+        ArrayList<Vol> vols = new ArrayList<>();
+        BufferedReader lecteur = new BufferedReader(new FileReader(fichier));
+        String line;
+        while ((line = lecteur.readLine()) != null) {
+            Vol vol = LectureVol(line);
+            Aeroport aeroport1 = vol.depart;
+            Aeroport aeroport2 = vol.arrivee;
+            if (this.getGraph_aeroport().getNode(aeroport1.getCode())==null){//Si le premier aéroport n'est pas déjà dans le graph, on l'ajoute
+                this.getGraph_aeroport().addNode(aeroport1.getCode());
+            }
+            if (this.getGraph_aeroport().getNode(aeroport2.getCode())==null){//Si le deuxième aéroport n'est pas déjà dans le graph, on l'ajoute
+                this.getGraph_aeroport().addNode(aeroport2.getCode());
+            }
+            if (this.getGraph_aeroport().getEdge(vol.getCode())==null){//Si le vol n'est pas déjà présent dans le graph on l'ajoute
+                this.getGraph_aeroport().addEdge(vol.getCode(), aeroport1.getCode(), aeroport2.getCode());
+            }
+            vols.add(vol);
         }
         lecteur.close();
         return vols;
