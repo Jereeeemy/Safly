@@ -172,7 +172,7 @@ public class DsaturAlgorithm {
             node.setAttribute("ui.style", "fill-color: rgb(" + (result[node.getIndex()] * 70 % 255) + "," + (result[node.getIndex()] * 130 % 255) + "," + (result[node.getIndex()] * 200 % 255) + ");");
         }
 
-        graph.display(); // Affiche le graphe colorié
+        //graph.display(); // Affiche le graphe colorié
 
         // Vérifie que chaque nœud a une couleur différente de ses voisins
         boolean allNodesCorrectlyColored = true;
@@ -231,6 +231,6 @@ public class DsaturAlgorithm {
         graph.addEdge("9-10", "9", "10");
 
         // Appelle la méthode pour colorier le graphe et l'afficher
-        colorAndDisplayGraph(graph, 2);
+        colorAndDisplayGraph(graph, 1);
     }
 }

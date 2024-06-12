@@ -1,5 +1,7 @@
 package applicationihm;
 
+import dsature.*;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -8,13 +10,27 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import graphvol.CreateurGraph;
+
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static dsature.DsaturAlgorithm.colorAndDisplayGraph;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;
     private CreateurGraph test;
     public File selectedFile;
+    public File fileToDownload;
+    int noeuds = 0;
+    int aretes = 0;
+    int degre = 0;
+    int composantes = 0;
+    int diametre = 0;
     public PageChargerGraphe(MenuPrincipal menuPrincipal) {
 
         panelCharger = new JPanel() {
@@ -168,14 +184,23 @@ public class PageChargerGraphe {
         boutonTelecharger.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonTelecharger.setForeground(Color.WHITE);
         boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+
+
         centrePanel1.add(boutonTelecharger);
 
         boutonTelecharger.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                fileToDownload = new File("hehehehhe");
                 if (selectedFile == null) {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
+                }
+                else if (fileToDownload == null){
+                    JOptionPane.showMessageDialog(panelCharger, "Attention ! Vous n'avez pas encore effectué la coloration.", "Erreur", JOptionPane.WARNING_MESSAGE);
+                }
+                else {
+                    saveFile();
                 }
             }
             @Override
@@ -254,7 +279,11 @@ public class PageChargerGraphe {
             public void mouseClicked(MouseEvent e) {
                 if (selectedFile == null) {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
+                }
+                else if (DsaturBouton.isSelected()){
+                    colorAndDisplayGraph(test.getGraph(),4);
+                } else if (WelshBouton.isSelected()) {
+                    
                 }
             }
 
@@ -281,6 +310,8 @@ public class PageChargerGraphe {
 
         centrePanel2.add(boutonColoration);
 
+
+
         JPanel centrePanel3 = new JPanel();
         centrePanel3.setBackground(Color.decode("#D9D9D9"));
         JTable tableauInfoGraphe = new JTable();
@@ -288,15 +319,15 @@ public class PageChargerGraphe {
                 new Object[][]{
                         {"Informations : ", null},
                         {null, null},
-                        {"Noeuds :", " "+ " "+ 280},
+                        {"Noeuds :", " "+ " "+ noeuds},
                         {"",null},
-                        {"Arêtes :", " "+ " "+ 7},
+                        {"Arêtes :", " "+ " "+ aretes},
                         {"",null},
-                        {"Degré Moyen :", " "+ " "+ 6},
+                        {"Degré Moyen :", " "+ " "+ degre},
                         {"",null},
-                        {"Nb Composantes :", " "+ " "+ 12},
+                        {"Nb Composantes :", " "+ " "+ composantes},
                         {"",null},
-                        {"Diamètre", " "+ " "+ 6},
+                        {"Diamètre", " "+ " "+ diametre},
                         {"",null},
                 },
                 new String[]{"Informations Graphe :", null}
@@ -395,6 +426,33 @@ public class PageChargerGraphe {
         }
         spinnerKMax.setBackground(Color.decode("#696767"));
         return spinnerKMax;
+    }
+
+    private void saveFile() {
+        if (fileToDownload != null) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Enregistrer le fichier");
+
+            // Configurer le nom de fichier par défaut
+            fileChooser.setSelectedFile(new File("example.txt"));
+
+            int userSelection = fileChooser.showSaveDialog(panelCharger);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                try {
+                    // Copier le contenu du fichier temporaire vers le fichier choisi par l'utilisateur
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave))) {
+                        writer.write("Ceci est un exemple de fichier texte avec des informations.");
+                    }
+                    JOptionPane.showMessageDialog(panelCharger, "Fichier enregistré avec succès.");
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(panelCharger, "Erreur lors de l'enregistrement du fichier : " + ex.getMessage());
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(panelCharger, "Le fichier à télécharger n'a pas été créé.");
+        }
     }
 
     public JPanel getPanel() {

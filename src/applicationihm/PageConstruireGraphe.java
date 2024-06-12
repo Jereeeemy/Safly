@@ -3,6 +3,8 @@ package applicationihm;
 import collisions.Aeroport;
 import collisions.Carte;
 
+import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import javax.swing.*;
 import java.awt.Image;
@@ -15,14 +17,15 @@ import java.awt.Graphics;
 import java.awt.Font;
 
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
+import collisions.Vol;
 import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.input.CenterMapListener;
+import org.jxmapviewer.input.PanMouseInputListener;
+import org.jxmapviewer.input.ZoomMouseWheelListenerCenter;
 import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
@@ -402,12 +405,34 @@ public class PageConstruireGraphe {
 
         // Ajouter les marqueurs des aéroports
         Set<DefaultWaypoint> airportWaypoints = new HashSet<>();
+        List<Route> routes = new ArrayList<>();
+
         if (map != null) {
             for (Aeroport aeroport : map.getListe_aeroports()) {
                 GeoPosition position = new GeoPosition(aeroport.getLatitude(), aeroport.getLongitude());
                 airportWaypoints.add(new DefaultWaypoint(position));
             }
         }
+
+
+        PanMouseInputListener panListener = new PanMouseInputListener(mapViewer);
+        mapViewer.addMouseListener(panListener);
+        mapViewer.addMouseMotionListener(panListener);
+
+        // Écouteur pour recentrer la carte sur un clic
+        mapViewer.addMouseListener(new CenterMapListener(mapViewer));
+
+        // Écouteur pour zoomer avec la molette de la souris
+        mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCenter(mapViewer));
+
+        // Optionnel : écouteur pour afficher la position géographique en cliquant
+        mapViewer.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                GeoPosition geoPosition = mapViewer.convertPointToGeoPosition(e.getPoint());
+                System.out.println("Position : " + geoPosition.getLatitude() + ", " + geoPosition.getLongitude());
+            }
+        });
 
         // Créer un WaypointPainter et ajouter les Waypoints
         WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<>();
