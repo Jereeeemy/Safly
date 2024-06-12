@@ -9,7 +9,7 @@ import collisions.ExceptionOrientation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
-
+import welshpowell.WelshPowell;
 
 public class TestCollisionAvecChoix {
     public static Carte test;
@@ -33,8 +33,11 @@ public class TestCollisionAvecChoix {
         ArrayList<Collision> collisions = test.RechercheCollision();
         System.out.println(collisions.size());
         System.out.println(collisions);
+
+
         test.getGraph_vol().display();
 
-
+        WelshPowell algowelsh = new WelshPowell(test.getGraph_vol());
+        System.out.println(algowelsh.getNoeuds());
     }
 }
