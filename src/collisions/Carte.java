@@ -93,7 +93,7 @@ public class Carte {
     }
 
     public void setColoration(ArrayList<ArrayList<Vol>> coloration) {
-        this.coloration = this.;
+        this.coloration = this.ImplementeColoration();
     }
 
     /**
