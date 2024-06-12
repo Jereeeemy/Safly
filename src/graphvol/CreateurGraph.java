@@ -70,7 +70,7 @@ public class CreateurGraph {
         // Lire le nombre maximum de couleurs (kmax)
         String line = br.readLine();
         int kmax = Integer.parseInt(line);
-        new_graph.setAttribute("nb_couleur",kmax);
+        new_graph.setAttribute("kmax",kmax);
 
         // Lire le nombre de sommets
         line = br.readLine();
