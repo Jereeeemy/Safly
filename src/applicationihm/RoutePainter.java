@@ -42,4 +42,3 @@ public class RoutePainter implements Painter<JXMapViewer> {
         g.dispose();
     }
 }
-

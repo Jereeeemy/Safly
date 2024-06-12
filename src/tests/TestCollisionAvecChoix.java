@@ -35,9 +35,10 @@ public class TestCollisionAvecChoix {
         System.out.println(collisions);
 
 
-        test.getGraph_vol().display();
 
         WelshPowell algowelsh = new WelshPowell(test.getGraph_vol());
         System.out.println(algowelsh.getNoeuds());
+        test.getGraph_vol().display();
+
     }
 }

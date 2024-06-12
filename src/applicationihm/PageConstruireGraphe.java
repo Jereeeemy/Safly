@@ -3,18 +3,13 @@ package applicationihm;
 import collisions.Aeroport;
 import collisions.Carte;
 
+import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashSet;
 import javax.swing.*;
-import java.awt.Image;
-import java.awt.Cursor;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.BorderLayout;
-import java.awt.Graphics;
-import java.awt.Font;
 
 import javax.swing.table.DefaultTableModel;
 import java.io.File;
@@ -26,16 +21,20 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.input.CenterMapListener;
 import org.jxmapviewer.input.PanMouseInputListener;
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter;
+import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.viewer.DefaultTileFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
+import org.jxmapviewer.util.*;
 
 
 public class PageConstruireGraphe {
     private final JPanel panelConstruire;
     public File selectedFile;
+
+    public File fichierVols;
 
     private Carte map;
 
@@ -139,7 +138,6 @@ public class PageConstruireGraphe {
             }
         });
 
-
         boutonFichierAeroport.setFocusable(false);
         boutonFichierAeroport.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierAeroport.setForeground(Color.WHITE);
@@ -148,25 +146,50 @@ public class PageConstruireGraphe {
         centrePanel1.add(boutonFichierAeroport);
         centrePanel1.add(labelNomFichier);
         RoundedButton boutonFichierVol = new RoundedButton("Importer une liste de vols",50);
-        boutonFichierVol.addActionListener(new ActionListener() {
+
+        boutonFichierVol.addMouseListener(new MouseListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 int returnValue = fileChooser.showOpenDialog(panelConstruire);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
+                    fichierVols = fileChooser.getSelectedFile();
+                    String fileName = fichierVols.getName();
+                    try {
 
-                    String fileName = selectedFile.getName();
-                    labelListeVol.setText(fileName);
-                    labelListeVol.setForeground(Color.BLUE);
-                    labelListeVol.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
-                    boutonFichierVol.setForeground(Color.GREEN);
-                    panelConstruire.revalidate();
-                    panelConstruire.repaint();
+                        map.setListe_vols(fichierVols);
 
+                        labelListeVol.setText(fileName);
+                        labelListeVol.setForeground(Color.BLUE);
+                        labelListeVol.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
+                        boutonFichierVol.setForeground(Color.decode("#77E59B"));
+                        panelConstruire.revalidate();
+                        panelConstruire.repaint();
+                    } catch (Exception ex) {
+                        // Afficher un message d'erreur si le fichier ne peut pas être lu
+                        JOptionPane.showMessageDialog(panelConstruire, "Attention ! votre fichier de vols ne correspond pas.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        ex.printStackTrace();
+                    }
                 }
             }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonFichierVol.setBackground(Color.DARK_GRAY);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonFichierVol.setBackground(Color.decode("#696767"));
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonFichierVol.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonFichierVol.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         });
+
         boutonFichierVol.setFocusable(false);
         boutonFichierVol.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         boutonFichierVol.setForeground(Color.WHITE);
@@ -385,7 +408,7 @@ public class PageConstruireGraphe {
         JXMapViewer mapViewer = new JXMapViewer();
 
         // Définir le fournisseur de tuiles (TileFactory) pour le JXMapViewer
-        TileFactoryInfo info = new TileFactoryInfo(1, 17, 11,
+        TileFactoryInfo info = new TileFactoryInfo(1, 12, 11,
                 256, true, true,
                 "http://tile.openstreetmap.org",
                 "x", "y", "z") {
@@ -405,14 +428,55 @@ public class PageConstruireGraphe {
 
         // Ajouter les marqueurs des aéroports
         Set<DefaultWaypoint> airportWaypoints = new HashSet<>();
-        List<Route> routes = new ArrayList<>();
-
         if (map != null) {
             for (Aeroport aeroport : map.getListe_aeroports()) {
                 GeoPosition position = new GeoPosition(aeroport.getLatitude(), aeroport.getLongitude());
                 airportWaypoints.add(new DefaultWaypoint(position));
             }
         }
+
+// Créer un WaypointPainter et ajouter les Waypoints
+        WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<>();
+        waypointPainter.setWaypoints(airportWaypoints);
+
+// Liste des routes entre aéroports pour les dessiner
+        List<Route> routes = new ArrayList<>();
+        if (map != null) {
+            for (Vol vol : map.getListe_vols()) {
+                Aeroport depart = vol.getDepart();
+                Aeroport arrivee = vol.getArrivee();
+                GeoPosition startPos = new GeoPosition(depart.getLatitude(), depart.getLongitude());
+                GeoPosition endPos = new GeoPosition(arrivee.getLatitude(), arrivee.getLongitude());
+                routes.add(new Route(startPos, endPos));
+            }
+        }
+
+// Créer un Painter pour dessiner les routes
+        Painter<JXMapViewer> routePainter = new Painter<JXMapViewer>() {
+            @Override
+            public void paint(Graphics2D g, JXMapViewer map, int width, int height) {
+                // Set the color and stroke for the routes
+                g.setColor(Color.RED);
+                g.setStroke(new BasicStroke(2));
+
+                for (Route route : routes) {
+                    GeoPosition start = route.getStart();
+                    GeoPosition end = route.getEnd();
+
+                    Point2D startPt = map.getTileFactory().geoToPixel(start, map.getZoom());
+                    Point2D endPt = map.getTileFactory().geoToPixel(end, map.getZoom());
+
+                    Path2D path = new Path2D.Double();
+                    path.moveTo(startPt.getX(), startPt.getY());
+                    path.lineTo(endPt.getX(), endPt.getY());
+
+                    g.draw(path);
+                }
+            }
+        };
+
+// Ajouter les painters au JXMapViewer
+        mapViewer.setOverlayPainter(new CompoundPainter<>());
 
 
         PanMouseInputListener panListener = new PanMouseInputListener(mapViewer);
@@ -434,9 +498,7 @@ public class PageConstruireGraphe {
             }
         });
 
-        // Créer un WaypointPainter et ajouter les Waypoints
-        WaypointPainter<DefaultWaypoint> waypointPainter = new WaypointPainter<>();
-        waypointPainter.setWaypoints(airportWaypoints);
+
 
         // Ajouter les marqueurs à la carte
         mapViewer.setOverlayPainter(waypointPainter);

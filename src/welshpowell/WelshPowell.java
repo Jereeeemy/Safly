@@ -27,6 +27,7 @@ public class WelshPowell {
         }
         //Range les noeuds dans l'ordre décroissant de degré
         this.RangerNoeudsOrdreDecroissant();
+        this.ColorierNoeuds();
 
     }
 

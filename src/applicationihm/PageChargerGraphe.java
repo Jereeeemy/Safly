@@ -3,6 +3,8 @@ package applicationihm;
 import dsature.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import graphvol.CreateurGraph;
+import org.graphstream.ui.view.Viewer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,6 +29,7 @@ public class PageChargerGraphe {
     private CreateurGraph test;
     public File selectedFile;
     public File fileToDownload;
+    int kmax;
     int noeuds = 0;
     int aretes = 0;
     int degre = 0;
@@ -119,6 +123,14 @@ public class PageChargerGraphe {
         final JLabel labelNomFichier = new JLabel();
         RoundedButton boutonFichierGraphe = new RoundedButton("Déposer un fichier de graphe", 70);
 
+        JSpinner spinnerKMax = getSpinnerKMax();
+        spinnerKMax.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                kmax = (int) spinnerKMax.getValue();
+            }
+        });
+
 
         boutonFichierGraphe.addMouseListener(new MouseListener() {
             @Override
@@ -131,6 +143,8 @@ public class PageChargerGraphe {
                     try {
                         // Essayer de créer le graphe avec le fichier sélectionné
                         test = new CreateurGraph(selectedFile);
+                        kmax = test.getGraph().getAttribute("kmax");
+                        spinnerKMax.setValue(kmax);
 
                         // Mettre à jour l'affichage si la création du graphe réussit
                         labelNomFichier.setText(fileName);
@@ -261,7 +275,6 @@ public class PageChargerGraphe {
         miniPanelCentral.add(labelKmax);
         labelKmax.setFont(new Font("Lucida Sans",Font.PLAIN,20));
 
-        JSpinner spinnerKMax = getSpinnerKMax();
         miniPanelCentral.add(spinnerKMax);
 
         miniPanelCentral.setBackground(Color.decode("#696767"));
@@ -281,9 +294,9 @@ public class PageChargerGraphe {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
                 else if (DsaturBouton.isSelected()){
-                    colorAndDisplayGraph(test.getGraph(),4);
+                    colorAndDisplayGraph(test.getGraph(),kmax);
                 } else if (WelshBouton.isSelected()) {
-                    
+
                 }
             }
 
@@ -345,6 +358,7 @@ public class PageChargerGraphe {
         tableauInfoGraphe.setEnabled(false);
 
         centrePanel3.add(tableauInfoGraphe);
+        centrePanel3.setBorder(BorderFactory.createEmptyBorder(0,20,0,0));
 
         JPanel centrePanelContainer = new JPanel();
         centrePanelContainer.setLayout(new BoxLayout(centrePanelContainer, BoxLayout.X_AXIS));
@@ -370,7 +384,9 @@ public class PageChargerGraphe {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                test.getGraph().display();
+
+                Viewer vue = test.getGraph().display();
+                vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
             }
             @Override
             public void mousePressed(MouseEvent e) {

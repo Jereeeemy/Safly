@@ -1,6 +1,7 @@
 package collisions;
 
 import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
 
@@ -18,6 +19,7 @@ public class Carte {
     private Graph graph_aeroport;
     private ArrayList<Aeroport> liste_aeroports;
     private ArrayList<Vol> liste_vols;
+    private ArrayList<ArrayList<Vol>> coloration;
     private static int nb_aeroports;
     private static int nb_vols;
     public static int temps_collision = 15;
@@ -77,8 +79,11 @@ public class Carte {
         return liste_aeroports;
     }
 
+    public ArrayList<Vol> getListe_vols() {return liste_vols;}
 
-    // Setters pour les listes des aéroports et des vols
+    public ArrayList<ArrayList<Vol>> getColoration() {return coloration;}
+
+    // Setters pour les listes des aéroports et des vols ainsi que pour la coloration
     public void setListe_aeroports(File fichier_aeroport) throws ExceptionOrientation, IOException {
         this.liste_aeroports = this.LireAeroports(fichier_aeroport);
     }
@@ -87,6 +92,9 @@ public class Carte {
         this.liste_vols = this.LireVols(fichier_vols);
     }
 
+    public void setColoration(ArrayList<ArrayList<Vol>> coloration) {
+        this.coloration = this.;
+    }
 
     /**
      * Calcule la valeur de la coordonnée (latitude ou longitude) en degrés.
@@ -483,5 +491,28 @@ public class Carte {
         }
         return liste_collisions;
     }
+
+    public ArrayList<ArrayList<Vol>> ImplementeColoration(){
+
+        ArrayList<ArrayList<Vol>> coloration = new ArrayList<>();
+        ArrayList<Vol> liste_initiale = getListe_vols();
+        Iterator<Vol> iterateur1 = liste_initiale.iterator();
+        while (iterateur1.hasNext()) {
+            Vol vol1 = iterateur1.next();
+            ArrayList<Vol> vols = new ArrayList<>();
+            String couleur = this.getGraph_vol().getNode(vol1.code).getAttribute("ui.style");
+            Iterator<Vol> iterateur2 = liste_initiale.iterator();
+            while (iterateur2.hasNext()){
+                Vol vol2 = iterateur2.next();
+                if (this.getGraph_vol().getNode(vol2.code).getAttribute("ui.style").equals(couleur)){
+                    vols.add(vol2);
+                    liste_initiale.remove(vol2);
+                }
+            }
+            coloration.add(vols);
+        }
+        return coloration;
+    }
+
 
 }
