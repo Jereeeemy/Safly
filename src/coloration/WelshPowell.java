@@ -1,10 +1,8 @@
-package welshpowell;
+package coloration;
 import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.SingleGraph;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 public class WelshPowell {
     Graph graph;
@@ -25,13 +23,10 @@ public class WelshPowell {
         for (Node node : graph) {
             this.noeuds.add(node);
         }
-        //Range les noeuds dans l'ordre décroissant de degré
-        this.RangerNoeudsOrdreDecroissant();
-        this.ColorierNoeuds();
 
     }
 
-    private void RangerNoeudsOrdreDecroissant(){
+    private void rangerNoeudsOrdreDecroissant(){
         for (int i = 1; i < noeuds.size(); i++) {
             Node key = noeuds.get(i);
             int keyValue = key.getDegree();
@@ -58,19 +53,24 @@ public class WelshPowell {
         }
     }
 
-    private void ColorierNoeuds() {
+
+    public void colorierNoeudsWelsh(int kmax) {
+        //Range les noeuds dans l'ordre décroissant de degré
+        this.rangerNoeudsOrdreDecroissant();
         // Fonction pour générer des couleurs RGB de manière dynamique
         int colorIndex = 0;
 
         for (Node node : noeuds) {
-            Set<String> usedColors = new HashSet<>();
+            ArrayList<String> usedColors = new ArrayList<>();
+            ArrayList<Couleur> colorCounts = new ArrayList<>();
+            List<Node> adjacentNodes = getAdjacentNodes(node);
 
             // Collecter les couleurs utilisées par les nœuds adjacents
-            for (Edge edge : node.getEachEdge()) {
-                Node neighbor = edge.getOpposite(node);
+            for (Node neighbor : adjacentNodes) {
                 if (neighbor.hasAttribute("ui.style")) {
                     String color = neighbor.getAttribute("ui.style");
                     usedColors.add(color);
+                    ajoutColorCount(colorCounts, color);
                 }
             }
 
@@ -78,12 +78,57 @@ public class WelshPowell {
             while (true) {
                 String color = generateColor(colorIndex);
                 if (!usedColors.contains("fill-color: " + color + ";")) {
-                    node.setAttribute("ui.style", "fill-color: " + color + ";");
-                    break;
+                    if (colorIndex < kmax) {
+                        node.setAttribute("ui.style", "fill-color: " + color + ";");
+                        break;
+                    }
+                    else {
+                        // Trouver la couleur la moins fréquente parmi les nœuds adjacents
+                        String leastUsedColor = trouveCouleurMini(colorCounts);
+                        if (leastUsedColor != null) {
+                            node.setAttribute("ui.style", leastUsedColor);
+                            break;
+                        }
+                    }
                 }
                 colorIndex++;
             }
         }
+    }
+
+
+    // Ajouter une couleur à la liste de comptage des couleurs
+    private void ajoutColorCount(ArrayList<Couleur> colorCounts, String color) {
+        for (Couleur cc : colorCounts) {
+            if (cc.getCouleur().equals(color)) {
+                cc.incrementCount();
+                return;
+            }
+        }
+        colorCounts.add(new Couleur(color));
+    }
+
+    // Trouver la couleur la moins utilisée
+    private String trouveCouleurMini(ArrayList<Couleur> colorCounts) {
+        String leastUsedColor = null;
+        int minCount = Integer.MAX_VALUE;
+        for (Couleur cc : colorCounts) {
+            if (cc.getCount() < minCount) {
+                minCount = cc.getCount();
+                leastUsedColor = cc.getCouleur();
+            }
+        }
+        return leastUsedColor;
+    }
+
+    // Obtenir les nœuds adjacents
+    private List<Node> getAdjacentNodes(Node node) {
+        List<Node> adjacentNodes = new ArrayList<>();
+        for (Edge edge : node.getEachEdge()) {
+            Node oppositeNode = edge.getOpposite(node);
+            adjacentNodes.add(oppositeNode);
+        }
+        return adjacentNodes;
     }
 
     // Fonction pour générer une couleur RGB basée sur un index
@@ -93,5 +138,9 @@ public class WelshPowell {
         int b = (index * 223) % 256;
         return "rgb(" + r + "," + g + "," + b + ")";
     }
+
+
+
+
 
 }

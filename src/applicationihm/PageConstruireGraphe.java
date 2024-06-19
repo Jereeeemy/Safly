@@ -49,7 +49,7 @@ public class PageConstruireGraphe {
             }
         };
 
-        panelConstruire.setLayout(new BorderLayout(60,45));
+        panelConstruire.setLayout(new BorderLayout(60, 45));
         JPanel panelConstruireHaut = new JPanel();
         panelConstruireHaut.setOpaque(false);
         RoundedPanel panelConstruireCentre = new RoundedPanel(40);
@@ -60,9 +60,9 @@ public class PageConstruireGraphe {
         JPanel panelConstruireBas = new JPanel();
         panelConstruireBas.setOpaque(false);
 
-        RoundedButton boutonAccueil = new RoundedButton("Accueil",25);
+        RoundedButton boutonAccueil = new RoundedButton("Accueil", 25);
         boutonAccueil.setFocusable(false);
-        boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
+        boutonAccueil.setFont(new Font("Lucida Sans", Font.PLAIN, 15));
         boutonAccueil.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonAccueil.setBackground(Color.decode("#D9D9D9"));
         boutonAccueil.addActionListener(new ActionListener() {
@@ -82,11 +82,11 @@ public class PageConstruireGraphe {
         centrePanel1.setLayout(new BoxLayout(centrePanel1, BoxLayout.PAGE_AXIS));
         JLabel labelDeposeFichiers = new JLabel("<html><div style='text-align: left'> Pour construire un graphe,<br> veuillez d'abord fournir <br>les fichiers nécessaires</div></html>");
         labelDeposeFichiers.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        labelDeposeFichiers.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        labelDeposeFichiers.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         centrePanel1.add(labelDeposeFichiers);
         JLabel labelNomFichier = new JLabel();
         JLabel labelListeVol = new JLabel();
-        RoundedButton boutonFichierAeroport = new RoundedButton("Importer une liste d'aéroports",50);
+        RoundedButton boutonFichierAeroport = new RoundedButton("Importer une liste d'aéroports", 50);
         boutonFichierAeroport.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -122,6 +122,7 @@ public class PageConstruireGraphe {
             public void mousePressed(MouseEvent e) {
                 boutonFichierAeroport.setBackground(Color.DARK_GRAY);
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 boutonFichierAeroport.setBackground(Color.decode("#696767"));
@@ -139,13 +140,13 @@ public class PageConstruireGraphe {
         });
 
         boutonFichierAeroport.setFocusable(false);
-        boutonFichierAeroport.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        boutonFichierAeroport.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         boutonFichierAeroport.setForeground(Color.WHITE);
         boutonFichierAeroport.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         boutonFichierAeroport.setBackground(Color.decode("#696767"));
         centrePanel1.add(boutonFichierAeroport);
         centrePanel1.add(labelNomFichier);
-        RoundedButton boutonFichierVol = new RoundedButton("Importer une liste de vols",50);
+        RoundedButton boutonFichierVol = new RoundedButton("Importer une liste de vols", 50);
 
         boutonFichierVol.addMouseListener(new MouseListener() {
             @Override
@@ -172,18 +173,22 @@ public class PageConstruireGraphe {
                     }
                 }
             }
+
             @Override
             public void mousePressed(MouseEvent e) {
                 boutonFichierVol.setBackground(Color.DARK_GRAY);
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 boutonFichierVol.setBackground(Color.decode("#696767"));
             }
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 boutonFichierVol.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 boutonFichierVol.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -193,7 +198,7 @@ public class PageConstruireGraphe {
         boutonFichierVol.setFocusable(false);
         boutonFichierVol.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         boutonFichierVol.setForeground(Color.WHITE);
-        boutonFichierAeroport.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        boutonFichierAeroport.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         boutonFichierVol.setBackground(Color.decode("#696767"));
         boutonFichierVol.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -202,27 +207,27 @@ public class PageConstruireGraphe {
 
         JPanel centrePanel2 = new JPanel();
         centrePanel2.setBackground(Color.decode("#D9D9D9"));
-        centrePanel2.setLayout(new BoxLayout(centrePanel2,BoxLayout.PAGE_AXIS));
+        centrePanel2.setLayout(new BoxLayout(centrePanel2, BoxLayout.PAGE_AXIS));
         JLabel labelChoixParam = new JLabel("<html><div style='text-align: left'> Après avoir chargé votre graphe,<br> vous pouvez personnaliser <br>la coloration du graphe : </div></html>");
         labelChoixParam.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        labelChoixParam.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        labelChoixParam.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         centrePanel2.add(labelChoixParam);
         RoundedPanel miniPanelCentral = new RoundedPanel(25);
         miniPanelCentral.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        miniPanelCentral.setLayout(new BoxLayout(miniPanelCentral,BoxLayout.PAGE_AXIS));
+        miniPanelCentral.setLayout(new BoxLayout(miniPanelCentral, BoxLayout.PAGE_AXIS));
         JLabel labelChoixAlgo = new JLabel("Choix Algorithme de coloration :");
         labelChoixAlgo.setForeground(Color.WHITE);
-        labelChoixAlgo.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        labelChoixAlgo.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         miniPanelCentral.add(labelChoixAlgo);
-        labelChoixAlgo.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        labelChoixAlgo.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         ButtonGroup groupAlgos = new ButtonGroup();
         JRadioButton WelshBouton = new JRadioButton("Welsh & Powell");
         WelshBouton.setForeground(Color.WHITE);
-        WelshBouton.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        WelshBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         WelshBouton.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         JRadioButton DsaturBouton = new JRadioButton("D-Satur");
         DsaturBouton.setForeground(Color.WHITE);
-        DsaturBouton.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        DsaturBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         DsaturBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         groupAlgos.add(WelshBouton);
@@ -235,18 +240,18 @@ public class PageConstruireGraphe {
         miniPanelCentral.add(DsaturBouton);
         JLabel labelChoixKmax = new JLabel("Choix de K-max :");
         miniPanelCentral.add(labelChoixKmax);
-        labelChoixKmax.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        labelChoixKmax.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         labelChoixKmax.setForeground(Color.WHITE);
         JSpinner spinnerKMax = getSpinnerKMax();
         miniPanelCentral.add(spinnerKMax);
 
         miniPanelCentral.setBackground(Color.decode("#696767"));
         centrePanel2.add(miniPanelCentral);
-        RoundedButton boutonColoration = new RoundedButton("Effectuer la coloration",50);
+        RoundedButton boutonColoration = new RoundedButton("Effectuer la coloration", 50);
         boutonColoration.setFocusable(false);
-        boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,30));
+        boutonColoration.setFont(new Font("Lucida Sans", Font.PLAIN, 30));
         boutonColoration.setForeground(Color.WHITE);
-        boutonColoration.setPreferredSize(new Dimension(400,80));
+        boutonColoration.setPreferredSize(new Dimension(400, 80));
         boutonColoration.setBackground(Color.decode("#122A47"));
         boutonColoration.addMouseListener(new MouseListener() {
             @Override
@@ -257,6 +262,7 @@ public class PageConstruireGraphe {
                 }
 
             }
+
             @Override
             public void mousePressed(MouseEvent e) {
                 boutonColoration.setBackground(Color.decode("#2C5789"));
@@ -286,22 +292,22 @@ public class PageConstruireGraphe {
                 new Object[][]{
                         {"Informations : ", null},
                         {null, null},
-                        {"Noeuds :", " "+ " "+ 280},
-                        {"",null},
-                        {"Arêtes :", " "+ " "+ 7},
-                        {"",null},
-                        {"Degré Moyen :", " "+ " "+ 6},
-                        {"",null},
-                        {"Nb Composantes :", " "+ " "+ 12},
-                        {"",null},
-                        {"Diamètre", " "+ " "+ 6},
-                        {"",null},
+                        {"Noeuds :", " " + " " + 280},
+                        {"", null},
+                        {"Arêtes :", " " + " " + 7},
+                        {"", null},
+                        {"Degré Moyen :", " " + " " + 6},
+                        {"", null},
+                        {"Nb Composantes :", " " + " " + 12},
+                        {"", null},
+                        {"Diamètre", " " + " " + 6},
+                        {"", null},
 
                 },
                 new String[]{"Informations Graphe :", null}
         ));
         tableauInfoGraphe.setGridColor(Color.DARK_GRAY);
-        tableauInfoGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,18));
+        tableauInfoGraphe.setFont(new Font("Lucida Sans", Font.PLAIN, 18));
         tableauInfoGraphe.setForeground(Color.WHITE);
         tableauInfoGraphe.setBackground(Color.decode("#696767"));
         tableauInfoGraphe.setShowVerticalLines(true);
@@ -325,7 +331,7 @@ public class PageConstruireGraphe {
         panelConstruireCentre.add(centrePanel3);
 
 
-        RoundedButton boutonAfficherGraphe = new RoundedButton("Afficher la carte",90);
+        RoundedButton boutonAfficherGraphe = new RoundedButton("Afficher la carte", 90);
 
         boutonAfficherGraphe.addMouseListener(new MouseListener() {
             @Override
@@ -357,8 +363,8 @@ public class PageConstruireGraphe {
 
         boutonAfficherGraphe.setFocusable(false);
         boutonAfficherGraphe.setForeground(Color.WHITE);
-        boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,30));
-        boutonAfficherGraphe.setPreferredSize(new Dimension(320,80));
+        boutonAfficherGraphe.setFont(new Font("Lucida Sans", Font.PLAIN, 30));
+        boutonAfficherGraphe.setPreferredSize(new Dimension(320, 80));
         boutonAfficherGraphe.setBackground(Color.decode("#122A47"));
         panelConstruireBas.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
@@ -368,27 +374,27 @@ public class PageConstruireGraphe {
         panelgauche.setOpaque(false);
         JPanel paneldroite = new JPanel();
         paneldroite.setOpaque(false);
-        panelConstruire.add(panelConstruireHaut,BorderLayout.NORTH);
-        panelConstruire.add(panelgauche,BorderLayout.WEST);
-        panelConstruire.add(panelConstruireCentre,BorderLayout.CENTER);
-        panelConstruire.add(paneldroite,BorderLayout.EAST);
+        panelConstruire.add(panelConstruireHaut, BorderLayout.NORTH);
+        panelConstruire.add(panelgauche, BorderLayout.WEST);
+        panelConstruire.add(panelConstruireCentre, BorderLayout.CENTER);
+        panelConstruire.add(paneldroite, BorderLayout.EAST);
         panelConstruire.add(panelConstruireBas, BorderLayout.SOUTH);
     }
 
-    private void initCarteFrance(){
+    private void initCarteFrance() {
 
     }
 
     private static JSpinner getSpinnerKMax() {
         JSpinner spinnerKMax = new JSpinner();
         spinnerKMax.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 0));
-        spinnerKMax.setModel(new SpinnerNumberModel(10,0,200,1));
+        spinnerKMax.setModel(new SpinnerNumberModel(10, 0, 200, 1));
         spinnerKMax.setFocusable(false);
-        Dimension preferredSize = new Dimension(75, spinnerKMax.getPreferredSize().height+5);
+        Dimension preferredSize = new Dimension(75, spinnerKMax.getPreferredSize().height + 5);
         spinnerKMax.setPreferredSize(preferredSize);
         spinnerKMax.setMaximumSize(preferredSize);
         JComponent editor = spinnerKMax.getEditor();
-        if (editor instanceof JSpinner.DefaultEditor){
+        if (editor instanceof JSpinner.DefaultEditor) {
             JFormattedTextField textField = ((JSpinner.DefaultEditor) editor).getTextField();
             textField.setEditable(false);
             textField.setBackground(Color.LIGHT_GRAY);
@@ -499,7 +505,6 @@ public class PageConstruireGraphe {
         });
 
 
-
         // Ajouter les marqueurs à la carte
         mapViewer.setOverlayPainter(waypointPainter);
 
@@ -507,7 +512,6 @@ public class PageConstruireGraphe {
         fenetreCarte.getContentPane().add(mapViewer);
         fenetreCarte.setVisible(true);
     }
-
 
 
     public JPanel getPanel() {

@@ -1,4 +1,4 @@
-package dsature;
+package coloration;
 
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.SingleGraph;

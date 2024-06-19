@@ -1,7 +1,5 @@
 package applicationihm;
 
-import dsature.*;
-
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -18,11 +16,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import static dsature.DsaturAlgorithm.colorAndDisplayGraph;
+import static coloration.DsaturAlgorithm.colorAndDisplayGraph;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;

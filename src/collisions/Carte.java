@@ -36,6 +36,7 @@ public class Carte {
         nb_vols = 0;
         liste_aeroports = this.LireAeroports();
         liste_vols = this.LireVols();
+        this.RechercheCollision();
     }
 
     /**
@@ -52,12 +53,29 @@ public class Carte {
         nb_vols = 0;
         liste_aeroports = this.LireAeroports(fichier_aeroport);
         liste_vols = this.LireVols(fichier_vol);
+        this.RechercheCollision();
+
     }
 
-    public Carte(File fichier_aeroport) throws IOException, ExceptionNoFlight, ExceptionOrientation {
+    /**
+     * Constructeur pour initialiser la carte avec les aéroports et les vols depuis un fichier spécifique pour soit pour les vols soit pour les aéroport (selon l'extension du fichier en paramètre).
+     * @param fichier Nom du fichier contenant les informations des vols ou les informations des aéroport (selon son extension, txt pour aéroports et csv pour vols).
+     * @throws IOException en cas d'erreur de lecture de fichier.
+     * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
+     */
+    public Carte(File fichier) throws IOException, ExceptionNoFlight, ExceptionOrientation {
+        graph_vol = new SingleGraph("Collisions_Carte_"+fichier);
+        graph_aeroport = new MultiGraph("Graph_Aeroport_As.Node_"+fichier);
         nb_aeroports = 0;
         nb_vols = 0;
-        liste_aeroports = this.LireAeroports(fichier_aeroport);
+        if (fichier.toPath().endsWith(".txt")) {
+            liste_aeroports = this.LireAeroports(fichier);
+        }
+        else if (fichier.toPath().endsWith(".csv")) {
+            liste_vols = this.LireVols(fichier);
+        }
+        this.RechercheCollision();
+
     }
 
     // Getters pour les attributs de la classe Collisions.Carte.
@@ -83,7 +101,7 @@ public class Carte {
 
     public ArrayList<ArrayList<Vol>> getColoration() {return coloration;}
 
-    // Setters pour les listes des aéroports et des vols ainsi que pour la coloration
+    // Setters
     public void setListe_aeroports(File fichier_aeroport) throws ExceptionOrientation, IOException {
         this.liste_aeroports = this.LireAeroports(fichier_aeroport);
     }
@@ -92,8 +110,8 @@ public class Carte {
         this.liste_vols = this.LireVols(fichier_vols);
     }
 
-    public void setColoration(ArrayList<ArrayList<Vol>> coloration) {
-        this.coloration = this.ImplementeColoration();
+    public static void setTemps_collision(int temps_collision) {
+        Carte.temps_collision = temps_collision;
     }
 
     /**
@@ -492,9 +510,10 @@ public class Carte {
         return liste_collisions;
     }
 
-    public ArrayList<ArrayList<Vol>> ImplementeColoration(){
 
-        ArrayList<ArrayList<Vol>> coloration = new ArrayList<>();
+    /** Inutile pour l'instant - à supprimer bientot
+    public ArrayList<ArrayList<Vol>> ImplementeColoration(){
+        //Insérer Exception Collisions non faites et coloration non faite
         ArrayList<Vol> liste_initiale = getListe_vols();
         Iterator<Vol> iterateur1 = liste_initiale.iterator();
         while (iterateur1.hasNext()) {
@@ -513,6 +532,6 @@ public class Carte {
         }
         return coloration;
     }
-
+    **/
 
 }

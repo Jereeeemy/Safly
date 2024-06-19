@@ -1,10 +1,11 @@
 package tests;
 
 
+import coloration.WelshPowell;
 import graphvol.CreateurGraph;
 import graphvol.ExceptionNoGraphVol;
 
-import dsature.DsaturAlgorithm;
+import coloration.DsaturAlgorithm;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +23,8 @@ public class TestGraphVol {
         int kmax = scanner.nextInt();
 
         // Appliquer l'algorithme DSATUR avec la valeur de Kmax choisie
-        DsaturAlgorithm dsatur = new DsaturAlgorithm();
-        dsatur.colorAndDisplayGraph(test.getGraph(), kmax);
+        WelshPowell wp = new WelshPowell(test.getGraph());
+        test.getGraph().display();
+
     }
 }

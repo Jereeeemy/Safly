@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -93,6 +94,31 @@ public class CreateurGraph {
             }
         }
         return new_graph;
+    }
+
+    public ArrayList<Graph> ChargerGraphsDepuisDossier(File dossier) throws IOException {
+        ArrayList<Graph> graphs = new ArrayList<>();
+
+        if (dossier.isDirectory()) {
+            File[] files = dossier.listFiles();
+
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        try {
+                            Graph graph = ChargerGraphDepuisFichier(file);
+                            graphs.add(graph);
+                        } catch (IOException e) {
+                            throw new IOException();
+                        }
+                    }
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Le chemin fourni n'est pas un dossier.");
+        }
+
+        return graphs;
     }
 
 }
