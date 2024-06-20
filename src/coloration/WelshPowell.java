@@ -155,16 +155,13 @@ public class WelshPowell {
                 if (node.hasAttribute("ui.style") && neighbor.hasAttribute("ui.style")) {
                     String color1 = node.getAttribute("ui.style");
                     String color2 = neighbor.getAttribute("ui.style");
-
                     if (color1.equals(color2)) {
-                        System.out.printf("Conflit trouvé entre noeud %s et noeud %s avec la couleur %s\n", node.getId(), neighbor.getId(), color1);
                         conflictCount++;
                     }
                 }
             }
         }
         conflictCount = conflictCount / 2;
-        System.out.println("Nombre total de conflits : " + conflictCount);
         return conflictCount;
     }
 
