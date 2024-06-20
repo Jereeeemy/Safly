@@ -143,4 +143,29 @@ public class WelshPowell {
         int b = ((index * 223) % 256);
         return "rgb(" + r + "," + g + "," + b + ")";
     }
+
+    // Méthode pour compter et afficher les conflits
+    public int CompterConflits(Graph graph) {
+        int conflictCount = 0;
+
+        for (Node node : graph) {
+            List<Node> adjacentNodes = getAdjacentNodes(node);
+
+            for (Node neighbor : adjacentNodes) {
+                if (node.hasAttribute("ui.style") && neighbor.hasAttribute("ui.style")) {
+                    String color1 = node.getAttribute("ui.style");
+                    String color2 = neighbor.getAttribute("ui.style");
+
+                    if (color1.equals(color2)) {
+                        System.out.printf("Conflit trouvé entre noeud %s et noeud %s avec la couleur %s\n", node.getId(), neighbor.getId(), color1);
+                        conflictCount++;
+                    }
+                }
+            }
+        }
+        conflictCount = conflictCount / 2;
+        System.out.println("Nombre total de conflits : " + conflictCount);
+        return conflictCount;
+    }
+
 }

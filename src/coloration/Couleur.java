@@ -1,6 +1,14 @@
 package coloration;
 
-class Couleur {
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class Couleur {
     private String couleur;
     private int count;
 
@@ -27,5 +35,17 @@ class Couleur {
     public void incrementCount() {
         this.count++;
     }
+
+    // Méthode pour obtenir les nœuds adjacents
+    private static List<Node> getAdjacentNodes(Node node) {
+        List<Node> adjacentNodes = new ArrayList<>();
+        for (Edge edge : node.getEachEdge()) {
+            Node oppositeNode = edge.getOpposite(node);
+            adjacentNodes.add(oppositeNode);
+        }
+        return adjacentNodes;
+    }
+
+
 }
 
