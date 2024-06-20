@@ -40,7 +40,7 @@ public class TestCollisionAvecChoix {
         //fenetrePrincipale.setVisible(true);
 
         WelshPowell algowelsh = new WelshPowell(test.getGraph_vol());
-        algowelsh.colorierNoeudsWelsh(3);
+        algowelsh.colorierNoeudsWelsh(2);
         countAndPrintConflicts(test.getGraph_vol());
         test.getGraph_vol().display();
 

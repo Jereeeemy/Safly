@@ -1,12 +1,14 @@
 package coloration;
+
 import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.SingleGraph;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class WelshPowell {
     Graph graph;
-    ArrayList<Node> noeuds = new ArrayList<>() ;
+    ArrayList<Node> noeuds = new ArrayList<>();
 
     public ArrayList<Node> getNoeuds() {
         return noeuds;
@@ -23,17 +25,16 @@ public class WelshPowell {
         for (Node node : graph) {
             this.noeuds.add(node);
         }
-
     }
 
-    private void rangerNoeudsOrdreDecroissant(){
+    private void rangerNoeudsOrdreDecroissant() {
         for (int i = 1; i < noeuds.size(); i++) {
             Node key = noeuds.get(i);
             int keyValue = key.getDegree();
             int left = 0;
             int right = i;
 
-            // Find the position to insert the current node (descending order)
+            // Trouver la position pour insérer le nœud actuel (ordre décroissant)
             while (left < right) {
                 int mid = (left + right) / 2;
                 if (keyValue <= noeuds.get(mid).getDegree()) {
@@ -43,21 +44,19 @@ public class WelshPowell {
                 }
             }
 
-            // Shift nodes to the right to make space for the current node
+            // Décaler les nœuds vers la droite pour faire de la place pour le nœud actuel
             for (int j = i; j > left; j--) {
                 noeuds.set(j, noeuds.get(j - 1));
             }
 
-            // Insert the current node at the found position
+            // Insérer le nœud actuel à la position trouvée
             noeuds.set(left, key);
         }
     }
 
-
     public void colorierNoeudsWelsh(int kmax) {
-        //Range les noeuds dans l'ordre décroissant de degré
+        // Range les nœuds dans l'ordre décroissant de degré
         this.rangerNoeudsOrdreDecroissant();
-        // Fonction pour générer des couleurs RGB de manière dynamique
         int colorIndex = 0;
 
         for (Node node : noeuds) {
@@ -75,27 +74,33 @@ public class WelshPowell {
             }
 
             // Trouver la première couleur disponible qui n'est pas utilisée par les nœuds adjacents
-            while (true) {
+            boolean colorSet = false;
+            while (!colorSet) {
                 String color = generateColor(colorIndex);
                 if (!usedColors.contains("fill-color: " + color + ";")) {
-                    if (colorIndex < kmax) {
-                        node.setAttribute("ui.style", "fill-color: " + color + ";");
-                        break;
-                    }
-                    else {
+                    node.setAttribute("ui.style", "fill-color: " + color + ";");
+                    colorSet = true;
+                } else {
+                    if (colorIndex < kmax-1) {
+                        colorIndex++;
+                    } else {
                         // Trouver la couleur la moins fréquente parmi les nœuds adjacents
                         String leastUsedColor = trouveCouleurMini(colorCounts);
                         if (leastUsedColor != null) {
                             node.setAttribute("ui.style", leastUsedColor);
+                            colorSet = true;
+                        } else {
+                            // Si toutes les couleurs sont utilisées également, on sort pour éviter une boucle infinie
                             break;
                         }
                     }
                 }
-                colorIndex++;
             }
+
+            // Réinitialiser colorIndex pour la prochaine itération
+            colorIndex = 0;
         }
     }
-
 
     // Ajouter une couleur à la liste de comptage des couleurs
     private void ajoutColorCount(ArrayList<Couleur> colorCounts, String color) {
@@ -133,14 +138,9 @@ public class WelshPowell {
 
     // Fonction pour générer une couleur RGB basée sur un index
     private String generateColor(int index) {
-        int r = (index * 67) % 256;
-        int g = (index * 137) % 256;
-        int b = (index * 223) % 256;
+        int r = ((index * 67) % 256);
+        int g = ((index * 137) % 256);
+        int b = ((index * 223) % 256);
         return "rgb(" + r + "," + g + "," + b + ")";
     }
-
-
-
-
-
 }

@@ -1,35 +1,60 @@
 package applicationihm;
 
+import coloration.*;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import graphvol.CreateurGraph;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 import org.graphstream.ui.view.Viewer;
+import org.graphstream.graph.implementations.*;
+
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.List;
 
 import static coloration.DsaturAlgorithm.colorAndDisplayGraph;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;
-    private CreateurGraph test;
+
+    private RoundedButton boutonAccueil;
+    private Color couleurPrincipale = Color.decode("#D9D9D9");
+    private Color couleurSecondaire = Color.decode("#2C5789");
+    private Color couleurTertiaire = Color.decode("#122A47");
+    private CreateurGraph graph;
     public File selectedFile;
     public File fileToDownload;
     int kmax;
     int noeuds = 0;
     int aretes = 0;
-    int degre = 0;
+    double degre = 0;
     int composantes = 0;
     int diametre = 0;
+    private JTable tableauInfoGraphe;
+    private DefaultTableModel model;
+    private RoundedButton boutonColoration;
+    private RoundedButton boutonTelecharger;
+    private JRadioButton WelshBouton;
+    private JRadioButton DsaturBouton;
+    private RoundedButton boutonAfficherGraphe;
     public PageChargerGraphe(MenuPrincipal menuPrincipal) {
 
         panelCharger = new JPanel() {
@@ -56,25 +81,14 @@ public class PageChargerGraphe {
         RoundedPanel panelChargerCentre = new RoundedPanel(40);
 
         panelChargerCentre.setBorder(BorderFactory.createEmptyBorder(30, 15, 30, 15));
-        panelChargerCentre.setBackground(Color.decode("#D9D9D9"));
+        panelChargerCentre.setBackground(couleurPrincipale);
+        panelChargerCentre.setLayout(new BorderLayout(0,0));
         panelChargerCentre.setOpaque(false);
+
         JPanel panelChargerBas = new JPanel();
         panelChargerBas.setOpaque(false);
 
-        RoundedButton boutonAccueil = new RoundedButton("Accueil", 25);
-        boutonAccueil.setFocusable(false);
-        boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
-        boutonAccueil.setBackground(Color.decode("#D9D9D9"));
-
-        boutonAccueil.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                menuPrincipal.setContentPane(menuPrincipal.getPanelAccueil());
-                menuPrincipal.revalidate();
-                menuPrincipal.repaint();
-            }
-        });
-
+        decoBoutonAcceuil();
         boutonAccueil.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -90,7 +104,7 @@ public class PageChargerGraphe {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                boutonAccueil.setBackground(Color.decode("#D9D9D9"));
+                boutonAccueil.setBackground(couleurPrincipale);
             }
 
             @Override
@@ -107,15 +121,17 @@ public class PageChargerGraphe {
         panelChargerHaut.add(boutonAccueil, BorderLayout.CENTER);
         panelChargerHaut.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-        panelChargerCentre.setLayout(new BorderLayout(0,0));
         JPanel centrePanel1 = new JPanel();
         centrePanel1.setLayout(new BoxLayout(centrePanel1, BoxLayout.PAGE_AXIS));
-        centrePanel1.setBackground(Color.decode("#D9D9D9"));
+        centrePanel1.setBackground(couleurPrincipale);
+
         JLabel labelDeposeFichier = new JLabel("<html><div style='text-align: left'> Pour charger un graphe,<br> veuillez d'abord fournir <br>les fichiers nécessaires</div></html>");
         labelDeposeFichier.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         labelDeposeFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+
         centrePanel1.add(labelDeposeFichier);
         final JLabel labelNomFichier = new JLabel();
+
         RoundedButton boutonFichierGraphe = new RoundedButton("Déposer un fichier de graphe", 70);
 
         JSpinner spinnerKMax = getSpinnerKMax();
@@ -137,8 +153,8 @@ public class PageChargerGraphe {
                     String fileName = selectedFile.getName();
                     try {
                         // Essayer de créer le graphe avec le fichier sélectionné
-                        test = new CreateurGraph(selectedFile);
-                        kmax = test.getGraph().getAttribute("kmax");
+                        graph = new CreateurGraph(selectedFile);
+                        kmax = graph.getGraph().getAttribute("kmax");
                         spinnerKMax.setValue(kmax);
 
                         // Mettre à jour l'affichage si la création du graphe réussit
@@ -148,9 +164,8 @@ public class PageChargerGraphe {
                         boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
                         panelCharger.revalidate();
                         panelCharger.repaint();
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         JOptionPane.showMessageDialog(panelCharger, "Erreur lors de la lecture du fichier ! Vérifiez que le fichier fourni est correct.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace(); // Afficher l'erreur dans le terminal pour un débogage ultérieur
                     }
                 }
             }
@@ -178,186 +193,75 @@ public class PageChargerGraphe {
         boutonFichierGraphe.setFocusable(false);
         boutonFichierGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         boutonFichierGraphe.setForeground(Color.WHITE);
-        boutonFichierGraphe.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+        boutonFichierGraphe.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         boutonFichierGraphe.setBackground(Color.decode("#696767"));
-        centrePanel1.add(boutonFichierGraphe);
-        centrePanel1.add(labelNomFichier);
+
         JLabel labelTelechargerFichier = new JLabel("<html><div style='text-align: left'> Cliquez ici si vous souhaitez <br>télécharger le fichier qui <br>contient les informations <br>du graphe colorié </div></html>");
         labelTelechargerFichier.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         labelTelechargerFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+
+        decoBoutonTelecharger();
+
+        centrePanel1.add(boutonFichierGraphe);
+        centrePanel1.add(labelNomFichier);
         centrePanel1.add(labelTelechargerFichier);
-        RoundedButton boutonTelecharger = new RoundedButton("Télécharger", 50);
-        boutonTelecharger.setFocusable(false);
-        boutonTelecharger.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
-        boutonTelecharger.setBackground(Color.decode("#696767"));
-        boutonTelecharger.setFont(new Font("Lucida Sans",Font.PLAIN,20));
-        boutonTelecharger.setForeground(Color.WHITE);
-        boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-
-
         centrePanel1.add(boutonTelecharger);
 
-        boutonTelecharger.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                fileToDownload = new File("hehehehhe");
-                if (selectedFile == null) {
-                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-                else if (fileToDownload == null){
-                    JOptionPane.showMessageDialog(panelCharger, "Attention ! Vous n'avez pas encore effectué la coloration.", "Erreur", JOptionPane.WARNING_MESSAGE);
-                }
-                else {
-                    saveFile();
-                }
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                boutonTelecharger.setBackground(Color.DARK_GRAY);
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                boutonTelecharger.setBackground(Color.decode("#696767"));
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                boutonTelecharger.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        });
 
         JPanel centrePanel2 = new JPanel();
         centrePanel2.setLayout(new BoxLayout(centrePanel2, BoxLayout.PAGE_AXIS));
-        centrePanel2.setBackground(Color.decode("#D9D9D9"));
+        centrePanel2.setBackground(couleurPrincipale);
+
         JLabel labelChoixParam = new JLabel("<html><div style='text-align: left'> Après avoir chargé votre graphe,<br> vous pouvez personnaliser la <br>coloration du graphe : </div></html>");
         labelChoixParam.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         labelChoixParam.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         centrePanel2.add(labelChoixParam);
+
         RoundedPanel miniPanelCentral = new RoundedPanel(25);
-        miniPanelCentral.setBackground(Color.decode("#D9D9D9"));
+        miniPanelCentral.setBackground(couleurPrincipale);
         miniPanelCentral.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         miniPanelCentral.setLayout(new BoxLayout(miniPanelCentral, BoxLayout.PAGE_AXIS));
         JLabel labelChoixAlgo = new JLabel("Choix de l'Algo de coloration :");
         labelChoixAlgo.setForeground(Color.WHITE);
-        miniPanelCentral.add(labelChoixAlgo);
         labelChoixAlgo.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+
         ButtonGroup groupAlgos = new ButtonGroup();
-        JRadioButton WelshBouton = new JRadioButton("Welsh & Powell");
-        WelshBouton.setForeground(Color.WHITE);
-        WelshBouton.setFocusable(false);
-        WelshBouton.setFont(new Font("Lucida Sans",Font.PLAIN,20));
-        WelshBouton.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        JRadioButton DsaturBouton = new JRadioButton("D-Satur");
-        DsaturBouton.setForeground(Color.WHITE);
-        DsaturBouton.setFocusable(false);
-        DsaturBouton.setFont(new Font("Lucida Sans",Font.PLAIN,20));
-        DsaturBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        decoBoutonWelsh();
+        decoBoutonDsatur();
         groupAlgos.add(WelshBouton);
         groupAlgos.add(DsaturBouton);
-        WelshBouton.setBackground(Color.decode("#696767"));
-        WelshBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        DsaturBouton.setBackground(Color.decode("#696767"));
-        DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        WelshBouton.setSelected(true);
-        miniPanelCentral.add(WelshBouton);
-        miniPanelCentral.add(DsaturBouton);
+
         JLabel labelKmax = new JLabel("Choix de K-max :");
         labelKmax.setForeground(Color.WHITE);
-        miniPanelCentral.add(labelKmax);
         labelKmax.setFont(new Font("Lucida Sans",Font.PLAIN,20));
 
+        miniPanelCentral.add(labelChoixAlgo);
+        miniPanelCentral.add(WelshBouton);
+        miniPanelCentral.add(DsaturBouton);
+        miniPanelCentral.add(labelKmax);
         miniPanelCentral.add(spinnerKMax);
-
         miniPanelCentral.setBackground(Color.decode("#696767"));
+
         centrePanel2.add(miniPanelCentral);
-        RoundedButton boutonColoration = new RoundedButton("Effectuer la coloration", 50);
-        boutonColoration.setFocusable(false);
-        boutonColoration.setForeground(Color.WHITE);
-        boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,20));
-        boutonColoration.setPreferredSize(new Dimension(220, 50));
-        boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        boutonColoration.setBackground(Color.decode("#122A47"));
-        boutonColoration.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (selectedFile == null) {
-                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-                else if (DsaturBouton.isSelected()){
-                    colorAndDisplayGraph(test.getGraph(),kmax);
-                } else if (WelshBouton.isSelected()) {
+        decoBoutonColoration();
 
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                boutonColoration.setBackground(Color.decode("#2C5789"));
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                boutonColoration.setBackground(Color.decode("#122A47"));
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                boutonColoration.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        });
 
         centrePanel2.add(boutonColoration);
 
-
-
         JPanel centrePanel3 = new JPanel();
-        centrePanel3.setBackground(Color.decode("#D9D9D9"));
-        JTable tableauInfoGraphe = new JTable();
-        tableauInfoGraphe.setModel(new DefaultTableModel(
-                new Object[][]{
-                        {"Informations : ", null},
-                        {null, null},
-                        {"Noeuds :", " "+ " "+ noeuds},
-                        {"",null},
-                        {"Arêtes :", " "+ " "+ aretes},
-                        {"",null},
-                        {"Degré Moyen :", " "+ " "+ degre},
-                        {"",null},
-                        {"Nb Composantes :", " "+ " "+ composantes},
-                        {"",null},
-                        {"Diamètre", " "+ " "+ diametre},
-                        {"",null},
-                },
-                new String[]{"Informations Graphe :", null}
-        ));
+        centrePanel3.setBackground(couleurPrincipale);
 
-        tableauInfoGraphe.setGridColor(Color.DARK_GRAY);
-        tableauInfoGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,18));
-        tableauInfoGraphe.setForeground(Color.WHITE);
-        tableauInfoGraphe.setBackground(Color.decode("#696767"));
-        tableauInfoGraphe.setShowVerticalLines(true);
-        tableauInfoGraphe.setShowHorizontalLines(false);
-        tableauInfoGraphe.setPreferredSize(new Dimension(250, 300));
-        tableauInfoGraphe.setRowHeight(tableauInfoGraphe.getRowHeight() + 10);
-        tableauInfoGraphe.getColumnModel().getColumn(0).setPreferredWidth(200);
-        tableauInfoGraphe.setEnabled(false);
+        initializeTable();
+        decoTab();
+
 
         centrePanel3.add(tableauInfoGraphe);
         centrePanel3.setBorder(BorderFactory.createEmptyBorder(0,20,0,0));
 
         JPanel centrePanelContainer = new JPanel();
         centrePanelContainer.setLayout(new BoxLayout(centrePanelContainer, BoxLayout.X_AXIS));
-        centrePanelContainer.setBackground(Color.decode("#D9D9D9"));
+        centrePanelContainer.setBackground(couleurPrincipale);
 
         centrePanel2.setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 0));
 
@@ -371,41 +275,9 @@ public class PageChargerGraphe {
         // Add the container to the center of panelChargerCentre
         panelChargerCentre.add(centrePanelContainer, BorderLayout.CENTER);
 
-        RoundedButton boutonAfficherGraphe = new RoundedButton("Afficher le Graphe", 90);
-        boutonAfficherGraphe.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (selectedFile == null) {
-                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
 
-                Viewer vue = test.getGraph().display();
-                vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {
-                boutonAfficherGraphe.setBackground(Color.decode("#2C5789"));
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                boutonAfficherGraphe.setBackground(Color.decode("#122A47"));
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                boutonAfficherGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-        });
+        decoBoutonGraphe();
 
-        boutonAfficherGraphe.setFocusable(false);
-        boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,25));
-        boutonAfficherGraphe.setForeground(Color.WHITE);
-        boutonAfficherGraphe.setPreferredSize(new Dimension(320, 80));
-        boutonAfficherGraphe.setBackground(Color.decode("#122A47"));
         panelChargerBas.add(boutonAfficherGraphe);
         panelChargerBas.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
@@ -421,10 +293,12 @@ public class PageChargerGraphe {
     }
 
 
+
+
     private static JSpinner getSpinnerKMax() {
         JSpinner spinnerKMax = new JSpinner();
         spinnerKMax.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 0));
-        spinnerKMax.setModel(new SpinnerNumberModel(10, 0, 200, 1));
+        spinnerKMax.setModel(new SpinnerNumberModel(10, 1, 200, 1));
         spinnerKMax.setFocusable(false);
         Dimension preferredSize = new Dimension(75, spinnerKMax.getPreferredSize().height + 5);
         spinnerKMax.setPreferredSize(preferredSize);
@@ -464,6 +338,285 @@ public class PageChargerGraphe {
         } else {
             JOptionPane.showMessageDialog(panelCharger, "Le fichier à télécharger n'a pas été créé.");
         }
+    }
+
+    private void initializeTable() {
+        model = new DefaultTableModel(
+                new Object[][]{
+                        {"Informations : ", null},
+                        {null, null},
+                        {"Noeuds :", " " + " " + 0}, // Valeurs initiales
+                        {"", null},
+                        {"Arêtes :", " " + " " + 0}, // Valeurs initiales
+                        {"", null},
+                        {"Degré Moyen :", " " + " " + 0}, // Valeurs initiales
+                        {"", null},
+                        {"Composantes  :", " " + " " + 0}, // Valeurs initiales
+                        {"", null},
+                        {"Diamètre", " " + " " + 0}, // Valeurs initiales
+                        {"", null},
+                },
+                new String[]{"Informations Graphe :", null}
+        );
+
+        tableauInfoGraphe = new JTable(model);
+
+        JButton updateButton = new JButton("Mettre à jour les données");
+
+    }
+
+    // Méthode pour mettre à jour les données du tableau
+    public void updateTableData(int noeuds, int aretes, double degre, int composantes, int diametre) {
+        model.setValueAt(" " + " " + noeuds, 2, 1);
+        model.setValueAt(" " + " " + aretes, 4, 1);
+        model.setValueAt(" " + " " + degre, 6, 1);
+        model.setValueAt(" " + " " + composantes, 8, 1);
+        model.setValueAt(" " + " " + diametre, 10, 1);
+    }
+
+    private void decoBoutonAcceuil(){
+        boutonAccueil = new RoundedButton("Accueil", 25);
+        boutonAccueil.setFocusable(false);
+        boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
+        boutonAccueil.setBackground(couleurPrincipale);
+    }
+    private void decoTab(){
+        tableauInfoGraphe.setGridColor(Color.DARK_GRAY);
+        tableauInfoGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,18));
+        tableauInfoGraphe.setForeground(Color.WHITE);
+        tableauInfoGraphe.setBackground(Color.decode("#696767"));
+        tableauInfoGraphe.setShowVerticalLines(true);
+        tableauInfoGraphe.setShowHorizontalLines(false);
+        tableauInfoGraphe.setPreferredSize(new Dimension(260, 300));
+        tableauInfoGraphe.setRowHeight(tableauInfoGraphe.getRowHeight() + 10);
+        tableauInfoGraphe.setRowMargin(5);
+        tableauInfoGraphe.getColumnModel().getColumn(0).setPreferredWidth(200);
+        tableauInfoGraphe.setEnabled(false);
+        TableColumn colonneValeur = tableauInfoGraphe.getColumnModel().getColumn(1);
+        colonneValeur.setPreferredWidth(125);
+    }
+
+    private void decoBoutonColoration(){
+        boutonColoration = new RoundedButton("Effectuer la coloration", 50);
+        boutonColoration.setFocusable(false);
+        boutonColoration.setForeground(Color.WHITE);
+        boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        boutonColoration.setPreferredSize(new Dimension(220, 50));
+        boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boutonColoration.setBackground(couleurTertiaire);
+        boutonColoration.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (selectedFile == null) {
+                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+                else if (DsaturBouton.isSelected()){
+                    colorAndDisplayGraph(graph.getGraph(),kmax);
+                    statGraphe();
+                    updateTableData(noeuds, aretes, degre, composantes,diametre);
+
+                } else if (WelshBouton.isSelected()) {
+
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonColoration.setBackground(couleurSecondaire);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonColoration.setBackground(couleurTertiaire);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonColoration.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+    }
+    private void decoBoutonWelsh() {
+        WelshBouton = new JRadioButton("Welsh & Powell");
+        WelshBouton.setForeground(Color.WHITE);
+        WelshBouton.setFocusable(false);
+        WelshBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+        WelshBouton.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        WelshBouton.setBackground(Color.decode("#696767"));
+        WelshBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        WelshBouton.setSelected(true);
+    }
+
+    private void decoBoutonDsatur() {
+        DsaturBouton = new JRadioButton("D-Satur");
+        DsaturBouton.setForeground(Color.WHITE);
+        DsaturBouton.setFocusable(false);
+        DsaturBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+        DsaturBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        DsaturBouton.setBackground(Color.decode("#696767"));
+        DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    private void decoBoutonGraphe(){
+        boutonAfficherGraphe = new RoundedButton("Afficher le Graphe", 90);
+        boutonAfficherGraphe.setFocusable(false);
+        boutonAfficherGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,25));
+        boutonAfficherGraphe.setForeground(Color.WHITE);
+        boutonAfficherGraphe.setPreferredSize(new Dimension(320, 80));
+        boutonAfficherGraphe.setBackground(couleurTertiaire);
+        boutonAfficherGraphe.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (selectedFile == null) {
+                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Viewer vue = graph.getGraph().display();
+                vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonAfficherGraphe.setBackground(couleurSecondaire);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonAfficherGraphe.setBackground(couleurTertiaire);
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonAfficherGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonAfficherGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+    }
+
+    private void decoBoutonTelecharger(){
+        boutonTelecharger = new RoundedButton("Télécharger", 50);
+        boutonTelecharger.setFocusable(false);
+        boutonTelecharger.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
+        boutonTelecharger.setBackground(Color.decode("#696767"));
+        boutonTelecharger.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        boutonTelecharger.setForeground(Color.WHITE);
+        boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boutonTelecharger.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                fileToDownload = new File("hehehehhe");
+                if (selectedFile == null) {
+                    JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+                else if (fileToDownload == null){
+                    JOptionPane.showMessageDialog(panelCharger, "Attention ! Vous n'avez pas encore effectué la coloration.", "Erreur", JOptionPane.WARNING_MESSAGE);
+                }
+                else {
+                    saveFile();
+                }
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boutonTelecharger.setBackground(Color.DARK_GRAY);
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boutonTelecharger.setBackground(Color.decode("#696767"));
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boutonTelecharger.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boutonTelecharger.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+        });
+    }
+
+
+
+    // Fonction pour explorer une composante connexe
+    private static void exploreComponent(Node node, Set<Node> visited) {
+        List<Node> queue = new LinkedList<>();
+        queue.add(node);
+        visited.add(node);
+
+        while (!queue.isEmpty()) {
+            Node current = ((LinkedList<Node>) queue).poll();
+            for (Edge edge : current.getEachEdge()) {
+                Node neighbor = edge.getOpposite(current);
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                }
+            }
+        }
+    }
+
+    // Fonction pour calculer le diamètre du graphe
+    private static int calculateDiameter(Graph graph) {
+        int diameter = 0;
+        for (Node node : graph) {
+            int maxDistance = bfs(node);
+            diameter = Math.max(diameter, maxDistance);
+        }
+        return diameter;
+    }
+
+    // Fonction pour effectuer une recherche en largeur (BFS) et retourner la distance maximale
+    private static int bfs(Node start) {
+        Map<Node, Integer> distances = new HashMap<>();
+        List<Node> queue = new LinkedList<>();
+        queue.add(start);
+        distances.put(start, 0);
+
+        int maxDistance = 0;
+        while (!queue.isEmpty()) {
+            Node current = ((LinkedList<Node>) queue).poll();
+            int currentDistance = distances.get(current);
+
+            for (Edge edge : current.getEachEdge()) {
+                Node neighbor = edge.getOpposite(current);
+                if (!distances.containsKey(neighbor)) {
+                    int newDistance = currentDistance + 1;
+                    distances.put(neighbor, newDistance);
+                    maxDistance = Math.max(maxDistance, newDistance);
+                    queue.add(neighbor);
+                }
+            }
+        }
+        return maxDistance;
+    }
+
+    private void statGraphe(){
+        noeuds = graph.getGraph().getNodeCount();
+        aretes = graph.getGraph().getEdgeCount();
+
+
+        // Calcul du degré moyen
+        double totalDegree = 0;
+        for (Node node : graph.getGraph()) {
+            totalDegree += node.getDegree();
+        }
+        degre = totalDegree / noeuds;
+
+        // Calcul des composantes connexes
+        Set<Node> visited = new HashSet<>();
+        composantes = 0;
+        for (Node node : graph.getGraph()) {
+            if (!visited.contains(node)) {
+                composantes++;
+                exploreComponent(node, visited);
+            }
+        }
+        // Calcul du diamètre du graphe
+        diametre = calculateDiameter(graph.getGraph());
     }
 
     public JPanel getPanel() {
