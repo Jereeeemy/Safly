@@ -1,7 +1,6 @@
 package coloration;
 
 import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.SingleGraph;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,8 @@ public class WelshPowell {
         }
     }
 
-    public void colorierNoeudsWelsh(int kmax) {
+    public int[] colorierNoeudsWelsh(int kmax) {
+        ArrayList<Integer> coloration = new ArrayList<>();
         // Range les nœuds dans l'ordre décroissant de degré
         this.rangerNoeudsOrdreDecroissant();
         int colorIndex = 0;
@@ -96,10 +96,15 @@ public class WelshPowell {
                     }
                 }
             }
-
+            coloration.add(colorIndex+1);
             // Réinitialiser colorIndex pour la prochaine itération
             colorIndex = 0;
         }
+        int[] colorationtab = new int[coloration.size()];
+        for (int i = 0; i<coloration.size(); i++) {
+            colorationtab[i] = coloration.get(i);
+        }
+        return colorationtab;
     }
 
     // Ajouter une couleur à la liste de comptage des couleurs

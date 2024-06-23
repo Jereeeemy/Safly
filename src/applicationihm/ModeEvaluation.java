@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import graphvol.CreateurGraph;
+import org.graphstream.graph.Graph;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -18,7 +20,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
-import static coloration.DsaturAlgorithm.colorAndDisplayGraph;
+import static graphvol.CreateurGraph.*;
+
 
 public class ModeEvaluation {
     private final JPanel panelEvaluation;
@@ -109,30 +112,59 @@ public class ModeEvaluation {
 
         final JLabel labelNomFichier = new JLabel();
         RoundedButton boutonFichierGraphe = new RoundedButton("Déposer un fichier de graphe", 70);
-
+        ArrayList<File> fichiers_choisi_repertoire = new ArrayList<>();
         boutonFichierGraphe.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); // Sélection de répertoire
                 int returnValue = fileChooser.showOpenDialog(panelEvaluation);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
-                    selectedFile = fileChooser.getSelectedFile();
-                    String fileName = selectedFile.getName();
-                    try {
-                        // Essayer de créer le graphe avec le fichier sélectionné
-                        graph = new CreateurGraph(selectedFile);
-                        kmax = graph.getGraph().getAttribute("kmax");
+                    File selectedDirectory = fileChooser.getSelectedFile();
+                    // Maintenant vous avez le dossier sélectionné (selectedDirectory)
 
-                        // Mettre à jour l'affichage si la création du graphe réussit
-                        labelNomFichier.setText(fileName);
-                        labelNomFichier.setForeground(Color.BLUE);
-                        labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
-                        boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
-                        panelEvaluation.revalidate();
-                        panelEvaluation.repaint();
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(panelEvaluation, "Erreur lors de la lecture du fichier ! Vérifiez que le fichier fourni est correct.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                        ex.printStackTrace(); // Afficher l'erreur dans le terminal pour un débogage ultérieur
+                    // Vous pouvez ajouter votre logique pour traiter les fichiers dans ce dossier ici
+                    // Par exemple, vous pouvez itérer sur les fichiers dans le dossier
+                    File[] files = selectedDirectory.listFiles();
+                    //INSERER EXCPETION DOSSIER VIDE
+                    /****/
+                    for (File fichier : files){
+                        if (fichier.getName().endsWith(".txt") && fichier.getName().startsWith("graph")){
+                            fichiers_choisi_repertoire.add(fichier);
+                        }
+                    }
+
+
+                    // Tri des fichiers selon l'ordre numérique dans les noms de fichier
+                    fichiers_choisi_repertoire.sort(Comparator.comparing(f -> {
+                        String name = f.getName();
+                        // Extraire le numéro entre "graph-test" et ".txt"
+                        String number = name.substring(10, name.length() - 4);
+                        return Integer.parseInt(number);
+                    }));
+
+                    if (files != null) {
+                        for (File file : files) {
+                            if (file.isFile() && file.getName().endsWith(".graph")) {
+                                // Traiter le fichier (par exemple, créer un graphe avec ce fichier)
+                                String fileName = file.getName();
+                                try {
+                                    graph = new CreateurGraph(file);
+                                    kmax = graph.getGraph().getAttribute("kmax");
+
+                                    // Mettre à jour l'affichage si la création du graphe réussit
+                                    labelNomFichier.setText(fileName);
+                                    labelNomFichier.setForeground(Color.BLUE);
+                                    labelNomFichier.setFont(new Font("Lucida Sans", Font.ITALIC, 20));
+                                    boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
+                                    panelEvaluation.revalidate();
+                                    panelEvaluation.repaint();
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(panelEvaluation, "Erreur lors de la lecture du fichier " + fileName + "! Vérifiez que le fichier fourni est correct.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                                    ex.printStackTrace(); // Afficher l'erreur dans le terminal pour un débogage ultérieur
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -181,8 +213,50 @@ public class ModeEvaluation {
         boutonColoration.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (selectedFile == null) {
+                if (fichiers_choisi_repertoire.isEmpty()) {
                     JOptionPane.showMessageDialog(panelEvaluation, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+                else{
+                    for (File fichier : fichiers_choisi_repertoire){
+                        int conflitwelsh = -1;
+                        int conflitdsat = -1;
+                        int [] colorationdsat;
+                        int [] colorationwelsh;
+                        CreateurGraph graphwelsh;
+                        CreateurGraph graphdsat;
+                        try {
+                            graphwelsh = new CreateurGraph(fichier);
+                            WelshPowell algowelsh = new WelshPowell(graphwelsh.getGraph());
+                            colorationwelsh = algowelsh.colorierNoeudsWelsh(graphwelsh.getGraph().getAttribute("kmax"));
+                            conflitwelsh = algowelsh.CompterConflits(algowelsh.getGraph());
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        try {
+                            graphdsat = new CreateurGraph(fichier);
+                            colorationdsat = DsaturAlgorithm.dsaturColoring(graphdsat.getGraph(), graphdsat.getGraph().getAttribute("kmax"));
+                            DsaturAlgorithm.modifyNodeColors(graphdsat.getGraph(), colorationdsat);
+                            DsaturAlgorithm dsataglo = new DsaturAlgorithm();
+                            conflitdsat = dsataglo.CompterConflits(graphdsat.getGraph());
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+
+                        if (conflitwelsh <= conflitdsat){
+                            writeCSVFile(fichier.getName(),conflitwelsh,"7");
+                            writeTxtFile(graphwelsh.getGraph(), colorationwelsh,"7");
+                        }
+                        else{
+                            writeCSVFile(fichier.getName(),conflitdsat,"7");
+                            writeTxtFile(graphdsat.getGraph(), colorationdsat, "7");
+                        }
+
+                    }
+                    try {
+                        zipOutputDirectory("7");
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
 

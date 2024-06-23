@@ -1,204 +1,287 @@
 package coloration;
 
+import graphvol.CreateurGraph;
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.SingleGraph;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
 
+import java.io.*;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static graphvol.CreateurGraph.*;
+
+/**
+ * Classe implémentant l'algorithme DSATUR pour colorier les graphes et générer des résultats.
+ */
 public class DsaturAlgorithm {
-
-    // Classe interne pour représenter un nœud dans le graphe
+    private static int numAfterNameFichierTxT = 0;
+    /**
+     * Classe interne représentant un nœud dans le graphe avec des informations supplémentaires.
+     * Comparable permet de comparer les nœuds basés sur leur degré de saturation et leur degré.
+     */
     static class GraphNode implements Comparable<GraphNode> {
-        int nodeId; // Identifiant unique du nœud
-        int degree; // Degré du nœud (nombre de voisins)
-        int saturationDegree; // Degré de saturation du nœud (nombre de couleurs uniques parmi ses voisins déjà colorés)
+        int nodeId; // Identifiant du nœud
+        int degree; // Degré du nœud
+        int saturationDegree; // Degré de saturation du nœud
 
-        // Constructeur de la classe GraphNode
+        /**
+         * Constructeur pour initialiser un nœud avec son identifiant et son degré.
+         * @param nodeId Identifiant du nœud.
+         * @param degree Degré du nœud.
+         */
         GraphNode(int nodeId, int degree) {
-            this.nodeId = nodeId; // Initialise l'identifiant du nœud
-            this.degree = degree; // Initialise le degré du nœud
-            this.saturationDegree = 0; // Initialise le degré de saturation à 0
+            this.nodeId = nodeId;
+            this.degree = degree;
+            this.saturationDegree = 0;
         }
 
+        /**
+         * Méthode de comparaison pour trier les nœuds par degré de saturation puis par degré.
+         * @param other Autre nœud à comparer.
+         * @return Valeur négative si this est avant other, positive si this est après other, 0 si égaux.
+         */
         @Override
         public int compareTo(GraphNode other) {
-            // Compare les nœuds en fonction de leur degré de saturation, puis de leur degré s'ils ont le même degré de saturation
             if (this.saturationDegree != other.saturationDegree) {
-                return other.saturationDegree - this.saturationDegree; // Trie par degré de saturation décroissant
+                return other.saturationDegree - this.saturationDegree;
             }
-            return other.degree - this.degree; // En cas d'égalité, trie par degré décroissant
+            return other.degree - this.degree;
         }
     }
 
-    // Algorithme principal pour colorier le graphe avec un Kmax donné
+    /**
+     * Applique l'algorithme DSATUR pour colorier un graphe.
+     * @param graph Le graphe à colorier.
+     * @param Kmax Le nombre maximum de couleurs à utiliser.
+     * @return Un tableau des couleurs attribuées à chaque nœud.
+     */
     public static int[] dsaturColoring(Graph graph, int Kmax) {
-        int numberOfVertices = graph.getNodeCount(); // Récupère le nombre de sommets du graphe
-        int[] colors = new int[numberOfVertices]; // Tableau pour stocker les couleurs des sommets
-        Arrays.fill(colors, -1); // Initialise toutes les couleurs à -1 (aucune couleur assignée)
+        int numberOfVertices = graph.getNodeCount(); // Nombre de nœuds dans le graphe
+        int[] colors = new int[numberOfVertices]; // Tableau des couleurs des nœuds
+        Arrays.fill(colors, 0); // Initialise toutes les couleurs à 0 (non colorié)
 
-        GraphNode[] nodes = new GraphNode[numberOfVertices]; // Tableau pour stocker les nœuds du graphe
+        GraphNode[] nodes = new GraphNode[numberOfVertices]; // Tableau des nœuds avec informations supplémentaires
         int index = 0;
-        // Crée des objets GraphNode pour chaque nœud du graphe et les stocke dans le tableau nodes
         for (Node node : graph) {
-            nodes[index] = new GraphNode(node.getIndex(), node.getDegree());
+            nodes[index] = new GraphNode(node.getIndex(), node.getDegree()); // Crée les objets GraphNode
             index++;
         }
 
-        TreeSet<GraphNode> nodeSet = new TreeSet<>();
+        TreeSet<GraphNode> nodeSet = new TreeSet<>(); // Ensemble trié des nœuds par degré de saturation et degré
         for (GraphNode node : nodes) {
             nodeSet.add(node);
         }
 
-        // Boucle principale pour colorier les nœuds
+        // Boucle principale de l'algorithme DSATUR
         while (!nodeSet.isEmpty()) {
-            GraphNode currentNode = nodeSet.pollFirst(); // Prend le nœud avec le plus haut degré de saturation
-            boolean[] availableColors = new boolean[Kmax]; // Tableau pour suivre les couleurs disponibles
-            Arrays.fill(availableColors, true); // Initialise toutes les couleurs comme disponibles
+            GraphNode currentNode = nodeSet.pollFirst(); // Récupère le nœud avec le degré de saturation le plus élevé
+            boolean[] availableColors = new boolean[Kmax + 1]; // Tableau des couleurs disponibles
+            Arrays.fill(availableColors, true);
 
-            Node graphNode = graph.getNode(currentNode.nodeId); // Récupère le nœud correspondant dans le graphe
-            // Parcourt tous les voisins du nœud actuel pour marquer les couleurs déjà utilisées
+            Node graphNode = graph.getNode(currentNode.nodeId); // Récupère le nœud dans le graphe
             for (Edge edge : graphNode.getEachEdge()) {
                 Node neighbor = edge.getOpposite(graphNode);
-                if (colors[neighbor.getIndex()] != -1 && colors[neighbor.getIndex()] < Kmax) {
-                    availableColors[colors[neighbor.getIndex()]] = false; // Marque la couleur utilisée comme indisponible
+                if (colors[neighbor.getIndex()] != 0 && colors[neighbor.getIndex()] <= Kmax) {
+                    availableColors[colors[neighbor.getIndex()]] = false; // Marque les couleurs déjà utilisées par les voisins
                 }
             }
 
-            int chosenColor = -1; // Initialisation de la couleur choisie à -1, représentant l'absence de couleur disponible
-            for (int color = 0; color < Kmax; color++) {
+            int chosenColor = 0;
+            for (int color = 1; color <= Kmax; color++) {
                 if (availableColors[color]) {
-                    chosenColor = color; // Trouve la première couleur disponible
-                    break; // Sort de la boucle dès qu'une couleur est trouvée
+                    chosenColor = color; // Choisit la première couleur disponible
+                    break;
                 }
             }
 
-            if (chosenColor == -1) {
-                // Si aucune couleur n'est disponible dans la limite de Kmax, trouve la couleur avec le moins de conflits
-                chosenColor = findMinConflictColor(graph, colors, currentNode.nodeId, Kmax);
+            if (chosenColor == 0) {
+                chosenColor = findMinConflictColor(graph, colors, currentNode.nodeId, Kmax); // Trouve la couleur avec le moins de conflits
             }
 
-            colors[currentNode.nodeId] = chosenColor; // Assigne la couleur choisie au nœud actuel
+            colors[currentNode.nodeId] = chosenColor; // Assigne la couleur choisie au nœud
 
-            // Met à jour les degrés de saturation des voisins du nœud actuel
             for (Edge edge : graphNode.getEachEdge()) {
                 Node neighbor = edge.getOpposite(graphNode);
-                if (colors[neighbor.getIndex()] == -1) {
+                if (colors[neighbor.getIndex()] == 0) {
                     GraphNode neighborNode = nodes[neighbor.getIndex()];
-                    nodeSet.remove(neighborNode);
+                    nodeSet.remove(neighborNode); // Met à jour le degré de saturation des voisins non coloriés
                     neighborNode.saturationDegree = calculateSaturationDegree(graph, colors, neighbor.getIndex());
                     nodeSet.add(neighborNode);
                 }
             }
         }
 
-        // Si certains sommets n'ont pas pu être coloriés avec Kmax, minimise les conflits restants
         for (int i = 0; i < numberOfVertices; i++) {
-            if (colors[i] == -1) {
-                colors[i] = findMinConflictColor(graph, colors, i, Kmax);
+            if (colors[i] == 0) {
+                colors[i] = findMinConflictColor(graph, colors, i, Kmax); // Assure qu'aucun nœud n'est laissé sans couleur
             }
         }
 
-        return colors; // Retourne les couleurs des sommets
+        return colors;
     }
 
-    // Méthode pour trouver une couleur minimisant les conflits pour un nœud qui n'est pas déjà utilisée par ses voisins
+    /**
+     * Trouve la couleur avec le moins de conflits pour un nœud donné.
+     * @param graph Le graphe.
+     * @param colors Tableau des couleurs des nœuds.
+     * @param nodeId L'identifiant du nœud.
+     * @param Kmax Le nombre maximum de couleurs à utiliser.
+     * @return La couleur avec le moins de conflits.
+     */
     private static int findMinConflictColor(Graph graph, int[] colors, int nodeId, int Kmax) {
-        int minConflicts = Integer.MAX_VALUE; // Initialise le nombre minimum de conflits à une valeur maximale
-        int minConflictColor = 0; // Initialise la couleur minimisant les conflits
+        int minConflicts = Integer.MAX_VALUE;
+        int minConflictColor = 1;
 
         Node node = graph.getNode(nodeId);
-        for (int color = 0; color < Kmax; color++) {
-            int conflicts = countConflicts(graph, colors, node, color);
+        for (int color = 1; color <= Kmax; color++) {
+            int conflicts = countConflicts(graph, colors, node, color); // Compte les conflits pour chaque couleur
             if (conflicts < minConflicts) {
                 minConflicts = conflicts;
-                minConflictColor = color;
+                minConflictColor = color; // Choisit la couleur avec le moins de conflits
             }
         }
 
-        return minConflictColor; // Retourne la couleur minimisant les conflits
+        return minConflictColor;
     }
 
-    // Méthode pour compter le nombre de conflits d'un nœud donné s'il est coloré avec une couleur spécifique
+    /**
+     * Compte les conflits de couleurs pour un nœud donné.
+     * @param graph Le graphe.
+     * @param colors Tableau des couleurs des nœuds.
+     * @param node Le nœud.
+     * @param color La couleur à tester.
+     * @return Le nombre de conflits.
+     */
     private static int countConflicts(Graph graph, int[] colors, Node node, int color) {
         int conflictCount = 0;
         for (Edge edge : node.getEachEdge()) {
             Node neighbor = edge.getOpposite(node);
             if (colors[neighbor.getIndex()] == color) {
-                conflictCount++;
+                conflictCount++; // Incrémente le nombre de conflits si un voisin a la même couleur
             }
         }
         return conflictCount;
     }
 
-    // Calcule le degré de saturation d'un nœud donné dans le graphe
+    /**
+     * Calcule le degré de saturation pour un nœud donné.
+     * @param graph Le graphe.
+     * @param colors Tableau des couleurs des nœuds.
+     * @param nodeId L'identifiant du nœud.
+     * @return Le degré de saturation.
+     */
     private static int calculateSaturationDegree(Graph graph, int[] colors, int nodeId) {
         Set<Integer> uniqueColors = new HashSet<>();
         Node node = graph.getNode(nodeId);
         for (Edge edge : node.getEachEdge()) {
             Node neighbor = edge.getOpposite(node);
-            if (colors[neighbor.getIndex()] != -1) {
-                uniqueColors.add(colors[neighbor.getIndex()]);
+            if (colors[neighbor.getIndex()] != 0) {
+                uniqueColors.add(colors[neighbor.getIndex()]); // Ajoute les couleurs uniques des voisins
             }
         }
-        return uniqueColors.size(); // Retourne le nombre de couleurs uniques (le degré de saturation)
+        return uniqueColors.size();
     }
 
-    // Méthode pour colorier un graphe donné et afficher le résultat
-    public static void colorAndDisplayGraph(Graph graph, int Kmax) {
-        int[] result = dsaturColoring(graph, Kmax); // Applique l'algorithme Dsatur pour colorier le graphe
 
-        // Affiche le nombre de sommets
+    /**
+     * Colore le graphe, affiche les informations et enregistre les résultats.
+     * @param graph Le graphe.
+     * @param Kmax Le nombre maximum de couleurs à utiliser.
+     * @param nomFichier Le nom du fichier pour les résultats.
+     * @param outputDirectory Le répertoire de sortie pour les fichiers.
+     * @return Un tableau des fichiers générés.
+     */
+    public static File[] colorAndDisplayGraph(Graph graph, int Kmax, String nomFichier, String outputDirectory) {
+        int[] result = dsaturColoring(graph, Kmax); // Applique l'algorithme DSatur pour colorier le graphe
+        displayGraphInfo(graph, result); // Affiche les informations sur le graphe et ses couleurs
+        modifyNodeColors(graph, result); // Modifie les couleurs des nœuds pour l'affichage graphique
+
+        int totalConflicts = checkColorConflicts(graph, result); // Vérifie les conflits de couleurs dans le graphe
+
+        File csvFile = writeCSVFile(nomFichier, totalConflicts, outputDirectory); // Écrit les résultats dans un fichier CSV
+        File txtFile = writeTxtFile(graph, result, outputDirectory); // Écrit les résultats dans un fichier texte
+
+        return new File[]{csvFile, txtFile}; // Retourne les fichiers générés
+    }
+
+
+    /**
+     * Affiche les informations du graphe.
+     * @param graph Le graphe.
+     * @param result Tableau des couleurs des nœuds.
+     */
+    private static void displayGraphInfo(Graph graph, int[] result) {
         int numberOfVertices = graph.getNodeCount();
-        System.out.println("Nombre de sommets: " + numberOfVertices);
-
-        // Affiche chaque sommet avec sa couleur
+        System.out.println("Nombre de sommets: " + numberOfVertices); // Affiche le nombre total de sommets dans le graphe
         System.out.println("Sommet; Couleur");
         for (int i = 0; i < numberOfVertices; i++) {
-            System.out.println(i + "; " + result[i]);
+            System.out.println((i + 1) + " ; " + result[i]); // Affiche l'identifiant du nœud et sa couleur correspondante
         }
 
-        // Compte le nombre de couleurs utilisées
         Set<Integer> uniqueColors = new HashSet<>();
         for (int color : result) {
             uniqueColors.add(color);
         }
-        System.out.println("Nombre de couleurs utilisées: " + uniqueColors.size());
+        System.out.println("Nombre de couleurs utilisées: " + uniqueColors.size()); // Affiche le nombre de couleurs différentes utilisées
+    }
 
-        // Modifie la couleur des nœuds dans le graphe pour refléter les couleurs attribuées
+
+    /**
+     * Modifie les couleurs des nœuds dans le graphe pour l'affichage.
+     * @param graph Le graphe.
+     * @param result Tableau des couleurs des nœuds.
+     */
+    public static void modifyNodeColors(Graph graph, int[] result) {
         for (Node node : graph) {
-            // Utilise les couleurs attribuées pour modifier l'aspect visuel des nœuds dans le graphe
-            node.setAttribute("ui.style", "fill-color: rgb(" + (result[node.getIndex()] * 70 % 255) + "," + (result[node.getIndex()] * 130 % 255) + "," + (result[node.getIndex()] * 200 % 255) + ");");
-        }
-
-        //graph.display(); // Affiche le graphe colorié
-
-        // Vérifie que chaque nœud a une couleur différente de ses voisins
-        boolean allNodesCorrectlyColored = true;
-        int totalConflicts = 0;
-        for (Node node : graph) {
-            int nodeId = node.getIndex();
-            int nodeColor = result[nodeId];
-            for (Edge edge : node.getEachEdge()) {
-                Node neighbor = edge.getOpposite(node);
-                int neighborColor = result[neighbor.getIndex()];
-                if (nodeColor == neighborColor) {
-                    System.out.println("Erreur: Le nœud " + nodeId + " et le nœud " + neighbor.getIndex() + " ont la même couleur.");
-                    allNodesCorrectlyColored = false;
-                    totalConflicts++;
-                }
-            }
-        }
-
-        if (allNodesCorrectlyColored) {
-            System.out.println("Tous les nœuds ont des couleurs différentes de leurs voisins.");
-        } else {
-            System.out.println("Nombre total de conflits: " + totalConflicts);
+            node.setAttribute("ui.style", "fill-color: rgb(" +
+                    (result[node.getIndex()] * 70 % 255) + "," +
+                    (result[node.getIndex()] * 130 % 255) + "," +
+                    (result[node.getIndex()] * 200 % 255) + ");"); // Modifie la couleur des nœuds pour l'affichage graphique
         }
     }
 
-    // Méthode principale
+    /**
+     * Vérifie les conflits de couleurs dans le graphe.
+     * @param graph Le graphe.
+     * @param result Tableau des couleurs des nœuds.
+     * @return Le nombre total de conflits de couleurs.
+     */
+    private static int checkColorConflicts(Graph graph, int[] result) {
+        Set<String> checkedPairs = new HashSet<>(); // Initialise un ensemble pour stocker les paires de nœuds déjà vérifiées
+        int totalConflicts = 0; // Initialise le compteur de conflits à zéro
+        for (Node node : graph) { // Parcourt tous les nœuds du graphe
+            int nodeId = node.getIndex(); // Récupère l'identifiant du nœud actuel
+            int nodeColor = result[nodeId]; // Récupère la couleur du nœud actuel à partir du tableau des résultats
+            for (Edge edge : node.getEachEdge()) { // Parcourt toutes les arêtes du nœud actuel
+                Node neighbor = edge.getOpposite(node); // Récupère le voisin connecté par cette arête
+                int neighborId = neighbor.getIndex(); // Récupère l'identifiant du voisin
+                int neighborColor = result[neighborId]; // Récupère la couleur du voisin à partir du tableau des résultats
+                // Génère une clé pour la paire de nœuds afin de gérer les paires dans les deux sens
+                String pairKey = nodeId < neighborId ? nodeId + "-" + neighborId : neighborId + "-" + nodeId;
+                // Vérifie si les deux nœuds ont la même couleur et si cette paire n'a pas déjà été vérifiée
+                if (nodeColor == neighborColor && !checkedPairs.contains(pairKey)) {
+                    System.out.println("Erreur: Le nœud " + nodeId + " et le nœud " + neighborId + " ont la même couleur.");
+                    checkedPairs.add(pairKey); // Ajoute la paire à l'ensemble des paires vérifiées
+                    totalConflicts++; // Incrémente le compteur de conflits
+                }
+            }
+        }
+        if (totalConflicts == 0) {
+            System.out.println("Tous les nœuds ont des couleurs différentes de leurs voisins.");
+        } else {
+            System.out.println("Nombre total de conflits: " + totalConflicts); // Affiche le nombre total de conflits détectés
+        }
+        return totalConflicts; // Retourne le nombre total de conflits de couleurs
+    }
+
+
+
+
+    /**
+     * Méthode principale pour tester l'algorithme DSATUR.
+     * @param args Arguments de la ligne de commande (non utilisés ici).
+     */
     public static void main(String[] args) {
         // Crée un nouveau graphe avec GraphStream
         Graph graph = new SingleGraph("DSATUR Graph");
@@ -230,7 +313,43 @@ public class DsaturAlgorithm {
         graph.addEdge("8-9", "8", "9");
         graph.addEdge("9-10", "9", "10");
 
-        // Appelle la méthode pour colorier le graphe et l'afficher
-        colorAndDisplayGraph(graph, 1);
+        int Kmax = 5;
+        String nomFichier = "nom_fichier.txt";
+        String outputDirectory = "output_directory";
+        colorAndDisplayGraph(graph, Kmax, nomFichier, outputDirectory);// Colore le graphe et affiche les résultats
+
+        // Écriture des sommets et couleurs dans un fichier texte
+        writeColorsToTxtFile(graph, dsaturColoring(graph, Kmax), "sommets_couleurs.txt");
     }
+
+    private List<Node> getAdjacentNodes(Node node) {
+        List<Node> adjacentNodes = new ArrayList<>();
+        for (Edge edge : node.getEachEdge()) {
+            Node oppositeNode = edge.getOpposite(node);
+            adjacentNodes.add(oppositeNode);
+        }
+        return adjacentNodes;
+    }
+
+    // Méthode pour compter et afficher les conflits
+    public int CompterConflits(Graph graph) {
+        int conflictCount = 0;
+
+        for (Node node : graph) {
+            List<Node> adjacentNodes = getAdjacentNodes(node);
+
+            for (Node neighbor : adjacentNodes) {
+                if (node.hasAttribute("ui.style") && neighbor.hasAttribute("ui.style")) {
+                    String color1 = node.getAttribute("ui.style");
+                    String color2 = neighbor.getAttribute("ui.style");
+                    if (color1.equals(color2)) {
+                        conflictCount++;
+                    }
+                }
+            }
+        }
+        conflictCount = conflictCount / 2;
+        return conflictCount;
+    }
+
 }

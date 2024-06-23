@@ -46,6 +46,26 @@ public class Couleur {
         return adjacentNodes;
     }
 
+    public int CompterConflits(Graph graph) {
+        int conflictCount = 0;
+
+        for (Node node : graph) {
+            List<Node> adjacentNodes = getAdjacentNodes(node);
+
+            for (Node neighbor : adjacentNodes) {
+                if (node.hasAttribute("ui.style") && neighbor.hasAttribute("ui.style")) {
+                    String color1 = node.getAttribute("ui.style");
+                    String color2 = neighbor.getAttribute("ui.style");
+                    if (color1.equals(color2)) {
+                        conflictCount++;
+                    }
+                }
+            }
+        }
+        conflictCount = conflictCount / 2;
+        return conflictCount;
+    }
+
 
 }
 

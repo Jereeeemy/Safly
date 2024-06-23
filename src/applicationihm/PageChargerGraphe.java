@@ -1,36 +1,34 @@
 package applicationihm;
 
-import coloration.*;
+import coloration.WelshPowell;
+import graphvol.CreateurGraph;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import graphvol.CreateurGraph;
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
-import org.graphstream.ui.view.Viewer;
-import org.graphstream.graph.implementations.*;
-
-
+import java.awt.event.MouseWheelEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static coloration.DsaturAlgorithm.colorAndDisplayGraph;
+import coloration.WelshPowell.*;
+import org.graphstream.ui.view.ViewerPipe;
 
 public class PageChargerGraphe {
     private final JPanel panelCharger;
@@ -40,6 +38,7 @@ public class PageChargerGraphe {
     private Color couleurSecondaire = Color.decode("#2C5789");
     private Color couleurTertiaire = Color.decode("#122A47");
     private CreateurGraph graph;
+    private WelshPowell graphWelsh;
     public File selectedFile;
     public File fileToDownload;
     int kmax;
@@ -55,6 +54,8 @@ public class PageChargerGraphe {
     private JRadioButton WelshBouton;
     private JRadioButton DsaturBouton;
     private RoundedButton boutonAfficherGraphe;
+    private Viewer vue;
+    private ViewerPipe viewerPipe;
     public PageChargerGraphe(MenuPrincipal menuPrincipal) {
 
         panelCharger = new JPanel() {
@@ -154,6 +155,7 @@ public class PageChargerGraphe {
                     try {
                         // Essayer de créer le graphe avec le fichier sélectionné
                         graph = new CreateurGraph(selectedFile);
+                        graphWelsh = new WelshPowell(graph.getGraph());
                         kmax = graph.getGraph().getAttribute("kmax");
                         spinnerKMax.setValue(kmax);
 
@@ -209,45 +211,70 @@ public class PageChargerGraphe {
 
 
         JPanel centrePanel2 = new JPanel();
-        centrePanel2.setLayout(new BoxLayout(centrePanel2, BoxLayout.PAGE_AXIS));
+        centrePanel2.setLayout(new GridBagLayout());
         centrePanel2.setBackground(couleurPrincipale);
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+// Ajout du label principal
         JLabel labelChoixParam = new JLabel("<html><div style='text-align: left'> Après avoir chargé votre graphe,<br> vous pouvez personnaliser la <br>coloration du graphe : </div></html>");
         labelChoixParam.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        labelChoixParam.setFont(new Font("Lucida Sans",Font.PLAIN,20));
-        centrePanel2.add(labelChoixParam);
+        labelChoixParam.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+        centrePanel2.add(labelChoixParam, gbc);
 
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
+// Ajout du miniPanelCentral
         RoundedPanel miniPanelCentral = new RoundedPanel(25);
         miniPanelCentral.setBackground(couleurPrincipale);
         miniPanelCentral.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         miniPanelCentral.setLayout(new BoxLayout(miniPanelCentral, BoxLayout.PAGE_AXIS));
+        miniPanelCentral.setBackground(Color.decode("#696767"));
+
         JLabel labelChoixAlgo = new JLabel("Choix de l'Algo de coloration :");
         labelChoixAlgo.setForeground(Color.WHITE);
-        labelChoixAlgo.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        labelChoixAlgo.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
+        miniPanelCentral.add(labelChoixAlgo);
 
         ButtonGroup groupAlgos = new ButtonGroup();
-        decoBoutonWelsh();
-        decoBoutonDsatur();
+        decoBoutonWelsh(); // Méthode que vous avez mentionnée pour instancier et personnaliser WelshBouton
+        decoBoutonDsatur(); // Méthode que vous avez mentionnée pour instancier et personnaliser DsaturBouton
+
+
+
         groupAlgos.add(WelshBouton);
         groupAlgos.add(DsaturBouton);
 
+
         JLabel labelKmax = new JLabel("Choix de K-max :");
         labelKmax.setForeground(Color.WHITE);
-        labelKmax.setFont(new Font("Lucida Sans",Font.PLAIN,20));
+        labelKmax.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
 
-        miniPanelCentral.add(labelChoixAlgo);
+
         miniPanelCentral.add(WelshBouton);
         miniPanelCentral.add(DsaturBouton);
         miniPanelCentral.add(labelKmax);
         miniPanelCentral.add(spinnerKMax);
-        miniPanelCentral.setBackground(Color.decode("#696767"));
 
-        centrePanel2.add(miniPanelCentral);
+        centrePanel2.add(miniPanelCentral, gbc);
 
-        decoBoutonColoration();
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.insets = new Insets(5, 0, 0, 0);
+
+// Ajout du bouton de coloration
+        decoBoutonColoration(); // Méthode que vous avez mentionnée pour instancier et personnaliser boutonColoration
+
+        centrePanel2.add(boutonColoration, gbc);
 
 
-        centrePanel2.add(boutonColoration);
 
         JPanel centrePanel3 = new JPanel();
         centrePanel3.setBackground(couleurPrincipale);
@@ -257,13 +284,13 @@ public class PageChargerGraphe {
 
 
         centrePanel3.add(tableauInfoGraphe);
-        centrePanel3.setBorder(BorderFactory.createEmptyBorder(0,20,0,0));
+        centrePanel3.setBorder(BorderFactory.createEmptyBorder(0,30,0,10));
 
         JPanel centrePanelContainer = new JPanel();
         centrePanelContainer.setLayout(new BoxLayout(centrePanelContainer, BoxLayout.X_AXIS));
         centrePanelContainer.setBackground(couleurPrincipale);
 
-        centrePanel2.setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 0));
+        centrePanel2.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 30));
 
         // Add centrePanel1, sepa1, centrePanel2, sepa2, centrePanel3 to the container
         centrePanelContainer.add(centrePanel1);
@@ -401,7 +428,7 @@ public class PageChargerGraphe {
         boutonColoration.setFocusable(false);
         boutonColoration.setForeground(Color.WHITE);
         boutonColoration.setFont(new Font("Lucida Sans",Font.PLAIN,20));
-        boutonColoration.setPreferredSize(new Dimension(220, 50));
+        boutonColoration.setPreferredSize(new Dimension(280, 50));
         boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonColoration.setBackground(couleurTertiaire);
         boutonColoration.addMouseListener(new MouseListener() {
@@ -411,11 +438,14 @@ public class PageChargerGraphe {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
                 else if (DsaturBouton.isSelected()){
-                    colorAndDisplayGraph(graph.getGraph(),kmax);
-                    statGraphe();
+                    colorAndDisplayGraph(graph.getGraph(),kmax,"test1","test2");
+                    statGrapheDsat();
                     updateTableData(noeuds, aretes, degre, composantes,diametre);
 
                 } else if (WelshBouton.isSelected()) {
+                    graphWelsh.colorierNoeudsWelsh(kmax);
+                    statGrapheWelsh();
+                    updateTableData(noeuds, aretes, degre, composantes,diametre);
 
                 }
             }
@@ -461,6 +491,7 @@ public class PageChargerGraphe {
         DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+
     private void decoBoutonGraphe(){
         boutonAfficherGraphe = new RoundedButton("Afficher le Graphe", 90);
         boutonAfficherGraphe.setFocusable(false);
@@ -474,10 +505,19 @@ public class PageChargerGraphe {
                 if (selectedFile == null) {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
+                } else if (DsaturBouton.isSelected()) {
+                    vue = graph.getGraph().display();
+                    viewerPipe = vue.newViewerPipe();
+                    vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
+                    ajouterGrapheListener(vue);
+                }
+                if (WelshBouton.isSelected()){
+                    vue = graphWelsh.getGraph().display();
+                    viewerPipe = vue.newViewerPipe();
+                    ajouterGrapheListener(vue);
+                    vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
                 }
 
-                Viewer vue = graph.getGraph().display();
-                vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
             }
             @Override
             public void mousePressed(MouseEvent e) {
@@ -498,6 +538,32 @@ public class PageChargerGraphe {
         });
     }
 
+    private void ajouterGrapheListener(Viewer vue){
+        vue.getDefaultView().addMouseWheelListener(new MouseAdapter() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                double zoomFactor = e.getWheelRotation() > 0 ? 1.1 : 0.9;
+                double zoomPercent = vue.getDefaultView().getCamera().getViewPercent() * zoomFactor;
+
+                // Calculez les coordonnées du point de zoom
+                double mouseX = e.getX();
+                double mouseY = e.getY();
+
+                // Calculez le nouveau centre de vue en fonction de la position de la souris
+                double currentZoom = vue.getDefaultView().getCamera().getViewPercent();
+                double centerX = vue.getDefaultView().getCamera().getViewCenter().x;
+                double centerY = vue.getDefaultView().getCamera().getViewCenter().y;
+
+                double newX = centerX - ((mouseX / vue.getDefaultView().getWidth()) * (zoomPercent - currentZoom));
+                double newY = centerY + (((vue.getDefaultView().getHeight() - mouseY) / vue.getDefaultView().getHeight()) * (zoomPercent - currentZoom));
+
+                // Appliquez le zoom et le nouvel emplacement du centre de vue
+                vue.getDefaultView().getCamera().setViewPercent(zoomPercent);
+                vue.getDefaultView().getCamera().setViewCenter(newX, newY, 0);
+            }
+        });
+
+    }
     private void decoBoutonTelecharger(){
         boutonTelecharger = new RoundedButton("Télécharger", 50);
         boutonTelecharger.setFocusable(false);
@@ -594,7 +660,7 @@ public class PageChargerGraphe {
         return maxDistance;
     }
 
-    private void statGraphe(){
+    private void statGrapheDsat(){
         noeuds = graph.getGraph().getNodeCount();
         aretes = graph.getGraph().getEdgeCount();
 
@@ -617,6 +683,31 @@ public class PageChargerGraphe {
         }
         // Calcul du diamètre du graphe
         diametre = calculateDiameter(graph.getGraph());
+    }
+
+    private void statGrapheWelsh(){
+        noeuds = graphWelsh.getGraph().getNodeCount();
+        aretes = graphWelsh.getGraph().getEdgeCount();
+
+
+        // Calcul du degré moyen
+        double totalDegree = 0;
+        for (Node node : graphWelsh.getGraph()) {
+            totalDegree += node.getDegree();
+        }
+        degre = totalDegree / noeuds;
+
+        // Calcul des composantes connexes
+        Set<Node> visited = new HashSet<>();
+        composantes = 0;
+        for (Node node : graphWelsh.getGraph()) {
+            if (!visited.contains(node)) {
+                composantes++;
+                exploreComponent(node, visited);
+            }
+        }
+        // Calcul du diamètre du graphe
+        diametre = calculateDiameter(graphWelsh.getGraph());
     }
 
     public JPanel getPanel() {
