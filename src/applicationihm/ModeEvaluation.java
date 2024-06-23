@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import graphvol.CreateurGraph;
+import graphvol.ExceptionFormatIncorrect;
+import graphvol.ExceptionLigneIncorrect;
 import org.graphstream.graph.Graph;
 
 import java.io.BufferedWriter;
@@ -170,6 +172,10 @@ public class ModeEvaluation {
                                 } catch (IOException ex) {
                                     JOptionPane.showMessageDialog(panelEvaluation, "Erreur lors de la lecture du fichier " + fileName + "! Vérifiez que le fichier fourni est correct.", "Erreur", JOptionPane.ERROR_MESSAGE);
                                     ex.printStackTrace(); // Afficher l'erreur dans le terminal pour un débogage ultérieur
+                                } catch (ExceptionFormatIncorrect ex) {
+                                    throw new RuntimeException(ex);
+                                } catch (ExceptionLigneIncorrect ex) {
+                                    throw new RuntimeException(ex);
                                 }
                             }
                         }
@@ -237,7 +243,7 @@ public class ModeEvaluation {
                             WelshPowell algowelsh = new WelshPowell(graphwelsh.getGraph());
                             colorationwelsh = algowelsh.colorierNoeudsWelsh(graphwelsh.getGraph().getAttribute("kmax"));
                             conflitwelsh = graphwelsh.CompterConflits(algowelsh.getGraph());
-                        } catch (IOException ex) {
+                        } catch (IOException | ExceptionFormatIncorrect | ExceptionLigneIncorrect ex) {
                             throw new RuntimeException(ex);
                         }
                         try {
@@ -245,7 +251,7 @@ public class ModeEvaluation {
                             colorationdsat = DsaturAlgorithm.dsaturColoring(graphdsat.getGraph(), graphdsat.getGraph().getAttribute("kmax"));
                             DsaturAlgorithm.modifyNodeColors(graphdsat.getGraph(), colorationdsat);
                             conflitdsat = graphdsat.CompterConflits(graphdsat.getGraph());
-                        } catch (IOException ex) {
+                        } catch (IOException | ExceptionFormatIncorrect | ExceptionLigneIncorrect ex) {
                             throw new RuntimeException(ex);
                         }
 

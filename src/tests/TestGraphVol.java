@@ -3,6 +3,8 @@ package tests;
 
 import coloration.WelshPowell;
 import graphvol.CreateurGraph;
+import graphvol.ExceptionFormatIncorrect;
+import graphvol.ExceptionLigneIncorrect;
 import graphvol.ExceptionNoGraphVol;
 
 import coloration.DsaturAlgorithm;
@@ -14,7 +16,7 @@ import java.util.Scanner;
 
 
 public class TestGraphVol {
-    public static void main(String[] args) throws IOException, ExceptionNoGraphVol {
+    public static void main(String[] args) throws IOException, ExceptionNoGraphVol, ExceptionFormatIncorrect, ExceptionLigneIncorrect {
         CreateurGraph test = new CreateurGraph();
         File chemin = test.ChoixGraph();
         test = new CreateurGraph(chemin);

@@ -6,38 +6,59 @@ import graphvol.CreateurGraph;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 
-import static coloration.DsaturAlgorithm.colorAndDisplayGraph;
 import static graphvol.CreateurGraph.InfoscolorOneGraph;
 import static coloration.DsaturAlgorithm.dsaturColoring;
-import coloration.WelshPowell.*;
 import org.graphstream.ui.view.ViewerPipe;
-
 
 /**
  * Classe de l'application qui propose de charger un graphe à partir d'un fichier et de colorier ce graphe grâce à différents algorithmes
  */
-
 public class PageChargerGraphe {
     /**
      * Bouton "Accueil" pour retourner à la page d'accueil.
@@ -186,12 +207,14 @@ public class PageChargerGraphe {
      * Tube de visionneuse pour interagir avec la vue du graphe.
      */
     private ViewerPipe viewerPipe;
+
     /**
      * Constructeur de la classe PageChargerGraphe.
      * @param menuPrincipal Instance de la classe MenuPrincipal pour la navigation et la gestion de l'interface.
      */
     public PageChargerGraphe(MenuPrincipal menuPrincipal) {
 
+        // Créer un JPanel avec une méthode paintComponent personnalisée pour dessiner l'image de fond
         panelCharger = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -202,27 +225,31 @@ public class PageChargerGraphe {
             }
         };
 
+        // Créer des séparateurs verticaux avec un fond gris
         JSeparator sepa1 = new JSeparator(SwingConstants.VERTICAL);
         sepa1.setBackground(Color.GRAY);
-
         JSeparator sepa2 = new JSeparator(SwingConstants.VERTICAL);
         sepa2.setBackground(Color.GRAY);
 
-
+        // Définir la disposition du panneau principal avec des écarts horizontaux et verticaux
         panelCharger.setLayout(new BorderLayout(60,45));
 
+        // Créer et configurer le panneau du haut
         JPanel panelChargerHaut = new JPanel();
         panelChargerHaut.setOpaque(false);
         RoundedPanel panelChargerCentre = new RoundedPanel(40);
 
+        // Créer et configurer le panneau central arrondi
         panelChargerCentre.setBorder(BorderFactory.createEmptyBorder(30, 15, 30, 15));
         panelChargerCentre.setBackground(couleurPrincipale);
         panelChargerCentre.setLayout(new BorderLayout(0,0));
         panelChargerCentre.setOpaque(false);
 
+        // Créer et configurer le panneau du bas
         JPanel panelChargerBas = new JPanel();
         panelChargerBas.setOpaque(false);
 
+        // Définir les propriétés du bouton d'accueil
         decoBoutonAcceuil();
         boutonAccueil.addMouseListener(new MouseListener() {
             @Override
@@ -256,19 +283,24 @@ public class PageChargerGraphe {
         panelChargerHaut.add(boutonAccueil, BorderLayout.CENTER);
         panelChargerHaut.setLayout(new FlowLayout(FlowLayout.CENTER));
 
+        // Créer et configurer le premier panneau central
         JPanel centrePanel1 = new JPanel();
         centrePanel1.setLayout(new BoxLayout(centrePanel1, BoxLayout.PAGE_AXIS));
         centrePanel1.setBackground(couleurPrincipale);
 
+        // Ajouter une étiquette avec des instructions pour déposer un fichier de graphe
         JLabel labelDeposeFichier = new JLabel("<html><div style='text-align: left'> Pour charger un graphe,<br> veuillez d'abord fournir <br>les fichiers nécessaires</div></html>");
         labelDeposeFichier.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         labelDeposeFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
-
         centrePanel1.add(labelDeposeFichier);
+
+        // Étiquette pour afficher le nom du fichier sélectionné
         final JLabel labelNomFichier = new JLabel();
 
+        // Bouton pour déposer un fichier de graphe
         RoundedButton boutonFichierGraphe = new RoundedButton("Déposer un fichier de graphe", 70);
 
+        // Spinner pour sélectionner la valeur de k-max
         JSpinner spinnerKMax = getSpinnerKMax();
         spinnerKMax.addChangeListener(new ChangeListener() {
             @Override
@@ -277,7 +309,7 @@ public class PageChargerGraphe {
             }
         });
 
-
+        // Ajouter un écouteur au bouton pour sélectionner un fichier de graphe
         boutonFichierGraphe.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -332,18 +364,21 @@ public class PageChargerGraphe {
         boutonFichierGraphe.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         boutonFichierGraphe.setBackground(Color.decode("#696767"));
 
+        // Ajouter une étiquette avec des instructions pour télécharger le fichier du graphe colorié
         JLabel labelTelechargerFichier = new JLabel("<html><div style='text-align: left'> Cliquez ici si vous souhaitez <br>télécharger le fichier qui <br>contient les informations <br>du graphe colorié </div></html>");
         labelTelechargerFichier.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
         labelTelechargerFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
 
+        // Définir les propriétés du bouton de téléchargement
         decoBoutonTelecharger();
 
+        // Ajouter les composants au premier panneau central
         centrePanel1.add(boutonFichierGraphe);
         centrePanel1.add(labelNomFichier);
         centrePanel1.add(labelTelechargerFichier);
         centrePanel1.add(boutonTelecharger);
 
-
+        // Créer et configurer le deuxième panneau central
         JPanel centrePanel2 = new JPanel();
         centrePanel2.setLayout(new GridBagLayout());
         centrePanel2.setBackground(couleurPrincipale);
@@ -354,7 +389,7 @@ public class PageChargerGraphe {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-// Ajout du label principal
+        // Ajouter une étiquette principale avec des instructions
         JLabel labelChoixParam = new JLabel("<html><div style='text-align: left'> Après avoir chargé votre graphe,<br> vous pouvez personnaliser la <br>coloration du graphe : </div></html>");
         labelChoixParam.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         labelChoixParam.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
@@ -364,28 +399,27 @@ public class PageChargerGraphe {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-// Ajout du miniPanelCentral
+        // Ajouter le panneau central miniature
         RoundedPanel miniPanelCentral = new RoundedPanel(25);
         miniPanelCentral.setBackground(couleurPrincipale);
         miniPanelCentral.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         miniPanelCentral.setLayout(new BoxLayout(miniPanelCentral, BoxLayout.PAGE_AXIS));
         miniPanelCentral.setBackground(Color.decode("#696767"));
 
+        // Ajouter une étiquette et des boutons pour le choix de l'algorithme de coloration
         JLabel labelChoixAlgo = new JLabel("Choix de l'Algo de coloration :");
         labelChoixAlgo.setForeground(Color.WHITE);
         labelChoixAlgo.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         miniPanelCentral.add(labelChoixAlgo);
 
         ButtonGroup groupAlgos = new ButtonGroup();
-        decoBoutonWelsh(); // Méthode que vous avez mentionnée pour instancier et personnaliser WelshBouton
-        decoBoutonDsatur(); // Méthode que vous avez mentionnée pour instancier et personnaliser DsaturBouton
-
-
+        decoBoutonWelsh(); // methode pour decorer et instancier le bouton Welsh
+        decoBoutonDsatur(); // methode pour decorer et instancier le bouton DSatur
 
         groupAlgos.add(WelshBouton);
         groupAlgos.add(DsaturBouton);
 
-
+        // Ajouter une étiquette et un spinner pour le choix de K-max
         JLabel labelKmax = new JLabel("Choix de K-max :");
         labelKmax.setForeground(Color.WHITE);
         labelKmax.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
@@ -403,49 +437,56 @@ public class PageChargerGraphe {
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.insets = new Insets(5, 0, 0, 0);
 
-// Ajout du bouton de coloration
+        // Ajout du bouton de coloration
         decoBoutonColoration(); // Méthode que vous avez mentionnée pour instancier et personnaliser boutonColoration
 
         centrePanel2.add(boutonColoration, gbc);
 
 
-
+        // Créer et configurer le troisième panneau central
         JPanel centrePanel3 = new JPanel();
         centrePanel3.setBackground(couleurPrincipale);
 
+        // Initialiser la table et définir ses propriétés
         initializeTable();
         decoTab();
 
-
+        // Ajouter le tableau d'informations sur le graphe au troisième panneau central
         centrePanel3.add(tableauInfoGraphe);
         centrePanel3.setBorder(BorderFactory.createEmptyBorder(0,30,0,10));
 
+        // Créer et configurer le conteneur principal pour les panneaux centraux
         JPanel centrePanelContainer = new JPanel();
         centrePanelContainer.setLayout(new BoxLayout(centrePanelContainer, BoxLayout.X_AXIS));
         centrePanelContainer.setBackground(couleurPrincipale);
 
+        // Ajouter des bordures au deuxième panneau central
         centrePanel2.setBorder(BorderFactory.createEmptyBorder(0, 30, 0, 30));
 
-        // Add centrePanel1, sepa1, centrePanel2, sepa2, centrePanel3 to the container
+        // Ajouter les panneaux centraux et les séparateurs au conteneur principal
         centrePanelContainer.add(centrePanel1);
         centrePanelContainer.add(sepa1);
         centrePanelContainer.add(centrePanel2);
         centrePanelContainer.add(sepa2);
         centrePanelContainer.add(centrePanel3);
 
-        // Add the container to the center of panelChargerCentre
+        // Ajouter le conteneur principal au centre du panneau principal
         panelChargerCentre.add(centrePanelContainer, BorderLayout.CENTER);
 
-
+        // Définir les propriétés du bouton pour afficher le graphe
         decoBoutonGraphe();
 
+        // Ajouter le bouton pour afficher le graphe au panneau inférieur
         panelChargerBas.add(boutonAfficherGraphe);
         panelChargerBas.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
+        // Créer et configurer les panneaux de gauche et de droite
         JPanel panelgauche = new JPanel();
         panelgauche.setOpaque(false);
         JPanel paneldroite = new JPanel();
         paneldroite.setOpaque(false);
+
+        // Ajouter les différents panneaux au panneau principal
         panelCharger.add(panelChargerHaut,BorderLayout.NORTH);
         panelCharger.add(panelgauche,BorderLayout.WEST);
         panelCharger.add(panelChargerCentre,BorderLayout.CENTER);
@@ -454,8 +495,11 @@ public class PageChargerGraphe {
     }
 
 
-
-
+    /**
+     * Méthode pour configurer et retourner un JSpinner pour la sélection de k-max.
+     *
+     * @return Un JSpinner configuré pour la sélection de k-max.
+     */
     private static JSpinner getSpinnerKMax() {
         JSpinner spinnerKMax = new JSpinner();
         spinnerKMax.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 0));
@@ -474,6 +518,11 @@ public class PageChargerGraphe {
         return spinnerKMax;
     }
 
+    /**
+     * Méthode pour enregistrer les informations du graphe colorié dans un fichier.
+     * Ouvre un JFileChooser pour sélectionner l'emplacement de sauvegarde et enregistre
+     * le fichier en fonction de l'algorithme de coloration sélectionné.
+     */
     private void saveFile() {
         if (resultcolorDsat != null || resultcolorWelsh != null) {
             JFileChooser fileChooser = new JFileChooser();
@@ -521,6 +570,10 @@ public class PageChargerGraphe {
         }
     }
 
+    /**
+     * Méthode pour initialiser la table d'informations sur le graphe.
+     * Configure les colonnes et les lignes de la table avec les valeurs initiales.
+     */
     private void initializeTable() {
         model = new DefaultTableModel(
                 new Object[][]{
@@ -547,7 +600,16 @@ public class PageChargerGraphe {
 
     }
 
-    // Méthode pour mettre à jour les données du tableau
+    /**
+     * Méthode pour mettre à jour les données de la table d'informations sur le graphe.
+     *
+     * @param noeuds       Nombre de noeuds du graphe.
+     * @param aretes       Nombre d'arêtes du graphe.
+     * @param degre        Degré moyen du graphe.
+     * @param composantes  Nombre de composantes du graphe.
+     * @param diametre     Diamètre du graphe.
+     * @param nbConflit    Nombre de conflits dans la coloration du graphe.
+     */
     public void updateTableData(int noeuds, int aretes, double degre, int composantes, int diametre, int nbConflit) {
         model.setValueAt(" " + " " + noeuds, 2, 1);
         model.setValueAt(" " + " " + aretes, 4, 1);
@@ -557,12 +619,19 @@ public class PageChargerGraphe {
         model.setValueAt(" " + " " + nbConflit, 12, 1);
     }
 
+    /**
+     * Méthode pour définir les propriétés du bouton d'accueil.
+     */
     private void decoBoutonAcceuil(){
         boutonAccueil = new RoundedButton("Accueil", 25);
         boutonAccueil.setFocusable(false);
         boutonAccueil.setFont(new Font("Lucida Sans",Font.PLAIN,15));
         boutonAccueil.setBackground(couleurPrincipale);
     }
+
+    /**
+     * Méthode pour définir les propriétés de la table d'informations sur le graphe.
+     */
     private void decoTab(){
         tableauInfoGraphe.setGridColor(Color.DARK_GRAY);
         tableauInfoGraphe.setFont(new Font("Lucida Sans",Font.PLAIN,18));
@@ -579,6 +648,9 @@ public class PageChargerGraphe {
         colonneValeur.setPreferredWidth(125);
     }
 
+    /**
+     * Méthode pour définir les propriétés du bouton de coloration du graphe.
+     */
     private void decoBoutonColoration(){
         boutonColoration = new RoundedButton("Effectuer la coloration", 50);
         boutonColoration.setFocusable(false);
@@ -591,19 +663,29 @@ public class PageChargerGraphe {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (selectedFile == null) {
-
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
                 else if (DsaturBouton.isSelected()){
-                    resultcolorDsat = dsaturColoring(graph.getGraph(),kmax);
-                    statGrapheDsat();
-                    updateTableData(noeuds, aretes, degre, composantes,diametre,nbConflit);
-
-                } else if (WelshBouton.isSelected()) {
-                    resultcolorWelsh = graphWelsh.colorierNoeudsWelsh(kmax);
-                    statGrapheWelsh();
-                    updateTableData(noeuds, aretes, degre, composantes,diametre,nbConflit);
-
+                    resultcolorWelsh = null;
+                    if (resultcolorDsat != null){
+                        JOptionPane.showMessageDialog(panelCharger, "Coloration déjà effectuée avec cet algorithme !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        resultcolorDsat = dsaturColoring(graph.getGraph(), kmax);
+                        statGrapheDsat();
+                        updateTableData(noeuds, aretes, degre, composantes, diametre, nbConflit);
+                    }
+                }
+                else if (WelshBouton.isSelected()) {
+                    resultcolorDsat = null;
+                    if (resultcolorWelsh != null){
+                        JOptionPane.showMessageDialog(panelCharger, "Coloration déjà effectuée avec cet algorithme !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        resultcolorWelsh = graphWelsh.colorierNoeudsWelsh(kmax);
+                        statGrapheWelsh();
+                        updateTableData(noeuds, aretes, degre, composantes, diametre, nbConflit);
+                    }
                 }
             }
             @Override
@@ -627,6 +709,10 @@ public class PageChargerGraphe {
             }
         });
     }
+
+    /**
+     * Méthode pour définir les propriétés du bouton pour l'algorithme Welsh-Powell.
+     */
     private void decoBoutonWelsh() {
         WelshBouton = new JRadioButton("Welsh & Powell");
         WelshBouton.setForeground(Color.WHITE);
@@ -638,6 +724,9 @@ public class PageChargerGraphe {
         WelshBouton.setSelected(true);
     }
 
+    /**
+     * Méthode pour définir les propriétés du bouton pour l'algorithme D-Satur.
+     */
     private void decoBoutonDsatur() {
         DsaturBouton = new JRadioButton("D-Satur");
         DsaturBouton.setForeground(Color.WHITE);
@@ -648,7 +737,9 @@ public class PageChargerGraphe {
         DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-
+    /**
+     * Méthode pour configurer et ajouter des écouteurs au bouton d'affichage du graphe.
+     */
     private void decoBoutonGraphe(){
         boutonAfficherGraphe = new RoundedButton("Afficher le Graphe", 90);
         boutonAfficherGraphe.setFocusable(false);
@@ -695,6 +786,11 @@ public class PageChargerGraphe {
         });
     }
 
+    /**
+     * Méthode pour ajouter un écouteur de zoom au Viewer du graphe.
+     *
+     * @param vue Le Viewer du graphe.
+     */
     private void ajouterGrapheListener(Viewer vue){
         vue.getDefaultView().addMouseWheelListener(new MouseAdapter() {
             @Override
@@ -721,6 +817,10 @@ public class PageChargerGraphe {
         });
 
     }
+
+    /**
+     * Méthode pour configurer et ajouter des écouteurs au bouton de téléchargement.
+     */
     private void decoBoutonTelecharger(){
         boutonTelecharger = new RoundedButton("Télécharger", 50);
         boutonTelecharger.setFocusable(false);
@@ -763,7 +863,12 @@ public class PageChargerGraphe {
 
 
 
-    // Fonction pour explorer une composante connexe
+    /**
+     * Fonction pour explorer une composante connexe du graphe.
+     *
+     * @param node    Le noeud de départ pour l'exploration.
+     * @param visited Ensemble des noeuds déjà visités.
+     */
     private static void exploreComponent(Node node, Set<Node> visited) {
         List<Node> queue = new LinkedList<>();
         queue.add(node);
@@ -781,7 +886,12 @@ public class PageChargerGraphe {
         }
     }
 
-    // Fonction pour calculer le diamètre du graphe
+    /**
+     * Fonction pour calculer le diamètre du graphe.
+     *
+     * @param graph Le graphe dont le diamètre est à calculer.
+     * @return Le diamètre du graphe.
+     */
     private static int calculateDiameter(Graph graph) {
         int diameter = 0;
         for (Node node : graph) {
@@ -791,7 +901,12 @@ public class PageChargerGraphe {
         return diameter;
     }
 
-    // Fonction pour effectuer une recherche en largeur (BFS) et retourner la distance maximale
+    /**
+     * Fonction pour effectuer une recherche en largeur (BFS) et retourner la distance maximale.
+     *
+     * @param start Le noeud de départ pour la recherche en largeur.
+     * @return La distance maximale trouvée dans le graphe.
+     */
     private static int bfs(Node start) {
         Map<Node, Integer> distances = new HashMap<>();
         List<Node> queue = new LinkedList<>();
@@ -816,6 +931,9 @@ public class PageChargerGraphe {
         return maxDistance;
     }
 
+    /**
+     * Calculer les statistiques du graphe pour l'algorithme DSATUR.
+     */
     private void statGrapheDsat(){
         noeuds = graph.getGraph().getNodeCount();
         aretes = graph.getGraph().getEdgeCount();
@@ -846,6 +964,9 @@ public class PageChargerGraphe {
         nbConflit = graph.CompterConflits(graph.getGraph());
     }
 
+    /**
+     * Calculer les statistiques du graphe pour l'algorithme Welsh-Powell.
+     */
     private void statGrapheWelsh(){
         noeuds = graphWelsh.getGraph().getNodeCount();
         aretes = graphWelsh.getGraph().getEdgeCount();
@@ -874,6 +995,11 @@ public class PageChargerGraphe {
         nbConflit = graph.CompterConflits(graphWelsh.getGraph());
     }
 
+    /**
+     * Obtenir le panneau principal.
+     *
+     * @return Le panneau principal.
+     */
     public JPanel getPanel() {
         return panelCharger;
     }

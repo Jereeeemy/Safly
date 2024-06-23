@@ -16,11 +16,11 @@ public class CreateurGraph {
     private static int numAfterNameFichierTxT = 0;
     Graph graph;
 
-    public CreateurGraph(File fichier) throws IOException {
+    public CreateurGraph(File fichier) throws IOException, ExceptionFormatIncorrect, ExceptionLigneIncorrect {
         this.graph = ChargerGraphDepuisFichier(fichier);
     }
 
-    public CreateurGraph() throws IOException {
+    public CreateurGraph() throws IOException, ExceptionFormatIncorrect, ExceptionLigneIncorrect {
         this.graph = ChargerGraphDepuisFichier(new File("data/graph-test0.txt"));
     }
 
@@ -63,18 +63,24 @@ public class CreateurGraph {
         return files[choix];
     }
 
-    public Graph ChargerGraphDepuisFichier(File fichier) throws IOException {
+    public Graph ChargerGraphDepuisFichier(File fichier) throws IOException, ExceptionFormatIncorrect, ExceptionLigneIncorrect {
         Graph new_graph = new SingleGraph(fichier.getCanonicalPath());
 
         BufferedReader br = new BufferedReader(new FileReader(fichier));
 
         // Lire le nombre maximum de couleurs (kmax)
         String line = br.readLine();
+        if (line == null || !line.matches("\\d+")) {
+            throw new ExceptionFormatIncorrect();
+        }
         int kmax = Integer.parseInt(line);
-        new_graph.setAttribute("kmax",kmax);
+        new_graph.setAttribute("kmax", kmax);
 
         // Lire le nombre de sommets
         line = br.readLine();
+        if (line == null || !line.matches("\\d+")) {
+            throw new ExceptionFormatIncorrect();
+        }
         int nb_sommets = Integer.parseInt(line);
 
         // Ajouter les sommets au graphe
@@ -84,15 +90,30 @@ public class CreateurGraph {
 
         // Lire les arêtes et les ajouter au graphe
         while ((line = br.readLine()) != null) {
+            if (!line.matches("\\d+ \\d+")) {
+                // Lancer une exception si la ligne n'est pas valide
+                throw new ExceptionLigneIncorrect(line);
+            }
             String[] noeuds = line.split(" ");
             String noeud1 = noeuds[0];
             String noeud2 = noeuds[1];
+
+            // Vérifier que les noeuds sont dans la plage valide
+            int noeud1Int = Integer.parseInt(noeud1);
+            int noeud2Int = Integer.parseInt(noeud2);
+            if (noeud1Int < 1 || noeud1Int > nb_sommets || noeud2Int < 1 || noeud2Int > nb_sommets) {
+                // Lancer une exception si les noeuds ne sont pas valides
+                throw new ExceptionLigneIncorrect(line);
+            }
+
+            // Ajouter l'arête si elle n'existe pas déjà
             String edgeId = noeud1 + "-" + noeud2;
             String edgeIdReverse = noeud2 + "-" + noeud1;
-            if(new_graph.getEdge(edgeId) == null && new_graph.getEdge(edgeIdReverse) == null){
+            if (new_graph.getEdge(edgeId) == null && new_graph.getEdge(edgeIdReverse) == null) {
                 new_graph.addEdge(edgeId, noeud1, noeud2);
             }
         }
+
         return new_graph;
     }
 
@@ -110,6 +131,8 @@ public class CreateurGraph {
                             graphs.add(graph);
                         } catch (IOException e) {
                             throw new IOException();
+                        } catch (ExceptionFormatIncorrect | ExceptionLigneIncorrect e) {
+                            throw new RuntimeException(e);
                         }
                     }
                 }
