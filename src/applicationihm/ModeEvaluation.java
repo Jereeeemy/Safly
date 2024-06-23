@@ -133,6 +133,14 @@ public class ModeEvaluation {
                             fichiers_choisi_repertoire.add(fichier);
                         }
                     }
+                    if (!fichiers_choisi_repertoire.isEmpty()){
+                        boutonFichierGraphe.removeMouseListener(this);
+                        boutonFichierGraphe.setBackground(Color.DARK_GRAY);
+                        boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(panelEvaluation, "Ce dossier ne contient aucun fichier de graph, veuillez réessayer", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
 
 
                     // Tri des fichiers selon l'ordre numérique dans les noms de fichier
@@ -241,7 +249,7 @@ public class ModeEvaluation {
                             throw new RuntimeException(ex);
                         }
 
-                        if (conflitwelsh <= -10/**conflitdsat**/){
+                        if (conflitwelsh <= conflitdsat){
                             writeCSVFile(fichier.getName(),conflitwelsh,"7");
                             writeTxtFile(graphwelsh.getGraph(), colorationwelsh,"7");
                         }
@@ -252,7 +260,9 @@ public class ModeEvaluation {
 
                     }
                     try {
+                        JOptionPane.showMessageDialog(panelEvaluation, "Votre fichier zippé à bien été créée", "Challenge coloration", JOptionPane.INFORMATION_MESSAGE);
                         zipOutputDirectory("7");
+
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }

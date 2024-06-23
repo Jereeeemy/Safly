@@ -9,12 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Iterator;
-
+import java.util.*;
 
 import static java.lang.Math.abs;
 import static java.lang.System.in;
@@ -44,8 +39,6 @@ public class Carte {
         this.RechercheCollision();
     }
 
-
-
     /**
      * Constructeur pour initialiser la carte avec les aéroports et les vols depuis un fichier spécifique pour les vols.
      * @param fichier_vol Nom du fichier contenant les informations des vols.
@@ -60,13 +53,13 @@ public class Carte {
         nb_vols = 0;
         liste_aeroports = this.LireAeroports(fichier_aeroport);
         liste_vols = this.LireVols(fichier_vol);
-        this.RechercheCollision();
-    }
+        //this.RechercheCollision();
 
+    }
 
     /**
      * Constructeur pour initialiser la carte avec les aéroports et les vols depuis un fichier spécifique pour soit pour les vols soit pour les aéroport (selon l'extension du fichier en paramètre).
-     * @param fichier Nom du fichier contenant les informations des vols ou les informations des aéroports (selon son extension, txt pour aéroports et csv pour vols).
+     * @param fichier Nom du fichier contenant les informations des vols ou les informations des aéroport (selon son extension, txt pour aéroports et csv pour vols).
      * @throws IOException en cas d'erreur de lecture de fichier.
      * @throws ExceptionNoFlight en cas d'absence de fichiers de vol disponibles.
      */
@@ -75,13 +68,14 @@ public class Carte {
         graph_aeroport = new MultiGraph("Graph_Aeroport_As.Node_"+fichier);
         nb_aeroports = 0;
         nb_vols = 0;
-        if (fichier.toPath().endsWith(".txt")) {
+        if (fichier.getName().endsWith(".txt")) {
             liste_aeroports = this.LireAeroports(fichier);
+
         }
-        else if (fichier.toPath().endsWith(".csv")) {
+        else if (fichier.getName().endsWith(".csv")) {
             liste_vols = this.LireVols(fichier);
         }
-        this.RechercheCollision();
+        //this.RechercheCollision();
 
     }
 
@@ -108,10 +102,6 @@ public class Carte {
 
     public ArrayList<ArrayList<Vol>> getColoration() {return coloration;}
 
-    public static int getTemps_collision() {
-        return temps_collision;
-    }
-
     // Setters
     public void setListe_aeroports(File fichier_aeroport) throws ExceptionOrientation, IOException {
         this.liste_aeroports = this.LireAeroports(fichier_aeroport);
@@ -123,6 +113,10 @@ public class Carte {
 
     public static void setTemps_collision(int temps_collision) {
         Carte.temps_collision = temps_collision;
+    }
+
+    public static int getTemps_collision() {
+        return temps_collision;
     }
 
     public void setGraph_vol(Graph graph_vol) {
