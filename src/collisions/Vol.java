@@ -1,14 +1,47 @@
 package collisions;
 
-
+/**
+ * Class représentant un vol
+ */
 public class Vol {
+    /**
+     * Code unique du vol
+     */
     String code;
+
+    /**
+     * Aéroport de départ du vol
+     */
     Aeroport depart;
+
+    /**
+     * Aéroport d'arrivée du vol
+     */
     Aeroport arrivee;
+
+    /**
+     * Heure de départ du vol
+     */
     double heure_depart;
+
+    /**
+     * Minute de départ du vol
+     */
     double minute_depart;
+
+    /**
+     * Heure d'arrivée du vol
+     */
     double heure_arrivee;
+
+    /**
+     * Minute d'arrivée du vol
+     */
     double minute_arrivee;
+
+    /**
+     * Temps de vol
+     */
     double temps_vol;
 
     /**

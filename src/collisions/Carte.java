@@ -1,7 +1,6 @@
 package collisions;
 
 import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
 
@@ -9,7 +8,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import static java.lang.Math.abs;
 import static java.lang.System.in;
@@ -53,8 +56,6 @@ public class Carte {
         nb_vols = 0;
         liste_aeroports = this.LireAeroports(fichier_aeroport);
         liste_vols = this.LireVols(fichier_vol);
-        //this.RechercheCollision();
-
     }
 
     /**
@@ -75,7 +76,6 @@ public class Carte {
         else if (fichier.getName().endsWith(".csv")) {
             liste_vols = this.LireVols(fichier);
         }
-        //this.RechercheCollision();
 
     }
 
@@ -317,7 +317,7 @@ public class Carte {
 
 
     /**
-     * Lit les vols à partir d'un fichier spécifique passé en paramètre et construit un graph avec les vols en tant qu'arretes et les aéroports en tant que noeuds.
+     * Lit les vols à partir d'un fichier spécifique passé en paramètre et construit un graph avec les vols en tant qu'arrêtes et les aéroports en tant que noeuds.
      * @param fichier Nom du fichier contenant les informations des vols.
      * @return La liste des vols.
      * @throws IOException en cas d'erreur de lecture de fichier.
@@ -345,6 +345,7 @@ public class Carte {
         lecteur.close();
         return vols;
     }
+
 
     /**
      * Lit un vol à partir d'une ligne de texte.

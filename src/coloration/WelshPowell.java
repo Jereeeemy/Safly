@@ -1,6 +1,7 @@
 package coloration;
 
 import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.SingleGraph;
 
 import java.util.ArrayList;
 import java.util.List;
