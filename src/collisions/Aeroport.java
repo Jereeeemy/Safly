@@ -13,7 +13,7 @@ public class Aeroport {
     double latitude;
 
     /**
-     * Constructeur pour créer un aéroport.
+     * Constructeur pour créer un aéroport avec uniquement les coordonnées cartésiennes.
      * @param code Code de l'aéroport.
      * @param ville Ville où se trouve l'aéroport.
      * @param x Coordonnée x de l'aéroport.
@@ -26,6 +26,13 @@ public class Aeroport {
         this.y = y;
     }
 
+    /**
+     * Constructeur pour créer un aéroport avec les coordonnées cartésiennes et géographiques.
+     * @param code Code de l'aéroport.
+     * @param ville Ville où se trouve l'aéroport.
+     * @param x Coordonnée x de l'aéroport.
+     * @param y Coordonnée y de l'aéroport.
+     */
     public Aeroport(String code, String ville, double x, double y, double latitude, double longitude) {
         this.code = code;
         this.ville = ville;

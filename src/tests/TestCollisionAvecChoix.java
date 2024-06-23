@@ -39,12 +39,12 @@ public class TestCollisionAvecChoix {
     public static void main(String[] args) {
         //MenuPrincipal fenetrePrincipale = new MenuPrincipal();
         //fenetrePrincipale.setVisible(true);
-
+        /**
         WelshPowell algowelsh = new WelshPowell(test.getGraph_vol());
         algowelsh.colorierNoeudsWelsh(2);
         int conflits = algowelsh.CompterConflits(test.getGraph_vol());
         test.getGraph_vol().display();
-
+        **/
     }
 
 

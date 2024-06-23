@@ -5,6 +5,8 @@ import org.graphstream.graph.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static coloration.Couleur.getAdjacentNodes;
+
 public class WelshPowell {
     Graph graph;
     ArrayList<Node> noeuds = new ArrayList<>();
@@ -131,16 +133,6 @@ public class WelshPowell {
         return leastUsedColor;
     }
 
-    // Obtenir les nœuds adjacents
-    private List<Node> getAdjacentNodes(Node node) {
-        List<Node> adjacentNodes = new ArrayList<>();
-        for (Edge edge : node.getEachEdge()) {
-            Node oppositeNode = edge.getOpposite(node);
-            adjacentNodes.add(oppositeNode);
-        }
-        return adjacentNodes;
-    }
-
     // Fonction pour générer une couleur RGB basée sur un index
     private String generateColor(int index) {
         int r = ((index * 67) % 256);
@@ -149,25 +141,21 @@ public class WelshPowell {
         return "rgb(" + r + "," + g + "," + b + ")";
     }
 
-    // Méthode pour compter et afficher les conflits
-    public int CompterConflits(Graph graph) {
-        int conflictCount = 0;
 
-        for (Node node : graph) {
-            List<Node> adjacentNodes = getAdjacentNodes(node);
 
-            for (Node neighbor : adjacentNodes) {
-                if (node.hasAttribute("ui.style") && neighbor.hasAttribute("ui.style")) {
-                    String color1 = node.getAttribute("ui.style");
-                    String color2 = neighbor.getAttribute("ui.style");
-                    if (color1.equals(color2)) {
-                        conflictCount++;
-                    }
+    public int CompteCouleurs(){
+        int compte = 0;
+        ArrayList<String> ListeCouleurs = new ArrayList<>();
+        for (Node node : this.getGraph()) {
+            String couleur = node.getAttribute("ui.style");
+            if (couleur !=null) {
+                if (!ListeCouleurs.contains(couleur)) {
+                    ListeCouleurs.add(couleur);
                 }
             }
         }
-        conflictCount = conflictCount / 2;
-        return conflictCount;
+        compte = ListeCouleurs.size();
+        return compte;
     }
 
 }

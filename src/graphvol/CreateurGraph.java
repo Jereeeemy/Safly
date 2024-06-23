@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static coloration.Couleur.getAdjacentNodes;
 import static java.lang.System.in;
 
 public class CreateurGraph {
@@ -306,6 +307,74 @@ public class CreateurGraph {
                 zos.closeEntry(); // Ferme l'entrée ZIP pour ce fichier
             }
         }
+    }
+
+    /**
+     * Cette méthode est similaire à writeTxtFile, elle est déstiner à la page charger graphe
+     * qui va permettre de donner les informations d'un graphe à la fois.
+     *
+     * @param graph    Le graphe.
+     * @param colors   Tableau des couleurs des nœuds.
+     * @param filename Le nom du fichier texte.
+     * @return
+     */
+    public static File writeColorsForOneGraphToTxtFile(Graph graph, int[] colors, String filename) {
+
+        // Prépare le contenu à écrire dans le fichier texte (identifiant du nœud et sa couleur)
+        StringBuilder txtContent = new StringBuilder();
+        for (Node node : graph) {
+            txtContent.append(node.getIndex() + 1).append(" ; ").append(colors[node.getIndex()]).append("\r\n");
+        }
+
+        // Crée un objet File pour le fichier texte
+        File txtFile = new File(filename);
+
+        // Utilisation de BufferedWriter pour écrire dans le fichier texte
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(txtFile))) {
+            writer.write(txtContent.toString()); // Écrit le contenu dans le fichier texte
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return txtFile;
+    }
+
+    /**
+     * Génère un fichier texte contenant les résultats de coloration d'un graphe donné.
+     *
+     * @param graph Le graphe pour lequel les résultats de coloration sont générés.
+     * @param filename Le nom de fichier à utiliser pour enregistrer les résultats.
+     * @param colorResult Le tableau contenant les résultats de coloration pour chaque sommet du graphe.
+     * @return Le fichier texte généré contenant les résultats de coloration.
+     * @throws IOException Si une erreur d'entrée/sortie survient lors de l'écriture dans le fichier.
+     */
+    public static File InfoscolorOneGraph(Graph graph, String filename, int colorResult[]) throws IOException {
+        // Écrit les résultats dans un fichier texte
+        File txtFile = writeColorsForOneGraphToTxtFile(graph, colorResult, filename);
+
+        // Retourne les fichiers générés
+        return txtFile;
+    }
+
+    // Méthode pour compter et afficher les conflits
+    public int CompterConflits(Graph graph) {
+        int conflictCount = 0;
+
+        for (Node node : graph) {
+            List<Node> adjacentNodes = getAdjacentNodes(node);
+
+            for (Node neighbor : adjacentNodes) {
+                if (node.hasAttribute("ui.style") && neighbor.hasAttribute("ui.style")) {
+                    String color1 = node.getAttribute("ui.style");
+                    String color2 = neighbor.getAttribute("ui.style");
+                    if (color1.equals(color2)) {
+                        conflictCount++;
+                    }
+                }
+            }
+        }
+        conflictCount = conflictCount / 2;
+        return conflictCount;
     }
 
 }

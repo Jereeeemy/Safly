@@ -228,7 +228,7 @@ public class ModeEvaluation {
                             graphwelsh = new CreateurGraph(fichier);
                             WelshPowell algowelsh = new WelshPowell(graphwelsh.getGraph());
                             colorationwelsh = algowelsh.colorierNoeudsWelsh(graphwelsh.getGraph().getAttribute("kmax"));
-                            conflitwelsh = algowelsh.CompterConflits(algowelsh.getGraph());
+                            conflitwelsh = graphwelsh.CompterConflits(algowelsh.getGraph());
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
@@ -236,13 +236,12 @@ public class ModeEvaluation {
                             graphdsat = new CreateurGraph(fichier);
                             colorationdsat = DsaturAlgorithm.dsaturColoring(graphdsat.getGraph(), graphdsat.getGraph().getAttribute("kmax"));
                             DsaturAlgorithm.modifyNodeColors(graphdsat.getGraph(), colorationdsat);
-                            DsaturAlgorithm dsataglo = new DsaturAlgorithm();
-                            conflitdsat = dsataglo.CompterConflits(graphdsat.getGraph());
+                            conflitdsat = graphdsat.CompterConflits(graphdsat.getGraph());
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
 
-                        if (conflitwelsh <= conflitdsat){
+                        if (conflitwelsh <= -10/**conflitdsat**/){
                             writeCSVFile(fichier.getName(),conflitwelsh,"7");
                             writeTxtFile(graphwelsh.getGraph(), colorationwelsh,"7");
                         }

@@ -37,7 +37,7 @@ public class Couleur {
     }
 
     // Méthode pour obtenir les nœuds adjacents
-    private static List<Node> getAdjacentNodes(Node node) {
+    public static List<Node> getAdjacentNodes(Node node) {
         List<Node> adjacentNodes = new ArrayList<>();
         for (Edge edge : node.getEachEdge()) {
             Node oppositeNode = edge.getOpposite(node);

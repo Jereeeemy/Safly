@@ -1,5 +1,6 @@
 package applicationihm;
 
+import coloration.DsaturAlgorithm;
 import coloration.WelshPowell;
 import graphvol.CreateurGraph;
 import org.graphstream.graph.Edge;
@@ -27,35 +28,168 @@ import java.util.List;
 import java.util.*;
 
 import static coloration.DsaturAlgorithm.colorAndDisplayGraph;
+import static graphvol.CreateurGraph.InfoscolorOneGraph;
+import static coloration.DsaturAlgorithm.dsaturColoring;
 import coloration.WelshPowell.*;
 import org.graphstream.ui.view.ViewerPipe;
 
+
+/**
+ * Classe de l'application qui propose de charger un graphe à partir d'un fichier et de colorier ce graphe grâce à différents algorithmes
+ */
+
 public class PageChargerGraphe {
+    /**
+     * Bouton "Accueil" pour retourner à la page d'accueil.
+     */
     private final JPanel panelCharger;
 
+    /**
+     * Nom du fichier graph
+     */
+    private String fileName;
+
+    /**
+     * Nom du fichier txt de sortie qui va contenir les infos du graph
+     */
+    private String outputFileName;
+
+    /**
+     * Cette variable va permettre de stocker les résultats de couleur de Dsatur
+     */
+    private int resultcolorDsat[];
+
+    /**
+     * Cette variable va permettre de stocker les résultats de couleur de Welsh&Powel
+     */
+    private int resultcolorWelsh[];
+
+    /**
+     * Fichier de sortie qui va contenir les informations de couleurs pour chaque sommet
+     */
+    File OutPuttxtFile;
+
+    /**
+     * Bouton "Accueil" pour retourner à la page d'accueil.
+     */
     private RoundedButton boutonAccueil;
+
+    /**
+     * Couleur principale utilisée dans l'interface.
+     * Par défaut : #D9D9D9 (Gris clair).
+     */
     private Color couleurPrincipale = Color.decode("#D9D9D9");
+
+    /**
+     * Couleur secondaire utilisée dans l'interface.
+     * Par défaut : #2C5789 (Bleu foncé).
+     */
     private Color couleurSecondaire = Color.decode("#2C5789");
+
+    /**
+     * Couleur tertiaire utilisée dans l'interface.
+     * Par défaut : #122A47 (Bleu marine).
+     */
     private Color couleurTertiaire = Color.decode("#122A47");
+
+    /**
+     * Instance du créateur de graphe utilisé pour la manipulation de graphes.
+     */
     private CreateurGraph graph;
+
+    /**
+     * Instance de l'algorithme de coloration de graphes Welsh-Powell.
+     */
     private WelshPowell graphWelsh;
+
+    /**
+     * Fichier de graphe sélectionné par l'utilisateur.
+     */
     public File selectedFile;
-    public File fileToDownload;
+
+    /**
+     * Valeur de la marge de sécurité pour la gestion des conflits.
+     */
     int kmax;
+
+    /**
+     * Nombre de nœuds dans le graphe chargé.
+     */
     int noeuds = 0;
+
+    /**
+     * Nombre d'arêtes dans le graphe chargé.
+     */
     int aretes = 0;
+
+    /**
+     * Degré moyen des nœuds dans le graphe chargé.
+     */
     double degre = 0;
+
+    /**
+     * Nombre de composantes connexes dans le graphe chargé.
+     */
     int composantes = 0;
+
+    /**
+     * Diamètre du graphe chargé.
+     */
     int diametre = 0;
+
+    /**
+     * Nombre de conflits du graphes
+     */
+    int nbConflit;
+
+    /**
+     * Tableau utilisé pour afficher les informations du graphe.
+     */
     private JTable tableauInfoGraphe;
+
+    /**
+     * Modèle de données utilisé par le tableau d'informations du graphe.
+     */
     private DefaultTableModel model;
+
+    /**
+     * Bouton pour lancer l'algorithme de coloration du graphe.
+     */
     private RoundedButton boutonColoration;
+
+    /**
+     * Bouton pour télécharger le graphe ou les résultats.
+     */
     private RoundedButton boutonTelecharger;
+
+    /**
+     * Bouton radio pour choisir l'algorithme de coloration Welsh-Powell.
+     */
     private JRadioButton WelshBouton;
+
+    /**
+     * Bouton radio pour choisir l'algorithme de coloration DSatur.
+     */
     private JRadioButton DsaturBouton;
+
+    /**
+     * Bouton pour afficher le graphe dans une vue graphique.
+     */
     private RoundedButton boutonAfficherGraphe;
+
+    /**
+     * Visionneuse pour afficher le graphe graphiquement.
+     */
     private Viewer vue;
+
+    /**
+     * Tube de visionneuse pour interagir avec la vue du graphe.
+     */
     private ViewerPipe viewerPipe;
+    /**
+     * Constructeur de la classe PageChargerGraphe.
+     * @param menuPrincipal Instance de la classe MenuPrincipal pour la navigation et la gestion de l'interface.
+     */
     public PageChargerGraphe(MenuPrincipal menuPrincipal) {
 
         panelCharger = new JPanel() {
@@ -151,7 +285,7 @@ public class PageChargerGraphe {
                 int returnValue = fileChooser.showOpenDialog(panelCharger);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     selectedFile = fileChooser.getSelectedFile();
-                    String fileName = selectedFile.getName();
+                    fileName = selectedFile.getName();
                     try {
                         // Essayer de créer le graphe avec le fichier sélectionné
                         graph = new CreateurGraph(selectedFile);
@@ -341,25 +475,42 @@ public class PageChargerGraphe {
     }
 
     private void saveFile() {
-        if (fileToDownload != null) {
+        if (resultcolorDsat!=null || resultcolorWelsh!=null) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Enregistrer le fichier");
 
+
             // Configurer le nom de fichier par défaut
-            fileChooser.setSelectedFile(new File("example.txt"));
+            String outputFileName = "Infos-Coloration-" + fileName;
+            fileChooser.setSelectedFile(new File("Info-coloration-"+fileName));
 
             int userSelection = fileChooser.showSaveDialog(panelCharger);
 
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
-                try {
-                    // Copier le contenu du fichier temporaire vers le fichier choisi par l'utilisateur
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave))) {
-                        writer.write("Ceci est un exemple de fichier texte avec des informations.");
+                if (DsaturBouton.isSelected()){
+                    try {
+                        OutPuttxtFile = InfoscolorOneGraph(graph.getGraph(), outputFileName, resultcolorDsat);
+                        JOptionPane.showMessageDialog(panelCharger, "Fichier enregistré avec succès.");
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(panelCharger, "Erreur lors de l'enregistrement du fichier : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace(); // Vous pouvez choisir de logger l'erreur plutôt que de l'afficher à l'utilisateur
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(panelCharger, "Une erreur inattendue s'est produite : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace(); // Vous pouvez choisir de logger l'erreur plutôt que de l'afficher à l'utilisateur
                     }
-                    JOptionPane.showMessageDialog(panelCharger, "Fichier enregistré avec succès.");
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(panelCharger, "Erreur lors de l'enregistrement du fichier : " + ex.getMessage());
+
+                } else if (WelshBouton.isSelected()) {
+                    try {
+                        OutPuttxtFile = InfoscolorOneGraph(graph.getGraph(), outputFileName, resultcolorWelsh);
+                        JOptionPane.showMessageDialog(panelCharger, "Fichier enregistré avec succès.");
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(panelCharger, "Erreur lors de l'enregistrement du fichier : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace(); // Vous pouvez choisir de logger l'erreur plutôt que de l'afficher à l'utilisateur
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(panelCharger, "Une erreur inattendue s'est produite : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace(); // logger l'erreur plutôt que de l'afficher à l'utilisateur
+                    }
                 }
             }
         } else {
@@ -380,8 +531,9 @@ public class PageChargerGraphe {
                         {"", null},
                         {"Composantes  :", " " + " " + 0}, // Valeurs initiales
                         {"", null},
-                        {"Diamètre", " " + " " + 0}, // Valeurs initiales
+                        {"Diamètre :", " " + " " + 0}, // Valeurs initiales
                         {"", null},
+                        {"Nb conflits :", " " + " " + 0}
                 },
                 new String[]{"Informations Graphe :", null}
         );
@@ -393,12 +545,13 @@ public class PageChargerGraphe {
     }
 
     // Méthode pour mettre à jour les données du tableau
-    public void updateTableData(int noeuds, int aretes, double degre, int composantes, int diametre) {
+    public void updateTableData(int noeuds, int aretes, double degre, int composantes, int diametre, int nbConflit) {
         model.setValueAt(" " + " " + noeuds, 2, 1);
         model.setValueAt(" " + " " + aretes, 4, 1);
         model.setValueAt(" " + " " + degre, 6, 1);
         model.setValueAt(" " + " " + composantes, 8, 1);
         model.setValueAt(" " + " " + diametre, 10, 1);
+        model.setValueAt(" " + " " + nbConflit, 12, 1);
     }
 
     private void decoBoutonAcceuil(){
@@ -414,7 +567,7 @@ public class PageChargerGraphe {
         tableauInfoGraphe.setBackground(Color.decode("#696767"));
         tableauInfoGraphe.setShowVerticalLines(true);
         tableauInfoGraphe.setShowHorizontalLines(false);
-        tableauInfoGraphe.setPreferredSize(new Dimension(260, 300));
+        tableauInfoGraphe.setPreferredSize(new Dimension(260, 350));
         tableauInfoGraphe.setRowHeight(tableauInfoGraphe.getRowHeight() + 10);
         tableauInfoGraphe.setRowMargin(5);
         tableauInfoGraphe.getColumnModel().getColumn(0).setPreferredWidth(200);
@@ -435,17 +588,18 @@ public class PageChargerGraphe {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (selectedFile == null) {
+
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
                 else if (DsaturBouton.isSelected()){
-                    colorAndDisplayGraph(graph.getGraph(),kmax,"test1","test2");
+                    resultcolorDsat = dsaturColoring(graph.getGraph(),kmax);
                     statGrapheDsat();
-                    updateTableData(noeuds, aretes, degre, composantes,diametre);
+                    updateTableData(noeuds, aretes, degre, composantes,diametre,nbConflit);
 
                 } else if (WelshBouton.isSelected()) {
-                    graphWelsh.colorierNoeudsWelsh(kmax);
+                    resultcolorWelsh = graphWelsh.colorierNoeudsWelsh(kmax);
                     statGrapheWelsh();
-                    updateTableData(noeuds, aretes, degre, composantes,diametre);
+                    updateTableData(noeuds, aretes, degre, composantes,diametre,nbConflit);
 
                 }
             }
@@ -575,11 +729,10 @@ public class PageChargerGraphe {
         boutonTelecharger.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                fileToDownload = new File("hehehehhe");
                 if (selectedFile == null) {
                     JOptionPane.showMessageDialog(panelCharger, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
-                else if (fileToDownload == null){
+                else if (resultcolorDsat==null && resultcolorWelsh==null){
                     JOptionPane.showMessageDialog(panelCharger, "Attention ! Vous n'avez pas encore effectué la coloration.", "Erreur", JOptionPane.WARNING_MESSAGE);
                 }
                 else {
@@ -683,6 +836,11 @@ public class PageChargerGraphe {
         }
         // Calcul du diamètre du graphe
         diametre = calculateDiameter(graph.getGraph());
+
+        //Colorie le graph puis compte le nombre de conflits
+        int [] colorationdsat = DsaturAlgorithm.dsaturColoring(graph.getGraph(),kmax);
+        DsaturAlgorithm.modifyNodeColors(graph.getGraph(), colorationdsat);
+        nbConflit = graph.CompterConflits(graph.getGraph());
     }
 
     private void statGrapheWelsh(){
@@ -708,6 +866,9 @@ public class PageChargerGraphe {
         }
         // Calcul du diamètre du graphe
         diametre = calculateDiameter(graphWelsh.getGraph());
+
+        //Récupère le nombre de conflit du graph
+        nbConflit = graph.CompterConflits(graphWelsh.getGraph());
     }
 
     public JPanel getPanel() {

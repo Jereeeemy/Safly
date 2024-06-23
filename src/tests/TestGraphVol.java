@@ -27,7 +27,7 @@ public class TestGraphVol {
         // Appliquer l'algorithme DSATUR avec la valeur de Kmax choisie
         WelshPowell algowelsh = new WelshPowell(test.getGraph());
         algowelsh.colorierNoeudsWelsh(kmax);
-        int nb_conf = algowelsh.CompterConflits(test.getGraph());
+        int nb_conf = test.CompterConflits(test.getGraph());
         System.out.println(nb_conf);
         //test.getGraph().display();
 
