@@ -237,7 +237,7 @@ public class PageConstruireGraphe {
                     String fileName = selectedFile.getName();
                     try {
                         if (!selectedFile.getName().endsWith(".txt")) {
-                            throw new ExceptionNoFlight();//Changer cette Exception
+                            throw new Exception();
                         }
                         // Création d'un objet Carte qui permet de stocker les aéroports et les vols
                         map = new Carte(selectedFile);

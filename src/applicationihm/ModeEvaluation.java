@@ -260,7 +260,7 @@ public class ModeEvaluation {
 
                     }
                     try {
-                        JOptionPane.showMessageDialog(panelEvaluation, "Votre fichier zippé à bien été créée", "Challenge coloration", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(panelEvaluation, "Votre fichier zippé a bien été créé", "Challenge coloration", JOptionPane.INFORMATION_MESSAGE);
                         zipOutputDirectory("7");
 
                     } catch (IOException ex) {
