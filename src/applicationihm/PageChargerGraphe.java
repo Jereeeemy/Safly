@@ -475,22 +475,24 @@ public class PageChargerGraphe {
     }
 
     private void saveFile() {
-        if (resultcolorDsat!=null || resultcolorWelsh!=null) {
+        if (resultcolorDsat != null || resultcolorWelsh != null) {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setDialogTitle("Enregistrer le fichier");
 
-
             // Configurer le nom de fichier par défaut
-            String outputFileName = "Infos-Coloration-" + fileName;
-            fileChooser.setSelectedFile(new File("Info-coloration-"+fileName));
+            outputFileName = "Infos-Coloration-" + fileName;
+            fileChooser.setSelectedFile(new File(outputFileName));
 
             int userSelection = fileChooser.showSaveDialog(panelCharger);
 
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
-                if (DsaturBouton.isSelected()){
+                String chosenFilePath = fileToSave.getAbsolutePath(); // Obtenir le chemin complet choisi par l'utilisateur
+
+                if (DsaturBouton.isSelected()) {
                     try {
-                        OutPuttxtFile = InfoscolorOneGraph(graph.getGraph(), outputFileName, resultcolorDsat);
+                        // Utiliser le chemin complet pour enregistrer le fichier
+                        OutPuttxtFile = InfoscolorOneGraph(graph.getGraph(), chosenFilePath, resultcolorDsat);
                         JOptionPane.showMessageDialog(panelCharger, "Fichier enregistré avec succès.");
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(panelCharger, "Erreur lors de l'enregistrement du fichier : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -502,7 +504,8 @@ public class PageChargerGraphe {
 
                 } else if (WelshBouton.isSelected()) {
                     try {
-                        OutPuttxtFile = InfoscolorOneGraph(graph.getGraph(), outputFileName, resultcolorWelsh);
+                        // Utiliser le chemin complet pour enregistrer le fichier
+                        OutPuttxtFile = InfoscolorOneGraph(graph.getGraph(), chosenFilePath, resultcolorWelsh);
                         JOptionPane.showMessageDialog(panelCharger, "Fichier enregistré avec succès.");
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(panelCharger, "Erreur lors de l'enregistrement du fichier : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
