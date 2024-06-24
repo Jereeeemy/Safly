@@ -1,4 +1,4 @@
-AGF;Agen;44;10;29;N;0;35;26;E
+AJA;Agen;44;10;29;N;0;35;26;E
 AJA;Ajaccio;41;55;25;N;8;48;10;E
 ANG;Angouleme;45;43;44;N;0;13;8;E
 NCY;Annecy;45;55;51;N;6;6;21;E

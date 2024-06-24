@@ -409,7 +409,7 @@ public class Carte {
                     fichierVide = false;
                     try {
                         Vol vol = LectureVol(line);
-                        if (vol!=null && vol.getCode()!=null && !idUnique(vols,vol)){
+                        if (vol!=null && vol.getCode()!=null && idUnique(vols, vol)){
                             this.getGraph_vol().addNode(vol.getCode()); // Ajouter le code du vol en tant qu'ID du nœud
                             vols.add(vol);
                             System.out.println(vol.getCode());
