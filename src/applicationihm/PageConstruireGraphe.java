@@ -46,10 +46,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.List;
-import java.util.HashSet;
+import java.util.*;
 
 import java.io.IOException;
 import java.io.File;
@@ -287,6 +284,10 @@ public class PageConstruireGraphe {
                     fichierVols = fileChooser.getSelectedFile();
                     String fileName = fichierVols.getName();
                     try {
+                        if ((fileName.toLowerCase().startsWith("aeroports")) || (fileName.toLowerCase().startsWith("aéroports"))
+                        || (fileName.toLowerCase().startsWith("aeroport")) || (fileName.toLowerCase().startsWith("aéroport"))) {
+                            throw new Exception();
+                        }
                         // Création du graphe de collisions avec les vols grace au fichier de vol
                         map.setGraph_vol(new SingleGraph("Collisions_carte_"+fileName));
                         map.setListe_vols(fichierVols);

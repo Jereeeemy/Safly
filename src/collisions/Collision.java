@@ -7,12 +7,12 @@ public class Collision {
     /**
      * 1er vol entrant en collision
      */
-    Vol vol1;
+    private Vol vol1;
 
     /**
      * 1er vol entrant en collision
      */
-    Vol vol2;
+    private Vol vol2;
 
     /**
      * Constructeur pour créer une collision.

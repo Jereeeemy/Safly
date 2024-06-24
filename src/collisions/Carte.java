@@ -302,7 +302,7 @@ public class Carte {
     private Aeroport TrouverAeroportParCode(String code){
         Aeroport resultat=null;
         for (Aeroport aeroport : this.liste_aeroports) {
-            if (aeroport.code.equals(code)){
+            if (aeroport.getCode().equals(code)){
                 resultat=aeroport;
             }
         }
@@ -405,15 +405,16 @@ public class Carte {
             boolean fichierVide = true; // Indicateur pour vérifier si le fichier est vide
             while ((line = lecteur.readLine()) != null) {
                 if (!line.trim().isEmpty()) {
-                    System.out.println("HEHEHA");
                     // Si la ligne n'est pas vide, traiter le vol
                     fichierVide = false;
                     try {
                         Vol vol = LectureVol(line);
-                        this.getGraph_vol().addNode(vol.getCode()); // Ajouter le code du vol en tant qu'ID du nœud
-                        vols.add(vol);
-                        System.out.println(vol.getCode());
-                        nb_vols++; // Incrémenter le compteur de vols
+                        if (vol!=null && vol.getCode()!=null && !idUnique(vols,vol)){
+                            this.getGraph_vol().addNode(vol.getCode()); // Ajouter le code du vol en tant qu'ID du nœud
+                            vols.add(vol);
+                            System.out.println(vol.getCode());
+                            nb_vols++; // Incrémenter le compteur de vols
+                        }
                     } catch (NoSuchElementException | NumberFormatException e) {
                         System.err.println("Erreur de lecture - format incorrect : " + line);
                     }
@@ -434,6 +435,22 @@ public class Carte {
     }
 
     /**
+     * Vérifie que l'id du vol en paramètre n'est pas déjà présent dans la liste de vols en paramètre
+     * @param vols liste étudiée de vol
+     * @param vol vol dont on vérifie l'id
+     * @return true si l'id est bien unique, false sinon
+     */
+    private boolean idUnique(ArrayList<Vol> vols , Vol vol){
+        boolean retour = true;
+        for (Vol voltest : vols){
+            if (voltest.getCode().equals(vol.getCode())){
+                retour = false;
+            }
+        }
+        return retour;
+    }
+
+    /**
      * Lit un vol à partir d'une ligne de texte.
      * @param line Ligne de texte contenant les informations du vol.
      * @return Le vol créé à partir de la ligne de texte.
@@ -445,11 +462,16 @@ public class Carte {
         String code = st.nextToken();
         Aeroport depart = TrouverAeroportParCode(st.nextToken());
         Aeroport arrivee = TrouverAeroportParCode(st.nextToken());
-        int heure_depart = Integer.parseInt(st.nextToken());
-        int minute_depart = Integer.parseInt(st.nextToken());
-        int temps_vol = Integer.parseInt(st.nextToken());
+        if (depart == null || arrivee == null) {
+            vol = null;
+        }
+        else{
+            int heure_depart = Integer.parseInt(st.nextToken());
+            int minute_depart = Integer.parseInt(st.nextToken());
+            int temps_vol = Integer.parseInt(st.nextToken());
+            vol = new Vol(code,depart,arrivee,heure_depart,minute_depart,temps_vol);
+        }
 
-        vol = new Vol(code,depart,arrivee,heure_depart,minute_depart,temps_vol);
 
         return vol;
     }
@@ -471,15 +493,15 @@ public class Carte {
     private double TempsAvantCollision(Vol vol,double x,double y) {
 
         // Distance entre le point de départ et le point d'intersection
-        double d_avant_collision = Math.sqrt(Math.pow((x - vol.depart.x),2) + Math.pow((y - vol.depart.y),2));
+        double d_avant_collision = Math.sqrt(Math.pow((x - vol.getDepart().getx()),2) + Math.pow((y - vol.getDepart().gety()),2));
         // Distance totale entre le point de départ et le point d'arrivée
-        double d_total = Math.sqrt(Math.pow((vol.arrivee.x - vol.depart.x),2) + Math.pow((vol.arrivee.y - vol.depart.y),2));
+        double d_total = Math.sqrt(Math.pow((vol.getArrivee().getx() - vol.getDepart().getx()),2) + Math.pow((vol.getArrivee().gety() - vol.getDepart().gety()),2));
 
         // Proportion de la distance totale parcourue avant d'atteindre le point d'intersection
         double proportion_avant_collision = d_avant_collision/d_total;
 
         // Temps avant collision en multipliant la proportion par le temps total du vol
-        return proportion_avant_collision*vol.temps_vol;
+        return proportion_avant_collision*vol.getTemps_vol();
     }
 
     /**
@@ -496,33 +518,33 @@ public class Carte {
         double[] reponse = new double[3];
 
         // Calcul du dénominateur pour déterminer s'il y a une intersection
-        double denominateur = (vol1.depart.x - vol1.arrivee.x) * (vol2.depart.y - vol2.arrivee.y) - (vol1.depart.y - vol1.arrivee.y) * (vol2.depart.x - vol2.arrivee.x);
+        double denominateur = (vol1.getDepart().getx() - vol1.getArrivee().getx()) * (vol2.getDepart().gety() - vol2.getArrivee().gety()) - (vol1.getDepart().gety() - vol1.getArrivee().gety()) * (vol2.getDepart().getx() - vol2.getArrivee().getx());
         double intersectionX;
         double intersectionY;
 
         // Différences de temps de départ et d'arrivée entre les vols
-        double diff_dec = abs((vol2.heure_depart * 60 + vol2.minute_depart) - (vol1.heure_depart * 60 + vol1.minute_depart));
-        double diff_att = abs((vol2.heure_arrivee * 60 + vol2.minute_arrivee) - (vol1.heure_arrivee * 60 + vol1.minute_arrivee));
+        double diff_dec = abs((vol2.getHeure_depart() * 60 + vol2.getMinute_depart()) - (vol1.getHeure_depart() * 60 + vol1.getMinute_depart()));
+        double diff_att = abs((vol2.getHeure_arrivee() * 60 + vol2.getMinute_arrivee()) - (vol1.getHeure_arrivee() * 60 + vol1.getMinute_arrivee()));
 
         // Vérifications diverses pour déterminer le type de collision possible
-        boolean aeroports_inverses = vol1.depart.x == vol2.arrivee.x && vol1.depart.y == vol2.arrivee.y && vol1.arrivee.x == vol2.depart.x && vol1.arrivee.y == vol2.depart.y;// L'aéroport de départ de l'un est l'aéroport d'arrivée de l'autre et inversement
-        boolean meme_depart = vol1.depart.x == vol2.depart.x && vol1.depart.y == vol2.depart.y;// Les vols partent du même aéroport
-        boolean meme_arrivee = vol1.arrivee.x == vol2.arrivee.x && vol1.arrivee.y == vol2.arrivee.y;// Les vols arrivent au même aéroport
+        boolean aeroports_inverses = vol1.getDepart().getx() == vol2.getArrivee().getx() && vol1.getDepart().gety() == vol2.getArrivee().gety() && vol1.getArrivee().getx() == vol2.getDepart().getx() && vol1.getArrivee().gety() == vol2.getDepart().gety();// L'aéroport de départ de l'un est l'aéroport d'arrivée de l'autre et inversement
+        boolean meme_depart = vol1.getDepart().getx() == vol2.getDepart().getx() && vol1.getDepart().gety() == vol2.getDepart().gety();// Les vols partent du même aéroport
+        boolean meme_arrivee = vol1.getArrivee().getx() == vol2.getArrivee().getx() && vol1.getArrivee().gety() == vol2.getArrivee().gety();// Les vols arrivent au même aéroport
 
-        boolean v1_part_avant_v2 = (vol1.heure_depart * 60 + vol1.minute_depart) <= (vol2.heure_depart * 60 + vol2.minute_depart);// Le vol 1 décolle avant le vol 2
-        boolean v2_part_avant_v1 = (vol2.heure_depart * 60 + vol2.minute_depart) <= (vol1.heure_depart * 60 + vol1.minute_depart);// Le vol 2 décolle avant le vol 1
+        boolean v1_part_avant_v2 = (vol1.getHeure_depart() * 60 + vol1.getMinute_depart()) <= (vol2.getHeure_depart() * 60 + vol2.getMinute_depart());// Le vol 1 décolle avant le vol 2
+        boolean v2_part_avant_v1 = (vol2.getHeure_depart() * 60 + vol2.getMinute_depart()) <= (vol1.getHeure_depart() * 60 + vol1.getMinute_depart());// Le vol 2 décolle avant le vol 1
 
-        boolean v2_part_avant_v1_arrive = (vol2.heure_depart * 60 + vol2.minute_depart) <= (vol1.heure_arrivee * 60 + vol1.minute_arrivee);// Le vol 2 décolle avant que le vol 1 n'atterrisse
-        boolean v1_part_avant_v2_arrive = (vol1.heure_depart * 60 + vol1.minute_depart) <= (vol2.heure_arrivee * 60 + vol2.minute_arrivee);// Le vol 1 décolle avant que le vol 2 n'atterrisse
+        boolean v2_part_avant_v1_arrive = (vol2.getHeure_depart() * 60 + vol2.getMinute_depart()) <= (vol1.getHeure_arrivee() * 60 + vol1.getMinute_arrivee());// Le vol 2 décolle avant que le vol 1 n'atterrisse
+        boolean v1_part_avant_v2_arrive = (vol1.getHeure_depart() * 60 + vol1.getMinute_depart()) <= (vol2.getHeure_arrivee() * 60 + vol2.getMinute_arrivee());// Le vol 1 décolle avant que le vol 2 n'atterrisse
 
-        boolean v1dec_meme_v2dec = (vol1.heure_depart * 60 + vol1.minute_depart) == (vol2.heure_depart * 60 + vol2.minute_depart);// Les vols décollent en même temps
+        boolean v1dec_meme_v2dec = (vol1.getHeure_depart() * 60 + vol1.getMinute_depart()) == (vol2.getHeure_depart() * 60 + vol2.getMinute_depart());// Les vols décollent en même temps
 
-        boolean v2_arrive_avant_v1 = (vol1.heure_arrivee * 60 + vol1.minute_arrivee) >= (vol2.heure_arrivee * 60 + vol2.minute_arrivee);// Le vol 2 atterrie avant le vol 1
-        boolean v1_arrive_avant_v2 = (vol2.heure_arrivee * 60 + vol2.minute_arrivee) >= (vol1.heure_arrivee * 60 + vol1.minute_arrivee);// Le vol 1 atterrie avant le vol 2
+        boolean v2_arrive_avant_v1 = (vol1.getHeure_arrivee() * 60 + vol1.getMinute_arrivee()) >= (vol2.getHeure_arrivee() * 60 + vol2.getMinute_arrivee());// Le vol 2 atterrie avant le vol 1
+        boolean v1_arrive_avant_v2 = (vol2.getHeure_arrivee() * 60 + vol2.getMinute_arrivee()) >= (vol1.getHeure_arrivee() * 60 + vol1.getMinute_arrivee());// Le vol 1 atterrie avant le vol 2
 
         if (denominateur != 0) { // Les vols se croisent
-            double t = ((vol1.depart.x - vol2.depart.x) * (vol2.depart.y - vol2.arrivee.y) - (vol1.depart.y - vol2.depart.y) * (vol2.depart.x - vol2.arrivee.x)) / denominateur;
-            double u = ((vol1.depart.x - vol2.depart.x) * (vol1.depart.y - vol1.arrivee.y) - (vol1.depart.y - vol2.depart.y) * (vol1.depart.x - vol1.arrivee.x)) / denominateur;
+            double t = ((vol1.getDepart().getx() - vol2.getDepart().getx()) * (vol2.getDepart().gety() - vol2.getArrivee().gety()) - (vol1.getDepart().gety() - vol2.getDepart().gety()) * (vol2.getDepart().getx() - vol2.getArrivee().getx())) / denominateur;
+            double u = ((vol1.getDepart().getx() - vol2.getDepart().getx()) * (vol1.getDepart().gety() - vol1.getArrivee().gety()) - (vol1.getDepart().gety() - vol2.getDepart().gety()) * (vol1.getDepart().getx() - vol1.getArrivee().getx())) / denominateur;
 
             //Arrondie des 2 valeurs pour contrebalancer les imprécisions de calculs
             double t_arrondi = (double) (Math.round(t * 1000000000)) / 1000000000;
@@ -530,8 +552,8 @@ public class Carte {
 
             if (t_arrondi >= 0.0 && t_arrondi <= 1 && u_arrondi >= 0 && u_arrondi <= 1) {
                 //Calcul des coordonnées du point d'intersection
-                intersectionX = vol1.depart.x + t * (vol1.arrivee.x - vol1.depart.x);
-                intersectionY = vol1.depart.y + t * (vol1.arrivee.y - vol1.depart.y);
+                intersectionX = vol1.getDepart().getx() + t * (vol1.getArrivee().getx() - vol1.getDepart().getx());
+                intersectionY = vol1.getDepart().gety() + t * (vol1.getArrivee().gety() - vol1.getDepart().gety());
                 reponse[0] = intersectionX;
                 reponse[1] = intersectionY;
                 reponse[2] = 1.00; // Collisions.Collision potentielle détectée
@@ -562,7 +584,7 @@ public class Carte {
             Iterator<Vol> iterateur2 = this.liste_vols.iterator();
             while (iterateur2.hasNext()) { // Compare le vol actuel avec tous les autres vols
                 Vol vol2 = iterateur2.next();
-                if (vol1.code.equals(vol2.code)){// Évite de comparer un vol avec lui-même
+                if (vol1.getCode().equals(vol2.getCode())){// Évite de comparer un vol avec lui-même
                     continue;
                 }
 
@@ -572,9 +594,9 @@ public class Carte {
                 double y3 = point_intersections[1];
 
                 if (point_intersections[2]==1 || point_intersections[2]==2){
-                    double instant_collision_vol1=vol1.heure_depart*60 + vol1.minute_depart + TempsAvantCollision(vol1,x3,y3);
+                    double instant_collision_vol1=vol1.getHeure_depart()*60 + vol1.getMinute_depart() + TempsAvantCollision(vol1,x3,y3);
 
-                    double instant_collision_vol2=vol2.heure_depart*60 + vol2.minute_depart + TempsAvantCollision(vol2,x3,y3);
+                    double instant_collision_vol2=vol2.getHeure_depart()*60 + vol2.getMinute_depart() + TempsAvantCollision(vol2,x3,y3);
 
                     // Vérifie si les temps de collision sont suffisamment proches pour considérer une collision
                     if (abs(instant_collision_vol1-instant_collision_vol2)<temps_collision || point_intersections[2]==2){//Vérifie s'il y a une collision potentielle
@@ -583,7 +605,7 @@ public class Carte {
 
                         // Vérifie si la collision n'est pas déjà enregistrée
                         for (Collision collision2 : liste_collisions){
-                            if ((collision1.vol1.code+collision1.vol2.code).equals(collision2.vol2.code+collision2.vol1.code)){
+                            if ((collision1.getVol1().getCode()+collision1.getVol2().getCode()).equals(collision2.getVol2().getCode()+collision2.getVol1().getCode())){
                                 collisionPresente = true;
                                 break;
 
@@ -591,7 +613,7 @@ public class Carte {
                         }
                         if (!collisionPresente){
                             // Ajoute l'arête entre les vols dans le graphe
-                            graph_vol.addEdge(vol1.code+" => "+ vol2.code,vol2.code, vol1.code);
+                            graph_vol.addEdge(vol1.getCode()+" => "+ vol2.getCode(),vol2.getCode(), vol1.getCode());
 
                             // Ajoute la collision à la liste
                             liste_collisions.add(collision1);

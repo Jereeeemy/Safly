@@ -15,12 +15,12 @@ public class WelshPowell {
     /**
      * Graph auquel on applique la coloration
      */
-    Graph graph;
+    private Graph graph;
 
     /**
      * Liste des noeuds du graph
      */
-    ArrayList<Node> noeuds = new ArrayList<>();
+    private ArrayList<Node> noeuds = new ArrayList<>();
 
     public ArrayList<Node> getNoeuds() {
         return noeuds;

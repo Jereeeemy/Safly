@@ -8,32 +8,32 @@ public class Aeroport {
     /**
      * Code unique de l'Aéroport
      */
-    String code;
+    private String code;
 
     /**
      * Ville où se situe l'Aéroport
      */
-    String ville;
+    private String ville;
 
     /**
      * 1re valeur des coordonnées cartésiennes de l'aéroport
      */
-    double x;
+    private double x;
 
     /**
      * 2e valeur des coordonnées cartésiennes de l'aéroport
      */
-    double y;
+    private double y;
 
     /**
      * 1re valeur des coordonnées géographiques de l'aéroport
      */
-    double longitude;
+    private double longitude;
 
     /**
      * 2e valeur des coordonnées géographiques de l'aéroport
      */
-    double latitude;
+    private double latitude;
 
     /**
      * Constructeur pour créer un aéroport avec uniquement les coordonnées cartésiennes.

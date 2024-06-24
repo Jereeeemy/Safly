@@ -7,42 +7,42 @@ public class Vol {
     /**
      * Code unique du vol
      */
-    String code;
+    private String code;
 
     /**
      * Aéroport de départ du vol
      */
-    Aeroport depart;
+    private Aeroport depart;
 
     /**
      * Aéroport d'arrivée du vol
      */
-    Aeroport arrivee;
+    private Aeroport arrivee;
 
     /**
      * Heure de départ du vol
      */
-    double heure_depart;
+    private double heure_depart;
 
     /**
      * Minute de départ du vol
      */
-    double minute_depart;
+    private double minute_depart;
 
     /**
      * Heure d'arrivée du vol
      */
-    double heure_arrivee;
+    private double heure_arrivee;
 
     /**
      * Minute d'arrivée du vol
      */
-    double minute_arrivee;
+    private double minute_arrivee;
 
     /**
      * Temps de vol
      */
-    double temps_vol;
+    private double temps_vol;
 
     /**
      * Constructeur pour créer un vol.
@@ -130,6 +130,8 @@ public class Vol {
     public void setCode(String code) {
         this.code = code;
     }
+
+
 
     /**
      * Fait la somme d'une Heure et d'une Minute avec un temps donné en minutes

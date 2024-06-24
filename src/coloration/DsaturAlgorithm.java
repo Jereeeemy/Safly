@@ -4,10 +4,14 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static graphvol.CreateurGraph.writeCSVFile;
+import static graphvol.CreateurGraph.writeTxtFile;
 
 
 /**
@@ -19,9 +23,9 @@ public class DsaturAlgorithm {
      * Comparable permet de comparer les nœuds basés sur leur degré de saturation et leur degré.
      */
     static class GraphNode implements Comparable<GraphNode> {
-        int nodeId; // Identifiant du nœud
-        int degree; // Degré du nœud
-        int saturationDegree; // Degré de saturation du nœud
+        private int nodeId; // Identifiant du nœud
+        private int degree; // Degré du nœud
+        private int saturationDegree; // Degré de saturation du nœud
 
         /**
          * Constructeur pour initialiser un nœud avec son identifiant et son degré.
@@ -247,5 +251,81 @@ public class DsaturAlgorithm {
             node.setAttribute("ui.style", "fill-color: rgb(" + red + "," + green + "," + blue + ");");
         }
     }
+
+    /**
+     * Colorie le graphe, affiche les informations et enregistre les résultats.
+     * @param graph Le graphe.
+     * @param Kmax Le nombre maximum de couleurs à utiliser.
+     * @param nomFichier Le nom du fichier pour les résultats.
+     * @param outputDirectory Le répertoire de sortie pour les fichiers.
+     * @return Un tableau des fichiers générés.
+     */
+    public static File[] colorAndDisplayGraph(Graph graph, int Kmax, String nomFichier, String outputDirectory) {
+        int[] result = dsaturColoring(graph, Kmax); // Applique l'algorithme DSatur pour colorier le graphe
+        displayGraphInfo(graph, result); // Affiche les informations sur le graphe et ses couleurs
+        modifyNodeColors(graph, result); // Modifie les couleurs des nœuds pour l'affichage graphique
+
+        int totalConflicts = checkColorConflicts(graph, result); // Vérifie les conflits de couleurs dans le graphe
+
+        File csvFile = writeCSVFile(nomFichier, totalConflicts, outputDirectory); // Écrit les résultats dans un fichier CSV
+        File txtFile = writeTxtFile(graph, result, outputDirectory); // Écrit les résultats dans un fichier texte
+
+        return new File[]{csvFile, txtFile}; // Retourne les fichiers générés
+    }
+
+    /**
+     * Vérifie les conflits de couleurs dans le graphe.
+     * @param graph Le graphe.
+     * @param result Tableau des couleurs des nœuds.
+     * @return Le nombre total de conflits de couleurs.
+     */
+    public static int checkColorConflicts(Graph graph, int[] result) {
+        Set<String> checkedPairs = new HashSet<>(); // Initialise un ensemble pour stocker les paires de nœuds déjà vérifiées
+        int totalConflicts = 0; // Initialise le compteur de conflits à zéro
+        for (Node node : graph) { // Parcourt tous les nœuds du graphe
+            int nodeId = node.getIndex(); // Récupère l'identifiant du nœud actuel
+            int nodeColor = result[nodeId]; // Récupère la couleur du nœud actuel à partir du tableau des résultats
+            for (Edge edge : node.getEachEdge()) { // Parcourt toutes les arêtes du nœud actuel
+                Node neighbor = edge.getOpposite(node); // Récupère le voisin connecté par cette arête
+                int neighborId = neighbor.getIndex(); // Récupère l'identifiant du voisin
+                int neighborColor = result[neighborId]; // Récupère la couleur du voisin à partir du tableau des résultats
+                // Génère une clé pour la paire de nœuds afin de gérer les paires dans les deux sens
+                String pairKey = nodeId < neighborId ? nodeId + "-" + neighborId : neighborId + "-" + nodeId;
+                // Vérifie si les deux nœuds ont la même couleur et si cette paire n'a pas déjà été vérifiée
+                if (nodeColor == neighborColor && !checkedPairs.contains(pairKey)) {
+                    System.out.println("Erreur: Le nœud " + nodeId + " et le nœud " + neighborId + " ont la même couleur.");
+                    checkedPairs.add(pairKey); // Ajoute la paire à l'ensemble des paires vérifiées
+                    totalConflicts++; // Incrémente le compteur de conflits
+                }
+            }
+        }
+        if (totalConflicts == 0) {
+            System.out.println("Tous les nœuds ont des couleurs différentes de leurs voisins.");
+        } else {
+            System.out.println("Nombre total de conflits: " + totalConflicts); // Affiche le nombre total de conflits détectés
+        }
+        return totalConflicts; // Retourne le nombre total de conflits de couleurs
+    }
+
+    /**
+     * Affiche les informations du graphe.
+     * @param graph Le graphe.
+     * @param result Tableau des couleurs des nœuds.
+     */
+    private static void displayGraphInfo(Graph graph, int[] result) {
+        int numberOfVertices = graph.getNodeCount();
+        System.out.println("Nombre de sommets: " + numberOfVertices); // Affiche le nombre total de sommets dans le graphe
+        System.out.println("Sommet; Couleur");
+        for (int i = 0; i < numberOfVertices; i++) {
+            System.out.println((i + 1) + " ; " + result[i]); // Affiche l'identifiant du nœud et sa couleur correspondante
+        }
+
+        Set<Integer> uniqueColors = new HashSet<>();
+        for (int color : result) {
+            uniqueColors.add(color);
+        }
+        System.out.println("Nombre de couleurs utilisées: " + uniqueColors.size()); // Affiche le nombre de couleurs différentes utilisées
+    }
+
 
 }

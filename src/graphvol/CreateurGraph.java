@@ -34,7 +34,7 @@ public class CreateurGraph {
     /**
      * Graph créé.
      */
-    Graph graph;
+    private Graph graph;
 
     /**
      * Constructeur de CreateurGraph prenant un fichier en paramètre.
@@ -190,11 +190,12 @@ public class CreateurGraph {
 
 
     /**
-     * Écrit les résultats dans un fichier CSV.
-     * @param nomFichier Le nom du fichier CSV.
-     * @param totalConflicts Le nombre total de conflits de couleurs.
-     * @param outputDirectory Le répertoire de sortie pour le fichier.
-     * @return Le fichier CSV généré.
+     * Écrit les résultats de coloration dans un fichier CSV.
+     *
+     * @param nomFichier       Le nom du fichier de graphe d'origine.
+     * @param totalConflicts   Le nombre total de conflits de couleurs.
+     * @param outputDirectory  Le répertoire de sortie pour le fichier CSV.
+     * @return                 Le fichier CSV généré.
      */
     public static File writeCSVFile(String nomFichier, int totalConflicts, String outputDirectory) {
         // Vérifie si le répertoire de sortie existe, sinon le crée
@@ -212,12 +213,19 @@ public class CreateurGraph {
         // Compte le nombre de lignes dans le fichier avant d'ajouter le nouveau contenu
         int lineCount = countLines(csvFile);
 
+        // Prépare le contenu à écrire dans le fichier CSV (nom du fichier et nombre total de conflits)
+        StringBuilder csvContent = new StringBuilder();
+
+        // Vérifie si nomFichier a au moins 10 caractères avant de prendre la sous-chaîne
+        if (nomFichier.length() >= 10) {
+            csvContent.append("graph-eval").append(nomFichier.substring(10)).append("; ").append(totalConflicts).append("\r\n");
+        } else {
+            // Utilise le nomFichier complet s'il est trop court
+            csvContent.append("graph-eval").append(nomFichier).append("; ").append(totalConflicts).append("\r\n");
+        }
+
         // Si le fichier contient moins de 20 lignes, ajoute de nouvelles données
         if (lineCount < 20) {
-            // Prépare le contenu à écrire dans le fichier CSV (nom du fichier et nombre total de conflits)
-            StringBuilder csvContent = new StringBuilder();
-            csvContent.append("graph-eval"+nomFichier.substring(10)).append("; ").append(totalConflicts).append("\r\n");
-
             // Utilisation de BufferedWriter pour écrire dans le fichier CSV
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile, true))) {
                 writer.write(csvContent.toString()); // Écrit le contenu dans le fichier CSV
@@ -225,11 +233,7 @@ public class CreateurGraph {
                 e.printStackTrace();
             }
         } else {
-            // Prépare le contenu à écrire dans le fichier CSV (nom du fichier et nombre total de conflits)
-            StringBuilder csvContent = new StringBuilder();
-            csvContent.append("graph-eval"+nomFichier.substring(10)).append("; ").append(totalConflicts).append("\r\n");
-
-            // Utilisation de BufferedWriter pour écrire dans le fichier CSV
+            // Utilisation de BufferedWriter pour réécrire le fichier CSV
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
                 writer.write(csvContent.toString()); // Écrit le contenu dans le fichier CSV
             } catch (IOException e) {
@@ -417,7 +421,12 @@ public class CreateurGraph {
         return adjacentNodes;
     }
 
-    // Méthode pour compter et afficher les conflits
+
+    /**
+     * Compte les conflits de coloration d'un graph
+     * @param graph Graph étudié
+     * @return nombre de conflits détectés
+     */
     public int CompterConflits(Graph graph) {
         int conflictCount = 0;
 
