@@ -53,6 +53,11 @@ public class Carte {
     private static int nb_vols;
 
     /**
+     * Compte le nombre de lignes ignorés
+     */
+    private int nb_erreurs = 0;
+
+    /**
      * Intervalle de temps pour lequel on considère qu'il y a un risque de collision (15 par défaut)
      */
     public static int temps_collision = 15;
@@ -200,7 +205,7 @@ public class Carte {
 
                     // Vérification du nombre attendu de tokens
                     if (st.countTokens() != 10) {
-                        System.err.println("Ligne ignorée - format incorrect : " + line);
+                        System.out.println("Ligne ignorée - format incorrect : " + line);
                         continue;
                     }
                     // Récupération des données
@@ -220,7 +225,7 @@ public class Carte {
                     nb_aeroports++; // Incrémentation du compteur d'aéroports
                 } catch (NoSuchElementException | NumberFormatException | ExceptionOrientation e) {
                     // Ignorer la ligne en cas d'erreur de format ou de conversion
-                    System.err.println("Ligne ignorée - erreur : " + e.getMessage());
+                    System.out.println("Ligne ignorée - erreur : " + e.getMessage());
                     continue;
                 }
             }
@@ -372,17 +377,18 @@ public class Carte {
                         vols.add(vol);
                         nb_vols++; // Incrémenter le compteur de vols
                     } catch (NoSuchElementException | NumberFormatException e) {
-                        System.err.println("Erreur de lecture - format incorrect : " + line);
+                        System.out.println("Erreur de lecture - format incorrect : " + line);
                     }
                 } else if (line.isEmpty() || line.isBlank()) {
                     // Si la ligne est vide, ignorer et continuer
-                    System.err.println("Ligne vide ignorée.");
+                    System.out.println("Ligne vide ignorée.");
                 }
             }
             // Vérifier si le fichier est vide
             if (fichierVide) {
                 throw new IOException("Le fichier de vols est vide : " + nomfichier.getName());
             }
+
         } catch (IOException e) {
             // Propager l'exception IOException vers l'appelant
             throw new IOException("Erreur de lecture du fichier de vols : " + nomfichier.getName(), e);
@@ -409,18 +415,25 @@ public class Carte {
                     fichierVide = false;
                     try {
                         Vol vol = LectureVol(line);
-                        if (vol!=null && vol.getCode()!=null && idUnique(vols, vol)){
+                        if (vol!=null && vol.getCode()!=null ){
                             this.getGraph_vol().addNode(vol.getCode()); // Ajouter le code du vol en tant qu'ID du nœud
                             vols.add(vol);
-                            System.out.println(vol.getCode());
                             nb_vols++; // Incrémenter le compteur de vols
                         }
-                    } catch (NoSuchElementException | NumberFormatException e) {
-                        System.err.println("Erreur de lecture - format incorrect : " + line);
+                        else{
+                            throw new NoSuchElementException();
+                        }
+                    } catch (NoSuchElementException  e) {
+                        System.out.println("Erreur de lecture - Format incorrect : " + line);
+                        nb_erreurs++;
+                    }
+                    catch (NumberFormatException e){
+                        System.out.println("Erreur de lecture - Nombre invalide : " + line);
+                        nb_erreurs++;
                     }
                 } else if (line.isEmpty() || line.isBlank()){
                     // Si la ligne est vide, ignorer et continuer
-                    System.err.println("Ligne vide ignorée.");
+                    System.out.println("Ligne vide ignorée.");
                 }
             }
             // Vérifier si le fichier est vide
@@ -431,6 +444,7 @@ public class Carte {
             // Propager l'exception IOException vers l'appelant
             throw new IOException("Erreur de lecture du fichier de vols : " + fichier.getName(), e);
         }
+        System.out.println("Nombre total de lignes ignorés : " + nb_erreurs);
         return vols;
     }
 

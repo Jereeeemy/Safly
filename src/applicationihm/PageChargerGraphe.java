@@ -306,6 +306,8 @@ public class PageChargerGraphe {
             @Override
             public void stateChanged(ChangeEvent e) {
                 kmax = (int) spinnerKMax.getValue();
+                resultcolorDsat = null;
+                resultcolorWelsh = null;
             }
         });
 
@@ -322,6 +324,8 @@ public class PageChargerGraphe {
                         // Essayer de créer le graphe avec le fichier sélectionné
                         graph = new CreateurGraph(selectedFile);
                         graphWelsh = new WelshPowell(graph.getGraph());
+                        resultcolorWelsh=null;
+                        resultcolorDsat=null;
                         kmax = graph.getGraph().getAttribute("kmax");
                         spinnerKMax.setValue(kmax);
 

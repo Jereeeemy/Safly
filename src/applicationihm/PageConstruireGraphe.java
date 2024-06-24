@@ -46,10 +46,12 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 
-import java.util.*;
-
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import collisions.Aeroport;
 import collisions.Carte;
@@ -99,6 +101,10 @@ public class PageConstruireGraphe {
      */
     public File selectedFile;
 
+    /**
+     * nombre de coloration maximum qu'il est possible d'implémenter
+     */
+    private int maxkmax=1000000000;
     /**
      * Fichier de vols sélectionné par l'utilisateur.
      */
@@ -285,7 +291,7 @@ public class PageConstruireGraphe {
                     String fileName = fichierVols.getName();
                     try {
                         if ((fileName.toLowerCase().startsWith("aeroports")) || (fileName.toLowerCase().startsWith("aéroports"))
-                        || (fileName.toLowerCase().startsWith("aeroport")) || (fileName.toLowerCase().startsWith("aéroport"))) {
+                                || (fileName.toLowerCase().startsWith("aeroport")) || (fileName.toLowerCase().startsWith("aéroport"))) {
                             throw new Exception();
                         }
                         // Création du graphe de collisions avec les vols grace au fichier de vol
@@ -849,12 +855,12 @@ public class PageConstruireGraphe {
                 if (algowelsh == null) {
                     map.RechercheCollision();
                     algowelsh = new WelshPowell(map.getGraph_vol());
-                    algowelsh.colorierNoeudsWelsh(1000000000);
+                    algowelsh.colorierNoeudsWelsh(maxkmax);
                     map.setGraph_vol(algowelsh.getGraph());
                 }
                 else {
                     algowelsh = new WelshPowell(map.getGraph_vol());
-                    algowelsh.colorierNoeudsWelsh(1000000000);
+                    algowelsh.colorierNoeudsWelsh(maxkmax);
                     map.setGraph_vol(algowelsh.getGraph());
                 }
 

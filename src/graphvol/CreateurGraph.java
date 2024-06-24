@@ -4,6 +4,8 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.spriteManager.Sprite;
+import org.graphstream.ui.spriteManager.SpriteManager;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -140,8 +142,9 @@ public class CreateurGraph {
 
         // Lire les arêtes et les ajouter au graphe
         while ((line = br.readLine()) != null) {
-            if (!line.matches("\\d+ \\d+")) {
+            if (line.isEmpty() || !line.matches("\\d+ \\d+")) {
                 // Lancer une exception si la ligne n'est pas valide
+
                 throw new ExceptionLigneIncorrect(line);
             }
             String[] noeuds = line.split(" ");
@@ -257,7 +260,7 @@ public class CreateurGraph {
                 lines++;
             }
         } catch (IOException e) {
-            System.err.println("Erreur lors de la lecture du fichier : " + e.getMessage());
+            System.out.println("Erreur lors de la lecture du fichier : " + e.getMessage());
         }
         return lines;
     }
