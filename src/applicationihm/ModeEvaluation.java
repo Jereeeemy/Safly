@@ -1,47 +1,97 @@
 package applicationihm;
 
-import coloration.*;
-import javax.swing.*;
-import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
+import coloration.DsaturAlgorithm;
+import coloration.WelshPowell;
 import graphvol.CreateurGraph;
 import graphvol.ExceptionFormatIncorrect;
 import graphvol.ExceptionLigneIncorrect;
-import org.graphstream.graph.Graph;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import static graphvol.CreateurGraph.*;
 
-
+/**
+ * Classe pour le mode d'évaluation de l'application.
+ */
 public class ModeEvaluation {
+
+    /**
+     * Panneau principal pour l'évaluation.
+     */
     private final JPanel panelEvaluation;
+
+    /**
+     * Objet CreateurGraph pour gérer les graphes.
+     */
     private CreateurGraph graph;
+
+    /**
+     * Fichier sélectionné par l'utilisateur.
+     */
     public File selectedFile;
+
+    /**
+     * Fichier à télécharger.
+     */
     public File fileToDownload;
+
+    /**
+     * Valeur maximale de k pour la coloration du graphe.
+     */
     int kmax;
+
+    /**
+     * Couleur principale de l'interface.
+     */
     Color couleurPrincipale = Color.decode("#D9D9D9");
+
+    /**
+     * Couleur secondaire de l'interface.
+     */
     Color couleurSecondaire = Color.decode("#2C5789");
+
+    /**
+     * Couleur tertiaire de l'interface.
+     */
     Color couleurTertaire = Color.decode("#122A47");
 
+    /**
+     * Constructeur de la classe ModeEvaluation.
+     *
+     * @param menuPrincipal Le menu principal de l'application.
+     */
     public ModeEvaluation(MenuPrincipal menuPrincipal) {
 
+        // Initialisation du panneau principal avec un fond personnalisé
         panelEvaluation = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                // Récupérer l'image de fond actuelle à chaque fois que le panneau est redessiné
                 Image background = menuPrincipal.getBackgroundImage();
                 g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
             }
@@ -49,24 +99,27 @@ public class ModeEvaluation {
 
         panelEvaluation.setLayout(new BorderLayout(200, 75));
 
-        JPanel panelChargerHaut = new JPanel();
+        // Mise en place des panels principaux de la page
+        JPanel panelChargerHaut = new JPanel(); // Panneau supérieur pour les boutons
         panelChargerHaut.setOpaque(false);
-        RoundedPanel panelChargerCentre = new RoundedPanel(40);
+        RoundedPanel panelChargerCentre = new RoundedPanel(40); // Panneau central avec coins arrondis
 
         panelChargerCentre.setBorder(BorderFactory.createEmptyBorder(30, 15, 30, 15));
         panelChargerCentre.setBackground(couleurPrincipale);
         panelChargerCentre.setOpaque(false);
-        JPanel panelChargerBas = new JPanel();
+        JPanel panelChargerBas = new JPanel(); // Panneau inférieur pour le nom de l'application
         panelChargerBas.setOpaque(false);
-        JLabel nomAppli = new JLabel("SAFLY");
+        JLabel nomAppli = new JLabel("SAFLY"); // Nom de l'application
         nomAppli.setFont(new Font("Lucida Sans", Font.BOLD, 60));
         panelChargerBas.add(nomAppli);
 
-        RoundedButton boutonAccueil = new RoundedButton("Accueil", 25);
+        // Mise en place du bouton d'accueil
+        RoundedButton boutonAccueil = new RoundedButton("Accueil", 25); // Bouton d'accueil
         boutonAccueil.setFocusable(false);
         boutonAccueil.setFont(new Font("Lucida Sans", Font.PLAIN, 15));
         boutonAccueil.setBackground(couleurPrincipale);
 
+        // Ajout d'un écouteur pour le bouton d'accueil
         boutonAccueil.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -123,32 +176,24 @@ public class ModeEvaluation {
                 int returnValue = fileChooser.showOpenDialog(panelEvaluation);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedDirectory = fileChooser.getSelectedFile();
-                    // Maintenant vous avez le dossier sélectionné (selectedDirectory)
 
-                    // Vous pouvez ajouter votre logique pour traiter les fichiers dans ce dossier ici
-                    // Par exemple, vous pouvez itérer sur les fichiers dans le dossier
                     File[] files = selectedDirectory.listFiles();
-                    //INSERER EXCPETION DOSSIER VIDE
-                    /****/
-                    for (File fichier : files){
-                        if (fichier.getName().endsWith(".txt") && fichier.getName().startsWith("graph")){
+                    for (File fichier : files) {
+                        if (fichier.getName().endsWith(".txt") && fichier.getName().startsWith("graph")) {
                             fichiers_choisi_repertoire.add(fichier);
                         }
                     }
-                    if (!fichiers_choisi_repertoire.isEmpty()){
+                    if (!fichiers_choisi_repertoire.isEmpty()) {
                         boutonFichierGraphe.removeMouseListener(this);
                         boutonFichierGraphe.setBackground(Color.DARK_GRAY);
                         boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
-                    }
-                    else{
+                    } else {
                         JOptionPane.showMessageDialog(panelEvaluation, "Ce dossier ne contient aucun fichier de graph, veuillez réessayer", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
-
 
                     // Tri des fichiers selon l'ordre numérique dans les noms de fichier
                     fichiers_choisi_repertoire.sort(Comparator.comparing(f -> {
                         String name = f.getName();
-                        // Extraire le numéro entre "graph-test" et ".txt"
                         String number = name.substring(10, name.length() - 4);
                         return Integer.parseInt(number);
                     }));
@@ -156,7 +201,6 @@ public class ModeEvaluation {
                     if (files != null) {
                         for (File file : files) {
                             if (file.isFile() && file.getName().endsWith(".graph")) {
-                                // Traiter le fichier (par exemple, créer un graphe avec ce fichier)
                                 String fileName = file.getName();
                                 try {
                                     graph = new CreateurGraph(file);
@@ -169,13 +213,9 @@ public class ModeEvaluation {
                                     boutonFichierGraphe.setForeground(Color.decode("#77E59B"));
                                     panelEvaluation.revalidate();
                                     panelEvaluation.repaint();
-                                } catch (IOException ex) {
+                                } catch (IOException | ExceptionFormatIncorrect | ExceptionLigneIncorrect ex) {
                                     JOptionPane.showMessageDialog(panelEvaluation, "Erreur lors de la lecture du fichier " + fileName + "! Vérifiez que le fichier fourni est correct.", "Erreur", JOptionPane.ERROR_MESSAGE);
                                     ex.printStackTrace(); // Afficher l'erreur dans le terminal pour un débogage ultérieur
-                                } catch (ExceptionFormatIncorrect ex) {
-                                    throw new RuntimeException(ex);
-                                } catch (ExceptionLigneIncorrect ex) {
-                                    throw new RuntimeException(ex);
                                 }
                             }
                         }
@@ -192,18 +232,17 @@ public class ModeEvaluation {
             public void mouseReleased(MouseEvent e) {
                 boutonFichierGraphe.setBackground(couleurTertaire);
             }
-
             @Override
             public void mouseEntered(MouseEvent e) {
                 boutonFichierGraphe.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
-
             @Override
             public void mouseExited(MouseEvent e) {
                 boutonFichierGraphe.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         });
 
+        // Décoration du bouton pour deposer le dossier de graphes
         boutonFichierGraphe.setFocusable(false);
         boutonFichierGraphe.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         boutonFichierGraphe.setForeground(Color.WHITE);
@@ -215,13 +254,13 @@ public class ModeEvaluation {
         gbc.gridwidth = 1; // Revenir à une seule colonne
         panelChargerCentre.add(boutonFichierGraphe, gbc);
 
-
+        // Mise en place et décoration du bouton pour colorier les graphes
         RoundedButton boutonColoration = new RoundedButton("Effectuer la coloration et telecharger", 50);
         boutonColoration.setFocusable(false);
         boutonColoration.setForeground(Color.WHITE);
         boutonColoration.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         boutonColoration.setPreferredSize(new Dimension(220, 50));
-        boutonColoration.setBorder(new EmptyBorder(15,15,15,15));
+        boutonColoration.setBorder(new EmptyBorder(15, 15, 15, 15));
         boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonColoration.setBackground(couleurTertaire);
         boutonColoration.addMouseListener(new MouseListener() {
@@ -229,15 +268,15 @@ public class ModeEvaluation {
             public void mouseClicked(MouseEvent e) {
                 if (fichiers_choisi_repertoire.isEmpty()) {
                     JOptionPane.showMessageDialog(panelEvaluation, "Veuillez d'abord charger un fichier de graphe.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
-                else{
-                    for (File fichier : fichiers_choisi_repertoire){
+                } else {
+                    for (File fichier : fichiers_choisi_repertoire) {
                         int conflitwelsh = -1;
                         int conflitdsat = -1;
-                        int [] colorationdsat;
-                        int [] colorationwelsh;
+                        int[] colorationdsat;
+                        int[] colorationwelsh;
                         CreateurGraph graphwelsh;
                         CreateurGraph graphdsat;
+                        // Pour chaque fichier de graphe, effectue les 2 colorations et les met en resultats
                         try {
                             graphwelsh = new CreateurGraph(fichier);
                             WelshPowell algowelsh = new WelshPowell(graphwelsh.getGraph());
@@ -254,42 +293,36 @@ public class ModeEvaluation {
                         } catch (IOException | ExceptionFormatIncorrect | ExceptionLigneIncorrect ex) {
                             throw new RuntimeException(ex);
                         }
-
-                        if (conflitwelsh <= conflitdsat){
-                            writeCSVFile(fichier.getName(),conflitwelsh,"7");
-                            writeTxtFile(graphwelsh.getGraph(), colorationwelsh,"7");
-                        }
-                        else{
-                            writeCSVFile(fichier.getName(),conflitdsat,"7");
+                        // Ecrit les fichier de resultats csv et les txt de chaque graphe en fonction de la meilleure coloration obtenue
+                        if (conflitwelsh <= conflitdsat) {
+                            writeCSVFile(fichier.getName(), conflitwelsh, "7");
+                            writeTxtFile(graphwelsh.getGraph(), colorationwelsh, "7");
+                        } else {
+                            writeCSVFile(fichier.getName(), conflitdsat, "7");
                             writeTxtFile(graphdsat.getGraph(), colorationdsat, "7");
                         }
-
                     }
                     try {
                         JOptionPane.showMessageDialog(panelEvaluation, "Votre fichier zippé a bien été créé", "Challenge coloration", JOptionPane.INFORMATION_MESSAGE);
+                        // transforme le dossier de resultats en zip
                         zipOutputDirectory("7");
-
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
                 }
             }
-
             @Override
             public void mousePressed(MouseEvent e) {
                 boutonColoration.setBackground(couleurSecondaire);
             }
-
             @Override
             public void mouseReleased(MouseEvent e) {
                 boutonColoration.setBackground(couleurTertaire);
             }
-
             @Override
             public void mouseEntered(MouseEvent e) {
                 boutonColoration.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
-
             @Override
             public void mouseExited(MouseEvent e) {
                 boutonColoration.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -308,6 +341,8 @@ public class ModeEvaluation {
         panelgauche.setOpaque(false);
         JPanel paneldroite = new JPanel();
         paneldroite.setOpaque(false);
+
+        // ajoute tout les panels principaux dans le panel de la page
         panelEvaluation.add(panelChargerHaut, BorderLayout.NORTH);
         panelEvaluation.add(panelgauche, BorderLayout.WEST);
         panelEvaluation.add(panelChargerCentre, BorderLayout.CENTER);
@@ -315,6 +350,7 @@ public class ModeEvaluation {
         panelEvaluation.add(panelChargerBas, BorderLayout.SOUTH);
     }
 
+    // Méthode pour sauvegarder un fichier
     private void saveFile() {
         if (fileToDownload != null) {
             JFileChooser fileChooser = new JFileChooser();
@@ -328,7 +364,6 @@ public class ModeEvaluation {
             if (userSelection == JFileChooser.APPROVE_OPTION) {
                 File fileToSave = fileChooser.getSelectedFile();
                 try {
-                    // Copier le contenu du fichier temporaire vers le fichier choisi par l'utilisateur
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave))) {
                         writer.write("Ceci est un exemple de fichier texte avec des informations.");
                     }
@@ -342,6 +377,10 @@ public class ModeEvaluation {
         }
     }
 
+    /**
+     * Renvoie le panelEvalutaion
+     * @return le JPanel panelEvaluation
+     */
     public JPanel getPanel() {
         return panelEvaluation;
     }

@@ -11,22 +11,57 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import static java.lang.Math.abs;
 import static java.lang.System.in;
 
+/**
+ * Class représentant la carte des vols, aéroports et collisions
+ */
 public class Carte {
+    /**
+     * Graph des vols avec les vols en nœuds et les collisions en arêtes
+     */
     private Graph graph_vol;
+
+    /**
+     * Graph des aéroports avec les aéroports en nœuds et les vols en arêtes
+     */
     private Graph graph_aeroport;
+
+    /**
+     * Liste contenant tous les aéroports du fichier
+     */
     private ArrayList<Aeroport> liste_aeroports;
+
+    /**
+     * Liste contenant tous les vols du fichier
+     */
     private ArrayList<Vol> liste_vols;
-    private ArrayList<ArrayList<Vol>> coloration;
+
+    /**
+     * Nombre d'aéroports présent dans le fichier sélectionné
+     */
     private static int nb_aeroports;
+
+    /**
+     * Nombre de vols présent dans le fichier sélectionné
+     */
     private static int nb_vols;
+
+    /**
+     * Intervalle de temps pour lequel on considère qu'il y a un risque de collision (15 par défaut)
+     */
     public static int temps_collision = 15;
+
+    /**
+     * Valeur du rayon de la terre
+     */
     public static int rayon_terre = 6371;
+
     /**
      * Constructeur par défaut pour initialiser la carte avec les aéroports et les vols.
      * @throws IOException en cas d'erreur de lecture de fichier.
@@ -100,8 +135,6 @@ public class Carte {
 
     public ArrayList<Vol> getListe_vols() {return liste_vols;}
 
-    public ArrayList<ArrayList<Vol>> getColoration() {return coloration;}
-
     // Setters
     public void setListe_aeroports(File fichier_aeroport) throws ExceptionOrientation, IOException {
         this.liste_aeroports = this.LireAeroports(fichier_aeroport);
@@ -151,29 +184,50 @@ public class Carte {
      * @return La liste des aéroports.
      * @throws IOException en cas d'erreur de lecture de fichier.
      */
-    private ArrayList<Aeroport> LireAeroports() throws IOException, ExceptionOrientation {
-        String nomfichier= "data/aeroports.txt";
-        BufferedReader lecteur = new BufferedReader(new FileReader(nomfichier));
-        String line;
+    public ArrayList<Aeroport> LireAeroports() throws IOException, ExceptionOrientation {
+        String nomfichier = "data/aeroports.txt";
         ArrayList<Aeroport> aeroports = new ArrayList<>();
-        while ((line = lecteur.readLine()) != null) {
-            StringTokenizer st = new StringTokenizer(line, ";");
-            String code=(st.nextToken());//Code de l'aéroport
-            String nom_ville=(st.nextToken());//Nom de la ville où est présent l'aéroport
 
-            double latitude=(CalculValeur(nom_ville, st.nextToken(),st.nextToken(),st.nextToken(),st.nextToken()));//Latitude de l'aéroport
+        try (BufferedReader lecteur = new BufferedReader(new FileReader(nomfichier))) {
+            String line;
+            // Vérifier si le fichier est vide
+            if (!lecteur.ready()) {
+                throw new IOException("Le fichier d'aéroports est vide : " + nomfichier);
+            }
+            while ((line = lecteur.readLine()) != null) {
+                try {
+                    StringTokenizer st = new StringTokenizer(line, ";");
 
-            double longitude=(CalculValeur(nom_ville, st.nextToken(),st.nextToken(),st.nextToken(),st.nextToken()));//Longitude de l'aéroport
+                    // Vérification du nombre attendu de tokens
+                    if (st.countTokens() != 10) {
+                        System.err.println("Ligne ignorée - format incorrect : " + line);
+                        continue;
+                    }
+                    // Récupération des données
+                    String code = st.nextToken();
+                    String nom_ville = st.nextToken();
 
-            // Conversion des coordonnées en coordonnées cartésiennes
-            double y = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.cos(longitude*((Math.PI)/180));
-            double x = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.sin(longitude*((Math.PI)/180));
+                    // Conversion des coordonnées de degré/minute/seconde/orientation en décimal
+                    double latitude = CalculValeur(nom_ville, st.nextToken(), st.nextToken(), st.nextToken(), st.nextToken());
+                    double longitude = CalculValeur(nom_ville, st.nextToken(), st.nextToken(), st.nextToken(), st.nextToken());
 
-            Aeroport aeroport = new Aeroport(code,nom_ville,x,y);
-            aeroports.add(aeroport);
-            nb_aeroports++;//Incrémentation du compteur d'aéroports
+                    // Conversion en coordonnées cartésiennes
+                    double y = rayon_terre * Math.cos(latitude * (Math.PI / 180)) * Math.cos(longitude * (Math.PI / 180));
+                    double x = rayon_terre * Math.cos(latitude * (Math.PI / 180)) * Math.sin(longitude * (Math.PI / 180));
+
+                    Aeroport aeroport = new Aeroport(code, nom_ville, x, y);
+                    aeroports.add(aeroport);
+                    nb_aeroports++; // Incrémentation du compteur d'aéroports
+                } catch (NoSuchElementException | NumberFormatException | ExceptionOrientation e) {
+                    // Ignorer la ligne en cas d'erreur de format ou de conversion
+                    System.err.println("Ligne ignorée - erreur : " + e.getMessage());
+                    continue;
+                }
+            }
+        } catch (IOException e) {
+            // Propager l'exception IOException vers l'appelant
+            throw new IOException("Erreur de lecture du fichier d'aéroports : " + nomfichier, e);
         }
-        lecteur.close();
         return aeroports;
     }
 
@@ -182,36 +236,63 @@ public class Carte {
      * @return La liste des aéroports.
      * @throws IOException en cas d'erreur de lecture de fichier.
      */
-    private ArrayList<Aeroport> LireAeroports(File fichier_aeroports) throws IOException, ExceptionOrientation {
-        BufferedReader lecteur = new BufferedReader(new FileReader(fichier_aeroports));
-        String line;
+    public ArrayList<Aeroport> LireAeroports(File fichier_aeroports) throws IOException, ExceptionOrientation {
         ArrayList<Aeroport> aeroports = new ArrayList<>();
-        while ((line = lecteur.readLine()) != null) {
-            StringTokenizer st = new StringTokenizer(line, ";");
-            String code=(st.nextToken());//Code de l'aéroport
-            String nom_ville=(st.nextToken());//Nom de la ville où est présent l'aéroport
+        int erreur = 0;
 
-            double latitude=(CalculValeur(nom_ville, st.nextToken(),st.nextToken(),st.nextToken(),st.nextToken()));//Latitude de l'aéroport
+        try (BufferedReader lecteur = new BufferedReader(new FileReader(fichier_aeroports))) {
+            String line;
 
-            double longitude=(CalculValeur(nom_ville, st.nextToken(),st.nextToken(),st.nextToken(),st.nextToken()));//Longitude de l'aéroport
+            // Vérifier si le fichier est vide
+            if (!lecteur.ready()) {
+                throw new IOException("Le fichier d'aéroports est vide");
+            }
 
-            // Conversion des coordonnées en coordonnées cartésiennes
-            double y = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.cos(longitude*((Math.PI)/180));
-            double x = rayon_terre*Math.cos(latitude*((Math.PI)/180))*Math.sin(longitude*((Math.PI)/180));
+            while ((line = lecteur.readLine()) != null) {
+                try {
+                    StringTokenizer st = new StringTokenizer(line, ";");
 
-            Aeroport aeroport = new Aeroport(code,nom_ville,x,y,latitude,longitude);
-            aeroports.add(aeroport);
-            nb_aeroports++;//Incrémentation du compteur d'aéroports
+                    // Vérification du nombre attendu de tokens
+                    if (st.countTokens() != 10) {
+                        System.out.println("Ligne ignorée - format incorrect : " + line);
+                        erreur++;
+                        if (erreur >= 20) {
+                            throw new IOException("Trop d'erreurs de format dans le fichier d'aéroports");
+                        }
+                        continue;
+                    }
+
+                    // Récupération des données
+                    String code = st.nextToken();
+                    String nom_ville = st.nextToken();
+
+                    // Conversion des coordonnées de degré/minute/seconde/orientation en décimal
+                    double latitude = CalculValeur(nom_ville, st.nextToken(), st.nextToken(), st.nextToken(), st.nextToken());
+                    double longitude = CalculValeur(nom_ville, st.nextToken(), st.nextToken(), st.nextToken(), st.nextToken());
+
+                    // Conversion en coordonnées cartésiennes
+                    double y = rayon_terre * Math.cos(latitude * (Math.PI / 180)) * Math.cos(longitude * (Math.PI / 180));
+                    double x = rayon_terre * Math.cos(latitude * (Math.PI / 180)) * Math.sin(longitude * (Math.PI / 180));
+
+                    Aeroport aeroport = new Aeroport(code, nom_ville, x, y, latitude, longitude);
+                    aeroports.add(aeroport);
+                    nb_aeroports++; // Incrémentation du compteur d'aéroports
+                } catch (NoSuchElementException | NumberFormatException | ExceptionOrientation e) {
+                    // Ignorer la ligne en cas d'erreur de format ou de conversion
+                    System.out.println("Ligne ignorée - erreur : " + e.getMessage());
+                    erreur++;
+                    if (erreur >= 20) {
+                        throw new IOException("Trop d'erreurs de format dans le fichier d'aéroports");
+                    }
+                    continue;
+                }
+            }
+        } catch (IOException e) {
+            // Propager l'exception IOException vers l'appelant
+            throw new IOException("Erreur de lecture du fichier d'aéroports", e);
         }
-        lecteur.close();
         return aeroports;
     }
-
-
-
-
-
-
 
     /**
      * Trouve un aéroport par son code.
@@ -248,7 +329,6 @@ public class Carte {
             System.out.println((i) + ". "+ files[i].getName());
         }
 
-
         int choix;
         while (true) {//Tant que l'utilisateur n'a pas entrée quelque chose de proposé, on boucle à l'infinie
             System.out.print("Veuillez saisir le numéro du fichier souhaité : ");
@@ -264,9 +344,7 @@ public class Carte {
                 scanner.next();
             }
         }
-
         return files[choix];
-
     }
 
     /**
@@ -278,17 +356,37 @@ public class Carte {
      */
     private ArrayList<Vol> LireVols() throws IOException, ExceptionNoFlight, InputMismatchException {
         ArrayList<Vol> vols = new ArrayList<>();
-        File nomfichier= ChoixVol();//le fichier est choisi grâce à la méthode ChoixVol()
-        BufferedReader lecteur = new BufferedReader(new FileReader(nomfichier));
-        String line;
-        while ((line = lecteur.readLine()) != null) {
-            Vol vol = LectureVol(line);
 
-            this.getGraph_vol().addNode(vol.code);//On met le code du vol en tant qu'id du noeud
-            vols.add(vol);
-            nb_vols++;//Incrémentation du compteur de vols
+        // Choix du fichier à partir de la méthode ChoixVol()
+        File nomfichier = ChoixVol();
+        try (BufferedReader lecteur = new BufferedReader(new FileReader(nomfichier))) {
+            String line;
+            boolean fichierVide = true; // Indicateur pour vérifier si le fichier est vide
+            while ((line = lecteur.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    // Si la ligne n'est pas vide, traiter le vol
+                    fichierVide = false;
+                    try {
+                        Vol vol = LectureVol(line);
+                        this.getGraph_vol().addNode(vol.getCode()); // Ajouter le code du vol en tant qu'ID du nœud
+                        vols.add(vol);
+                        nb_vols++; // Incrémenter le compteur de vols
+                    } catch (NoSuchElementException | NumberFormatException e) {
+                        System.err.println("Erreur de lecture - format incorrect : " + line);
+                    }
+                } else if (line.isEmpty() || line.isBlank()) {
+                    // Si la ligne est vide, ignorer et continuer
+                    System.err.println("Ligne vide ignorée.");
+                }
+            }
+            // Vérifier si le fichier est vide
+            if (fichierVide) {
+                throw new IOException("Le fichier de vols est vide : " + nomfichier.getName());
+            }
+        } catch (IOException e) {
+            // Propager l'exception IOException vers l'appelant
+            throw new IOException("Erreur de lecture du fichier de vols : " + nomfichier.getName(), e);
         }
-        lecteur.close();
         return vols;
     }
 
@@ -299,53 +397,41 @@ public class Carte {
      * @throws IOException en cas d'erreur de lecture de fichier.
      * @throws InputMismatchException en cas d'erreur de format du fichier.
      */
-    private ArrayList<Vol> LireVols(File fichier) throws IOException, ExceptionNoFlight, InputMismatchException {
+    public ArrayList<Vol> LireVols(File fichier) throws IOException, ExceptionNoFlight, InputMismatchException {
         ArrayList<Vol> vols = new ArrayList<>();
-        BufferedReader lecteur = new BufferedReader(new FileReader(fichier));
-        String line;
-        while ((line = lecteur.readLine()) != null) {
-            Vol vol = LectureVol(line);
 
-            this.getGraph_vol().addNode(vol.code);//On met le code du vol en tant qu'id du noeud
-            vols.add(vol);
-            nb_vols++;//Incrémentation du compteur de vols
+        try (BufferedReader lecteur = new BufferedReader(new FileReader(fichier))) {
+            String line;
+            boolean fichierVide = true; // Indicateur pour vérifier si le fichier est vide
+            while ((line = lecteur.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    System.out.println("HEHEHA");
+                    // Si la ligne n'est pas vide, traiter le vol
+                    fichierVide = false;
+                    try {
+                        Vol vol = LectureVol(line);
+                        this.getGraph_vol().addNode(vol.getCode()); // Ajouter le code du vol en tant qu'ID du nœud
+                        vols.add(vol);
+                        System.out.println(vol.getCode());
+                        nb_vols++; // Incrémenter le compteur de vols
+                    } catch (NoSuchElementException | NumberFormatException e) {
+                        System.err.println("Erreur de lecture - format incorrect : " + line);
+                    }
+                } else if (line.isEmpty() || line.isBlank()){
+                    // Si la ligne est vide, ignorer et continuer
+                    System.err.println("Ligne vide ignorée.");
+                }
+            }
+            // Vérifier si le fichier est vide
+            if (fichierVide) {
+                throw new IOException("Le fichier de vols est vide : " + fichier.getName());
+            }
+        } catch (IOException e) {
+            // Propager l'exception IOException vers l'appelant
+            throw new IOException("Erreur de lecture du fichier de vols : " + fichier.getName(), e);
         }
-        lecteur.close();
         return vols;
     }
-
-
-
-    /**
-     * Lit les vols à partir d'un fichier spécifique passé en paramètre et construit un graph avec les vols en tant qu'arrêtes et les aéroports en tant que noeuds.
-     * @param fichier Nom du fichier contenant les informations des vols.
-     * @return La liste des vols.
-     * @throws IOException en cas d'erreur de lecture de fichier.
-     * @throws InputMismatchException en cas d'erreur de format du fichier.
-     */
-    private ArrayList<Vol> LireVolsAsEdge(File fichier) throws IOException, ExceptionNoFlight, InputMismatchException {
-        ArrayList<Vol> vols = new ArrayList<>();
-        BufferedReader lecteur = new BufferedReader(new FileReader(fichier));
-        String line;
-        while ((line = lecteur.readLine()) != null) {
-            Vol vol = LectureVol(line);
-            Aeroport aeroport1 = vol.depart;
-            Aeroport aeroport2 = vol.arrivee;
-            if (this.getGraph_aeroport().getNode(aeroport1.getCode())==null){//Si le premier aéroport n'est pas déjà dans le graph, on l'ajoute
-                this.getGraph_aeroport().addNode(aeroport1.getCode());
-            }
-            if (this.getGraph_aeroport().getNode(aeroport2.getCode())==null){//Si le deuxième aéroport n'est pas déjà dans le graph, on l'ajoute
-                this.getGraph_aeroport().addNode(aeroport2.getCode());
-            }
-            if (this.getGraph_aeroport().getEdge(vol.getCode())==null){//Si le vol n'est pas déjà présent dans le graph on l'ajoute
-                this.getGraph_aeroport().addEdge(vol.getCode(), aeroport1.getCode(), aeroport2.getCode());
-            }
-            vols.add(vol);
-        }
-        lecteur.close();
-        return vols;
-    }
-
 
     /**
      * Lit un vol à partir d'une ligne de texte.
@@ -466,11 +552,9 @@ public class Carte {
     }
 
     /**
-     * Recherche les collisions potentielles entre les vols et les ajoute à une liste de collisions.
-     *
-     * @return Une liste de collisions potentielles entre les vols.
+     * Recherche les collisions potentielles entre les vols crée une arête quand une est trouvée.
      */
-    public ArrayList<Collision> RechercheCollision() {
+    public void RechercheCollision() {
         ArrayList<Collision> liste_collisions = new ArrayList<Collision>();
         Iterator<Vol> iterateur = this.liste_vols.iterator();
         while (iterateur.hasNext()) { // Itère sur chaque vol pour vérifier les collisions possibles
@@ -517,7 +601,5 @@ public class Carte {
                 }
             }
         }
-        return liste_collisions;
     }
-
 }

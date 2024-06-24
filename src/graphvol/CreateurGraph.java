@@ -1,33 +1,75 @@
 package graphvol;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static coloration.Couleur.getAdjacentNodes;
 import static java.lang.System.in;
 
+/**
+ * Class implémentant les graph à l'aide des fichiers graph-vol
+ */
 public class CreateurGraph {
+    /**
+     * Compteur utilisé pour le nommage des lignes pour le mode évaluation
+     */
     private static int numAfterNameFichierTxT = 0;
+
+    /**
+     * Graph créé.
+     */
     Graph graph;
 
+    /**
+     * Constructeur de CreateurGraph prenant un fichier en paramètre.
+     * @param fichier Le fichier à partir duquel le graphe est chargé.
+     * @throws IOException En cas de problème de lecture du fichier.
+     * @throws ExceptionFormatIncorrect Si le format du fichier est incorrect.
+     * @throws ExceptionLigneIncorrect Si une ligne du fichier est incorrecte.
+     */
     public CreateurGraph(File fichier) throws IOException, ExceptionFormatIncorrect, ExceptionLigneIncorrect {
         this.graph = ChargerGraphDepuisFichier(fichier);
     }
 
+    /**
+     * Constructeur par défaut de CreateurGraph chargeant un fichier par défaut.
+     * @throws IOException En cas de problème de lecture du fichier.
+     * @throws ExceptionFormatIncorrect Si le format du fichier est incorrect.
+     * @throws ExceptionLigneIncorrect Si une ligne du fichier est incorrecte.
+     */
     public CreateurGraph() throws IOException, ExceptionFormatIncorrect, ExceptionLigneIncorrect {
         this.graph = ChargerGraphDepuisFichier(new File("data/graph-test0.txt"));
     }
 
+    /**
+     * Retourne le graphe chargé.
+     * @return Le graphe.
+     */
     public Graph getGraph() {
         return graph;
     }
 
+    /**
+     * Permet à l'utilisateur de choisir un fichier de graphe parmi une liste de fichiers disponibles.
+     * @return Le fichier choisi.
+     * @throws ExceptionNoGraphVol Si aucun fichier de graphe n'est trouvé.
+     */
     public File ChoixGraph() throws ExceptionNoGraphVol {
         Scanner scanner = new Scanner(in);
         File repertoire = new File("data");//Dossier contenant tous les fichiers nécessaires
@@ -63,6 +105,14 @@ public class CreateurGraph {
         return files[choix];
     }
 
+    /**
+     * Charge un graphe à partir d'un fichier.
+     * @param fichier Le fichier à partir duquel le graphe est chargé.
+     * @return Le graphe chargé.
+     * @throws IOException En cas de problème de lecture du fichier.
+     * @throws ExceptionFormatIncorrect Si le format du fichier est incorrect.
+     * @throws ExceptionLigneIncorrect Si une ligne du fichier est incorrecte.
+     */
     public Graph ChargerGraphDepuisFichier(File fichier) throws IOException, ExceptionFormatIncorrect, ExceptionLigneIncorrect {
         Graph new_graph = new SingleGraph(fichier.getCanonicalPath());
 
@@ -115,33 +165,6 @@ public class CreateurGraph {
         }
 
         return new_graph;
-    }
-
-    public ArrayList<Graph> ChargerGraphsDepuisDossier(File dossier) throws IOException {
-        ArrayList<Graph> graphs = new ArrayList<>();
-
-        if (dossier.isDirectory()) {
-            File[] files = dossier.listFiles();
-
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) {
-                        try {
-                            Graph graph = ChargerGraphDepuisFichier(file);
-                            graphs.add(graph);
-                        } catch (IOException e) {
-                            throw new IOException();
-                        } catch (ExceptionFormatIncorrect | ExceptionLigneIncorrect e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            }
-        } else {
-            throw new IllegalArgumentException("Le chemin fourni n'est pas un dossier.");
-        }
-
-        return graphs;
     }
 
 
@@ -377,6 +400,21 @@ public class CreateurGraph {
 
         // Retourne les fichiers générés
         return txtFile;
+    }
+
+
+    /**
+     * Récupère les nœuds adjacents à un nœud
+     * @param node Nœud étudié
+     * @return Liste des nœuds adjecents au nœud étudié
+     */
+    public static List<Node> getAdjacentNodes(Node node) {
+        List<Node> adjacentNodes = new ArrayList<>();
+        for (Edge edge : node.getEachEdge()) {
+            Node oppositeNode = edge.getOpposite(node);
+            adjacentNodes.add(oppositeNode);
+        }
+        return adjacentNodes;
     }
 
     // Méthode pour compter et afficher les conflits

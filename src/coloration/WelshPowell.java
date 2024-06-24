@@ -1,15 +1,25 @@
 package coloration;
 
-import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static coloration.Couleur.getAdjacentNodes;
+import static graphvol.CreateurGraph.getAdjacentNodes;
 
+/**
+ * Class représentant l'algorithme de Welsh et Powell ainsi que différentes opérations liées
+ */
 public class WelshPowell {
+    /**
+     * Graph auquel on applique la coloration
+     */
     Graph graph;
+
+    /**
+     * Liste des noeuds du graph
+     */
     ArrayList<Node> noeuds = new ArrayList<>();
 
     public ArrayList<Node> getNoeuds() {
@@ -20,15 +30,22 @@ public class WelshPowell {
         return graph;
     }
 
+    /**
+     * Constructeur de la class
+     * @param graph Graph auquel on veut appliquer l'algorithme de Welsh & Powell
+     */
     public WelshPowell(Graph graph) {
         this.graph = graph;
         this.noeuds = new ArrayList<>();
-        // Implémente tous les noeuds du graph dans la liste
+        // Implémente tous les nœuds du graph dans la liste des noeuds
         for (Node node : graph) {
             this.noeuds.add(node);
         }
     }
 
+    /**
+     * Range les nœuds dans l'ordre décroissant de leurs degrée
+     */
     private void rangerNoeudsOrdreDecroissant() {
         for (int i = 1; i < noeuds.size(); i++) {
             Node key = noeuds.get(i);
@@ -56,6 +73,11 @@ public class WelshPowell {
         }
     }
 
+    /**
+     * Colorie le graph qui est en attribut
+     * @param kmax Nombre maximum de couleurs
+     * @return Tableau contenant la coloration effectuée, à chaque élément on a un entier représentant la couleur du nœud de l'indice
+     */
     public int[] colorierNoeudsWelsh(int kmax) {
         ArrayList<Integer> coloration = new ArrayList<>();
         // Range les nœuds dans l'ordre décroissant de degré
@@ -110,7 +132,11 @@ public class WelshPowell {
         return colorationtab;
     }
 
-    // Ajouter une couleur à la liste de comptage des couleurs
+    /**
+     * Ajoute une couleur à la liste des couleurs si elle n'existe pas déjà, ou incrémente le compteur si elle existe.
+     * @param colorCounts La liste des objets Couleur représentant les couleurs et leurs occurrences.
+     * @param color       La couleur à ajouter ou à incrémenter.
+     */
     private void ajoutColorCount(ArrayList<Couleur> colorCounts, String color) {
         for (Couleur cc : colorCounts) {
             if (cc.getCouleur().equals(color)) {
@@ -121,7 +147,13 @@ public class WelshPowell {
         colorCounts.add(new Couleur(color));
     }
 
-    // Trouver la couleur la moins utilisée
+
+    /**
+     * Trouve la couleur la moins utilisée dans la liste des couleurs.
+     *
+     * @param colorCounts La liste des objets Couleur représentant les couleurs et leurs occurrences.
+     * @return La couleur la moins utilisée sous forme de chaîne de caractères.
+     */
     private String trouveCouleurMini(ArrayList<Couleur> colorCounts) {
         String leastUsedColor = null;
         int minCount = Integer.MAX_VALUE;
@@ -134,7 +166,12 @@ public class WelshPowell {
         return leastUsedColor;
     }
 
-    // Fonction pour générer une couleur RGB basée sur un index
+    /**
+     * Génère une couleur RGB basée sur un index.
+     *
+     * @param index L'index utilisé pour générer la couleur.
+     * @return La couleur générée sous forme de chaîne de caractères au format "rgb(r,g,b)".
+     */
     private String generateColor(int index) {
         int r = ((index * 67) % 256);
         int g = ((index * 137) % 256);
@@ -143,7 +180,10 @@ public class WelshPowell {
     }
 
 
-
+    /**
+     * Compte le nombre de couleurs uniques utilisées dans le graph.
+     * @return Le nombre de couleurs uniques utilisées.
+     */
     public int CompteCouleurs(){
         int compte = 0;
         ArrayList<String> ListeCouleurs = new ArrayList<>();

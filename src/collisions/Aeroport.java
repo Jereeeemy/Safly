@@ -5,11 +5,34 @@ package collisions;
  * Classe représentant un aéroport avec son code, la ville où il est situé, et ses coordonnées.
  */
 public class Aeroport {
+    /**
+     * Code unique de l'Aéroport
+     */
     String code;
+
+    /**
+     * Ville où se situe l'Aéroport
+     */
     String ville;
+
+    /**
+     * 1re valeur des coordonnées cartésiennes de l'aéroport
+     */
     double x;
+
+    /**
+     * 2e valeur des coordonnées cartésiennes de l'aéroport
+     */
     double y;
+
+    /**
+     * 1re valeur des coordonnées géographiques de l'aéroport
+     */
     double longitude;
+
+    /**
+     * 2e valeur des coordonnées géographiques de l'aéroport
+     */
     double latitude;
 
     /**

@@ -1,14 +1,21 @@
 package applicationihm;
 
-import javax.swing.*;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
  * La classe GraphInfoTable gère un tableau affichant des informations sur un graphe.
  */
 public class GraphInfoTable {
-    private JTable tableauInfoGraphe; // Tableau pour afficher les informations du graphe
-    private DefaultTableModel model;  // Modèle de données pour le tableau
+    /**
+     * Tableau pour afficher les informations du graph
+     */
+    private JTable tableauInfoGraphe;
+
+    /**
+     * Modèle de données pour le tableau
+     */
+    private DefaultTableModel model;
 
     /**
      * Constructeur de la classe GraphInfoTable.

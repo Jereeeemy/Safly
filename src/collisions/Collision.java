@@ -4,7 +4,14 @@ package collisions;
  * Classe représentant une collision entre un vol et un autre.
  */
 public class Collision {
+    /**
+     * 1er vol entrant en collision
+     */
     Vol vol1;
+
+    /**
+     * 1er vol entrant en collision
+     */
     Vol vol2;
 
     /**

@@ -31,7 +31,6 @@ public class TestGraphVol {
         algowelsh.colorierNoeudsWelsh(kmax);
         int nb_conf = test.CompterConflits(test.getGraph());
         System.out.println(nb_conf);
-        //test.getGraph().display();
 
     }
 }
