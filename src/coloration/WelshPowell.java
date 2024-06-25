@@ -79,6 +79,9 @@ public class WelshPowell {
      * @return Tableau contenant la coloration effectuée, à chaque élément on a un entier représentant la couleur du nœud de l'indice
      */
     public int[] colorierNoeudsWelsh(int kmax) {
+        for (Node noeud : getGraph()){
+            noeud.removeAttribute("ui-style");
+        }
         ArrayList<Integer> coloration = new ArrayList<>();
         // Range les nœuds dans l'ordre décroissant de degré
         this.rangerNoeudsOrdreDecroissant();
