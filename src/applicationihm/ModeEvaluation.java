@@ -302,6 +302,7 @@ public class ModeEvaluation {
                             RLF rlf = new RLF(graphrlf.getGraph(),graphrlf.getGraph().getAttribute("kmax"));
                             rlf.colorGraph();
                             colorationrlf = rlf.getNodeColors();
+                            conflitrlf = graphrlf.CompterConflits(graphrlf.getGraph());
                         } catch (ExceptionLigneIncorrect | IOException | ExceptionFormatIncorrect ex) {
                             throw new RuntimeException(ex);
                         }

@@ -137,33 +137,4 @@ public class RLF {
         return nodeColors;
     }
 
-    public int countConflicts() {
-        int conflictCount = 0;
-        for (Node node : graph.getEachNode()) {
-            int nodeColor = nodeColors[node.getIndex()];
-            for (Edge edge : node.getEachEdge()) {
-                Node neighbor = edge.getOpposite(node);
-                int neighborColor = nodeColors[neighbor.getIndex()];
-                if (nodeColor == neighborColor) {
-                    conflictCount++;
-                }
-            }
-        }
-        // Chaque conflit est compté deux fois (une fois pour chaque nœud), donc diviser par 2
-        return conflictCount / 2;
-    }
-
-    public static void main(String[] args) throws ExceptionLigneIncorrect, IOException, ExceptionFormatIncorrect, ExceptionNoGraphVol {
-        Graph graph = new SingleGraph("Graph");
-
-        CreateurGraph CG = new CreateurGraph();
-        File fichier = CG.ChoixGraph();
-        graph = CG.ChargerGraphDepuisFichier(fichier);
-
-        RLF coloring = new RLF(graph, 5);
-        coloring.colorGraph();
-        int[] colors = coloring.getNodeColors();
-
-        System.out.println("Nombre de conflits : " + coloring.countConflicts());
-    }
 }
