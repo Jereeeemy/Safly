@@ -21,6 +21,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import coloration.DsaturAlgorithm;
+import coloration.RLF;
 import coloration.WelshPowell;
 import graphvol.CreateurGraph;
 import graphvol.ExceptionFormatIncorrect;
@@ -272,10 +273,13 @@ public class ModeEvaluation {
                     for (File fichier : fichiers_choisi_repertoire) {
                         int conflitwelsh = -1;
                         int conflitdsat = -1;
+                        int conflitrlf = -1;
                         int[] colorationdsat;
                         int[] colorationwelsh;
+                        int[] colorationrlf;
                         CreateurGraph graphwelsh;
                         CreateurGraph graphdsat;
+                        CreateurGraph graphrlf;
                         // Pour chaque fichier de graphe, effectue les 2 colorations et les met en resultats
                         try {
                             graphwelsh = new CreateurGraph(fichier);
@@ -293,13 +297,26 @@ public class ModeEvaluation {
                         } catch (IOException | ExceptionFormatIncorrect | ExceptionLigneIncorrect ex) {
                             throw new RuntimeException(ex);
                         }
+                        try {
+                            graphrlf = new CreateurGraph(fichier);
+                            RLF rlf = new RLF(graphrlf.getGraph(),graphrlf.getGraph().getAttribute("kmax"));
+                            rlf.colorGraph();
+                            colorationrlf = rlf.getNodeColors();
+                        } catch (ExceptionLigneIncorrect | IOException | ExceptionFormatIncorrect ex) {
+                            throw new RuntimeException(ex);
+                        }
                         // Ecrit les fichier de resultats csv et les txt de chaque graphe en fonction de la meilleure coloration obtenue
-                        if (conflitwelsh <= conflitdsat) {
+                        if (conflitwelsh <= conflitdsat && conflitwelsh<= conflitrlf) {
                             writeCSVFile(fichier.getName(), conflitwelsh, "7");
                             writeTxtFile(graphwelsh.getGraph(), colorationwelsh, "7");
-                        } else {
+                        }
+                        else if (conflitdsat <= conflitwelsh && conflitdsat<= conflitrlf) {
                             writeCSVFile(fichier.getName(), conflitdsat, "7");
                             writeTxtFile(graphdsat.getGraph(), colorationdsat, "7");
+                        }
+                        else{
+                            writeCSVFile(fichier.getName(), conflitrlf, "7");
+                            writeTxtFile(graphrlf.getGraph(), colorationrlf, "7");
                         }
                     }
                     try {

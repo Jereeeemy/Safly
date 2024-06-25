@@ -4,19 +4,27 @@ import graphvol.CreateurGraph;
 import graphvol.ExceptionFormatIncorrect;
 import graphvol.ExceptionLigneIncorrect;
 import graphvol.ExceptionNoGraphVol;
-import org.graphstream.graph.*;
-import org.graphstream.graph.implementations.*;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class GraphColoring {
+public class RLF {
     private Graph graph;
     private int kmax;
     private int[] nodeColors;
 
-    public GraphColoring(Graph graph, int kmax) {
+    public RLF(Graph graph, int kmax) {
         this.graph = graph;
         this.kmax = kmax;
         this.nodeColors = new int[graph.getNodeCount()];
@@ -152,7 +160,7 @@ public class GraphColoring {
         File fichier = CG.ChoixGraph();
         graph = CG.ChargerGraphDepuisFichier(fichier);
 
-        GraphColoring coloring = new GraphColoring(graph, 5);
+        RLF coloring = new RLF(graph, 5);
         coloring.colorGraph();
         int[] colors = coloring.getNodeColors();
 
