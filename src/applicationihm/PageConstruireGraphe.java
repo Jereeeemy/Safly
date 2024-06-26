@@ -69,11 +69,7 @@ import org.jxmapviewer.input.PanMouseInputListener;
 import org.jxmapviewer.input.ZoomMouseWheelListenerCenter;
 import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
-import org.jxmapviewer.viewer.DefaultTileFactory;
-import org.jxmapviewer.viewer.GeoPosition;
-import org.jxmapviewer.viewer.TileFactoryInfo;
-import org.jxmapviewer.viewer.DefaultWaypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
+import org.jxmapviewer.viewer.*;
 
 /**
  * Classe de l'application qui propose de construire un graphe d'intersection de vols et affiche une carte de ces vols en France
@@ -652,7 +648,7 @@ public class PageConstruireGraphe {
      */
     private JXMapViewer initMapViewer() {
         JXMapViewer mapViewer = new JXMapViewer();
-        TileFactoryInfo info = new TileFactoryInfo(5, 12, 11, 256, true, true,
+        TileFactoryInfo info = new TileFactoryInfo(1, 17, 11, 256, true, true,
                 "http://tile.openstreetmap.org", "x", "y", "z") {
             @Override
             public String getTileUrl(int x, int y, int zoom) {

@@ -1,6 +1,7 @@
 package applicationihm;
 
 import coloration.DsaturAlgorithm;
+import coloration.RLF;
 import coloration.WelshPowell;
 import graphvol.CreateurGraph;
 import org.graphstream.graph.Edge;
@@ -84,6 +85,11 @@ public class PageChargerGraphe {
      * Cette variable va permettre de stocker les résultats de couleur de Welsh&Powel
      */
     private int resultcolorWelsh[];
+
+    /**
+     * Cette variable va permettre de stocker les résultats de couleur de RLF
+     */
+    private int[] resultcolorRLF;
 
     /**
      * Fichier de sortie qui va contenir les informations de couleurs pour chaque sommet
@@ -194,6 +200,11 @@ public class PageChargerGraphe {
     private JRadioButton DsaturBouton;
 
     /**
+     * Bouton radio pour choisir l'algorithme de coloration RLF.
+     */
+    private JRadioButton RLFBouton;
+
+    /**
      * Bouton pour afficher le graphe dans une vue graphique.
      */
     private RoundedButton boutonAfficherGraphe;
@@ -207,6 +218,8 @@ public class PageChargerGraphe {
      * Tube de visionneuse pour interagir avec la vue du graphe.
      */
     private ViewerPipe viewerPipe;
+
+
 
     /**
      * Constructeur de la classe PageChargerGraphe.
@@ -290,7 +303,7 @@ public class PageChargerGraphe {
 
         // Ajouter une étiquette avec des instructions pour déposer un fichier de graphe
         JLabel labelDeposeFichier = new JLabel("<html><div style='text-align: left'> Pour charger un graphe,<br> veuillez d'abord fournir <br>les fichiers nécessaires</div></html>");
-        labelDeposeFichier.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+        labelDeposeFichier.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
         labelDeposeFichier.setFont(new Font("Lucida Sans",Font.PLAIN,20));
         centrePanel1.add(labelDeposeFichier);
 
@@ -308,6 +321,7 @@ public class PageChargerGraphe {
                 kmax = (int) spinnerKMax.getValue();
                 resultcolorDsat = null;
                 resultcolorWelsh = null;
+                resultcolorRLF = null;
             }
         });
 
@@ -326,6 +340,7 @@ public class PageChargerGraphe {
                         graphWelsh = new WelshPowell(graph.getGraph());
                         resultcolorWelsh=null;
                         resultcolorDsat=null;
+                        resultcolorRLF = null;
                         kmax = graph.getGraph().getAttribute("kmax");
                         spinnerKMax.setValue(kmax);
 
@@ -395,7 +410,7 @@ public class PageChargerGraphe {
 
         // Ajouter une étiquette principale avec des instructions
         JLabel labelChoixParam = new JLabel("<html><div style='text-align: left'> Après avoir chargé votre graphe,<br> vous pouvez personnaliser la <br>coloration du graphe : </div></html>");
-        labelChoixParam.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        labelChoixParam.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
         labelChoixParam.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
         centrePanel2.add(labelChoixParam, gbc);
 
@@ -419,9 +434,11 @@ public class PageChargerGraphe {
         ButtonGroup groupAlgos = new ButtonGroup();
         decoBoutonWelsh(); // methode pour decorer et instancier le bouton Welsh
         decoBoutonDsatur(); // methode pour decorer et instancier le bouton DSatur
+        decoBoutonRFL(); // methode pour decorer et instancier le bouton RFL
 
         groupAlgos.add(WelshBouton);
         groupAlgos.add(DsaturBouton);
+        groupAlgos.add(RLFBouton);
 
         // Ajouter une étiquette et un spinner pour le choix de K-max
         JLabel labelKmax = new JLabel("Choix de K-max :");
@@ -431,6 +448,7 @@ public class PageChargerGraphe {
 
         miniPanelCentral.add(WelshBouton);
         miniPanelCentral.add(DsaturBouton);
+        miniPanelCentral.add(RLFBouton);
         miniPanelCentral.add(labelKmax);
         miniPanelCentral.add(spinnerKMax);
 
@@ -567,6 +585,18 @@ public class PageChargerGraphe {
                         JOptionPane.showMessageDialog(panelCharger, "Une erreur inattendue s'est produite : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
                         e.printStackTrace(); // logger l'erreur plutôt que de l'afficher à l'utilisateur
                     }
+                } else if (RLFBouton.isSelected()) {
+                    try {
+                        // Utiliser le chemin complet pour enregistrer le fichier
+                        OutPuttxtFile = InfoscolorOneGraph(graph.getGraph(), chosenFilePath, resultcolorRLF);
+                        JOptionPane.showMessageDialog(panelCharger, "Fichier enregistré avec succès.");
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(panelCharger, "Erreur lors de l'enregistrement du fichier : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace(); // Vous pouvez choisir de logger l'erreur plutôt que de l'afficher à l'utilisateur
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(panelCharger, "Une erreur inattendue s'est produite : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace(); // logger l'erreur plutôt que de l'afficher à l'utilisateur
+                    }
                 }
             }
         } else {
@@ -671,6 +701,7 @@ public class PageChargerGraphe {
                 }
                 else if (DsaturBouton.isSelected()){
                     resultcolorWelsh = null;
+                    resultcolorRLF = null;
                     if (resultcolorDsat != null){
                         JOptionPane.showMessageDialog(panelCharger, "Coloration déjà effectuée avec cet algorithme !", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
@@ -682,6 +713,7 @@ public class PageChargerGraphe {
                 }
                 else if (WelshBouton.isSelected()) {
                     resultcolorDsat = null;
+                    resultcolorRLF = null;
                     if (resultcolorWelsh != null){
                         JOptionPane.showMessageDialog(panelCharger, "Coloration déjà effectuée avec cet algorithme !", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
@@ -690,6 +722,22 @@ public class PageChargerGraphe {
                         statGrapheWelsh();
                         updateTableData(noeuds, aretes, degre, composantes, diametre, nbConflit);
                     }
+                }
+                else if (RLFBouton.isSelected()){
+                    resultcolorDsat = null;
+                    resultcolorWelsh = null;
+                    if (resultcolorRLF != null){
+                        JOptionPane.showMessageDialog(panelCharger, "Coloration déjà effectuée avec cet algorithme !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        RLF rlf = new RLF(graph.getGraph(),graph.getGraph().getAttribute("kmax"));
+                        rlf.colorGraph();
+                        resultcolorRLF = rlf.getNodeColors();
+                        nbConflit = graph.CompterConflits(graph.getGraph());
+                        statGrapheWelsh();
+                        updateTableData(noeuds, aretes, degre, composantes, diametre, nbConflit);
+                    }
+
                 }
             }
             @Override
@@ -721,8 +769,8 @@ public class PageChargerGraphe {
         WelshBouton = new JRadioButton("Welsh & Powell");
         WelshBouton.setForeground(Color.WHITE);
         WelshBouton.setFocusable(false);
-        WelshBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
-        WelshBouton.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        WelshBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 18));
+        WelshBouton.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
         WelshBouton.setBackground(Color.decode("#696767"));
         WelshBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         WelshBouton.setSelected(true);
@@ -735,10 +783,23 @@ public class PageChargerGraphe {
         DsaturBouton = new JRadioButton("D-Satur");
         DsaturBouton.setForeground(Color.WHITE);
         DsaturBouton.setFocusable(false);
-        DsaturBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 20));
-        DsaturBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        DsaturBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 19));
+        DsaturBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         DsaturBouton.setBackground(Color.decode("#696767"));
         DsaturBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    /**
+     * Méthode pour définir les propriétés du bouton pour l'algorithme RFL.
+     */
+    private void decoBoutonRFL() {
+        RLFBouton = new JRadioButton("RFL");
+        RLFBouton.setForeground(Color.WHITE);
+        RLFBouton.setFocusable(false);
+        RLFBouton.setFont(new Font("Lucida Sans", Font.PLAIN, 18));
+        RLFBouton.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        RLFBouton.setBackground(Color.decode("#696767"));
+        RLFBouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     /**
@@ -763,13 +824,18 @@ public class PageChargerGraphe {
                     vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
                     ajouterGrapheListener(vue);
                 }
-                if (WelshBouton.isSelected()){
+                else if (WelshBouton.isSelected()){
                     vue = graphWelsh.getGraph().display();
                     viewerPipe = vue.newViewerPipe();
                     ajouterGrapheListener(vue);
                     vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
                 }
-
+                else if (RLFBouton.isSelected()){
+                    vue = graph.getGraph().display();
+                    viewerPipe = vue.newViewerPipe();
+                    vue.setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
+                    ajouterGrapheListener(vue);
+                }
             }
             @Override
             public void mousePressed(MouseEvent e) {
@@ -997,6 +1063,37 @@ public class PageChargerGraphe {
 
         //Récupère le nombre de conflit du graph
         nbConflit = graph.CompterConflits(graphWelsh.getGraph());
+    }
+
+    /**
+     * Calculer les statistiques du graphe pour l'algorithme RLF.
+     */
+    private void statGrapheRLF(){
+        noeuds = graph.getGraph().getNodeCount();
+        aretes = graph.getGraph().getEdgeCount();
+
+
+        // Calcul du degré moyen
+        double totalDegree = 0;
+        for (Node node : graph.getGraph()) {
+            totalDegree += node.getDegree();
+        }
+        degre = totalDegree / noeuds;
+
+        // Calcul des composantes connexes
+        Set<Node> visited = new HashSet<>();
+        composantes = 0;
+        for (Node node : graph.getGraph()) {
+            if (!visited.contains(node)) {
+                composantes++;
+                exploreComponent(node, visited);
+            }
+        }
+        // Calcul du diamètre du graphe
+        diametre = calculateDiameter(graph.getGraph());
+
+        //Récupère le nombre de conflit du graph
+        nbConflit = graph.CompterConflits(graph.getGraph());
     }
 
     /**
