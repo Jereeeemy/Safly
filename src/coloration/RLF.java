@@ -18,18 +18,45 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+/**
+ * La classe RLF (Recursive Largest First) implémente un algorithme de coloration de graphe.
+ */
 public class RLF {
+    /**
+     * Graph coloré
+     */
     private Graph graph;
+
+    /**
+     * Nombre maximum de couleurs différentes
+     */
     private int kmax;
+
+    /**
+     * Tableau contenant la coloration effectuée, à chaque élément on a un entier représentant la couleur du nœud de l'indice
+     */
     private int[] nodeColors;
 
+
+    /**
+     * Constructeur de la classe RLF.
+     *
+     * @param graph le graphe à colorier
+     * @param kmax  le nombre maximal de couleurs
+     */
     public RLF(Graph graph, int kmax) {
         this.graph = graph;
         this.kmax = kmax;
         this.nodeColors = new int[graph.getNodeCount()];
     }
 
+    public int[] getNodeColors() {
+        return nodeColors;
+    }
+
+    /**
+     * Colore le graphe en utilisant l'algorithme RLF.
+     */
     public void colorGraph() {
         // Initialisation des couleurs de tous les nœuds à -1 (non colorié)
         Arrays.fill(nodeColors, -1);
@@ -71,10 +98,24 @@ public class RLF {
         }
     }
 
+
+    /**
+     * Sélectionne le nœud avec le plus grand degré parmi les nœuds non colorés.
+     *
+     * @param uncoloredNodes la liste des nœuds non colorés
+     * @return le nœud avec le plus grand degré
+     */
     private Node selectNodeWithHighestDegree(List<Node> uncoloredNodes) {
         return Collections.max(uncoloredNodes, Comparator.comparingInt(Node::getDegree));
     }
 
+    /**
+     * Sélectionne le prochain nœud à colorier.
+     *
+     * @param currentColorGroup le groupe des nœuds colorés dans la phase courante
+     * @param uncoloredNodes    la liste des nœuds non colorés
+     * @return le prochain nœud à colorier, ou null s'il n'y a pas de nœud approprié
+     */
     private Node selectNextNode(Set<Node> currentColorGroup, List<Node> uncoloredNodes) {
         Node bestNode = null;
         int maxNonAdjacency = -1;
@@ -96,6 +137,12 @@ public class RLF {
         return bestNode;
     }
 
+    /**
+     * Sélectionne la meilleure couleur pour un nœud donné.
+     *
+     * @param node le nœud à colorier
+     * @return la meilleure couleur pour le nœud
+     */
     private int selectBestColorForNode(Node node) {
         int[] conflictCount = new int[kmax];
         Arrays.fill(conflictCount, 0);
@@ -120,11 +167,23 @@ public class RLF {
         return bestColor;
     }
 
+    /**
+     * Colore un nœud avec une couleur spécifiée.
+     *
+     * @param node  le nœud à colorier
+     * @param color la couleur à utiliser
+     */
     private void colorNode(Node node, int color) {
         nodeColors[node.getIndex()] = color;
         node.setAttribute("ui.style", "fill-color: rgb(" + getColorRGB(color) + ");");
     }
 
+    /**
+     * Génère une couleur RGB pour une couleur donnée.
+     *
+     * @param color la couleur à convertir en RGB
+     * @return la chaîne RGB correspondante
+     */
     private String getColorRGB(int color) {
         // Générer des couleurs différentes pour chaque entier de 0 à kmax-1
         int r = (color * 70) % 256;
@@ -133,8 +192,6 @@ public class RLF {
         return r + "," + g + "," + b;
     }
 
-    public int[] getNodeColors() {
-        return nodeColors;
-    }
+
 
 }

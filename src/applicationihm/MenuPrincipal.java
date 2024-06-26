@@ -53,6 +53,10 @@ public class MenuPrincipal extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
 
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/logo.png"));
+        Image logo = logoIcon.getImage();
+        this.setIconImage(logo);
+
         // Chargement l'image de fond, met en place un fond d'acran gris si l'image n'est pas trouvée
         try {
             background = new ImageIcon(Objects.requireNonNull(getClass().getResource("/background1.png"))).getImage();
