@@ -22,6 +22,7 @@ public class WelshPowell {
      */
     private ArrayList<Node> noeuds = new ArrayList<>();
 
+
     public ArrayList<Node> getNoeuds() {
         return noeuds;
     }

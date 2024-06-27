@@ -11,7 +11,10 @@ import java.awt.geom.RoundRectangle2D;
  * La classe RoundedButton est une extension de JButton qui permet de dessiner un bouton avec des coins arrondis.
  */
 public class RoundedButton extends JButton {
-    private int cornerRadius; // Rayon des coins arrondis
+    /**
+     * Raypn des coins arrondis
+     */
+    private int cornerRadius;
 
     /**
      * Constructeur de la classe RoundedButton.
